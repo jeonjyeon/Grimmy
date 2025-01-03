@@ -1,4 +1,4 @@
-# Grimmy
+# 그리미 Grimmy🎨
 
 ## 1. Code 컨벤션
 **<Layout>**
