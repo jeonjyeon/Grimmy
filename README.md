@@ -43,9 +43,11 @@ img_banner
 
 + 필요한 라이브러리는 추가 후 추가 목적 주석으로 작성.
 
+
 ## 2. Branch 전략
 **<Branch 전략>**
 - 개발자별로 Branch 이름 정함.
+
 
 ## 3. Commit 컨벤션
 **<Commit 컨벤션>**
@@ -54,3 +56,16 @@ img_banner
 (EX)
 [activity_login] 로그인 화면 구현
 [LoginActivity.kt] 로그인 기능 구현
+
+
+## 4. Android Studio 환경 설정
+**<Android Studio 버전>**
+- Ladybug
+
+**<targetSDK, minSDK 버전>**
+- targetSDK: 34
+- minSDK: 24
+
+**<테스트 방식>**
+- 처음 화면 구성 및 기초 기능 구현 시 IDE 내 Emulator로 테스트
+- api 연동 후, 어느정도 앱이 완성되었을 때 실제 디바이스로 테스트트
