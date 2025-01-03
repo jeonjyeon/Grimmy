@@ -1,7 +1,7 @@
 # 그리미 Grimmy🎨
 
 ## 1. Code 컨벤션
-**<Layout>**
+****<Layout>****
 - activity_ : Activity에 사용되는 layout
 - fragment_ : Fragment에 사용되는 layout
 - dialog_ : Dialog에 사용되눈 layout
