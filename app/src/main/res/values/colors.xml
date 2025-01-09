@@ -2,4 +2,29 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+<!--    Main Colors-->
+    <color name="main_color">#FF6E1D</color>
+    <color name="subtle_color">#FF9E59</color>
+    <color name="darker">#0F0F0F</color>
+    <color name="subtle">#212123</color>
+    <color name="lighter">#616161</color>
+
+<!--    Font Colors-->
+    <color name="font1">#222222</color>
+    <color name="font2">#616161</color>
+    <color name="font3">#9E9E9E</color>
+    <color name="font4">#BDBDBD</color>
+
+<!--    Gray Colors-->
+    <color name="gray1">#0F0F0F</color>
+    <color name="gray2">#202020</color>
+    <color name="gray3">#787272</color>
+    <color name="gray4">#8C8C8C</color>
+    <color name="gray5">#A29C9C</color>
+    <color name="gray6">#CBC7C6</color>
+    <color name="gray7">#D9D9D9</color>
+    <color name="gray8">#E7E6E4</color>
+    <color name="gray9">#F1EFEE</color>
+    <color name="gray10">#F9F9F9</color>
 </resources>
