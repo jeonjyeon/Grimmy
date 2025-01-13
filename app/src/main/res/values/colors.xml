@@ -9,6 +9,7 @@
     <color name="darker">#0F0F0F</color>
     <color name="subtle">#212123</color>
     <color name="lighter">#616161</color>
+    <color name="box_color">#212123</color>
 
 <!--    Font Colors-->
     <color name="font1">#222222</color>

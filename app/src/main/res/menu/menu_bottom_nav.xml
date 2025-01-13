@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fragment_schedule"
+        android:title="스케줄"
+        android:icon="@drawable/ic_schedule"/>
+    <item
+        android:id="@+id/fragment_goal"
+        android:title="목표"
+        android:icon="@drawable/ic_goal"/>
+    <item
+        android:id="@+id/fragment_home"
+        android:title="홈"
+        android:icon="@drawable/ic_home"/>
+    <item
+        android:id="@+id/fragment_report"
+        android:title="기록"
+        android:icon="@drawable/ic_report"/>
+    <item
+        android:id="@+id/fragment_mypage"
+        android:title="MY"
+        android:icon="@drawable/ic_mypage"/>
+</menu>
