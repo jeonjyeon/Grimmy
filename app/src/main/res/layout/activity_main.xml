@@ -24,7 +24,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/menu_bottom_nav"
         app:labelVisibilityMode="labeled"
-        app:itemTextColor="@color/font2"
-        app:itemIconTint="@color/font2"/>
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:itemBackground="@null"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
