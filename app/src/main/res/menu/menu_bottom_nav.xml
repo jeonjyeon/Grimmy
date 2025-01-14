@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/fragment_schedule"
         android:title="스케줄"
-        android:icon="@drawable/ic_schedule"/>
+        android:icon="@drawable/ic_schedule"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_goal"
         android:title="목표"
-        android:icon="@drawable/ic_goal"/>
+        android:icon="@drawable/ic_goal"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_home"
         android:title="홈"
-        android:icon="@drawable/ic_home"/>
+        android:icon="@drawable/ic_home"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
     <item
         android:id="@+id/fragment_report"
         android:title="기록"
-        android:icon="@drawable/ic_report"/>
+        android:icon="@drawable/ic_report"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_mypage"
         android:title="MY"
-        android:icon="@drawable/ic_mypage"/>
+        android:icon="@drawable/ic_mypage"
+        app:showAsAction="always"/>
 </menu>
