@@ -51,65 +51,101 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:columnCount="3"
+        android:rowCount="2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/identity_title_tv"
-        app:layout_constraintBottom_toBottomOf="@id/identity_next_btn_iv"
-        android:columnCount="3"
+        app:layout_constraintTop_toBottomOf="@id/identity_title_tv"
+        app:layout_constraintBottom_toTopOf="@id/identity_next_btn_tv"
         android:useDefaultMargins="true"
         >
 
-        <ImageView
-            android:id="@+id/identity_ele_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_elementary_school_student"
+        <TextView
+            android:id="@+id/identity_ele_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:text="초등학생"
+            android:textColor="@color/font3"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_circle"
             />
 
-        <ImageView
-            android:id="@+id/identity_middle_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_middle_school_student"
+        <TextView
+            android:id="@+id/identity_middle_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:text="중학생"
+            android:textColor="@color/font3"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_circle"
             />
 
-        <ImageView
-            android:id="@+id/identity_high_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_high_school_student"
+        <TextView
+            android:id="@+id/identity_high_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:text="고등학생"
+            android:textColor="@color/font3"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_circle"
+            />
+        <TextView
+            android:id="@+id/identity_qual_exam_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:text="검정고시"
+            android:textColor="@color/font3"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_circle"
+            />
+        <TextView
+            android:id="@+id/identity_n_repeat_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:text="N수생"
+            android:textColor="@color/font3"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_circle"
             />
 
-        <ImageView
-            android:id="@+id/identity_qual_exam_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_qualification_examination"
-            />
-
-        <ImageView
-            android:id="@+id/identity_n_repeat_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_n_repeat_examinee"
-            />
-
-        <ImageView
-            android:id="@+id/identity_adult_btn_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_adult"
-            />
+        <TextView
+            android:id="@+id/identity_adult_btn_tv"
+            android:width="122dp"
+            android:height="122dp"
+            android:background="@drawable/bg_circle"
+            android:fontFamily="@font/pretendard_medium"
+            android:gravity="center"
+            android:text="성인"
+            android:textColor="@color/font3"
+            android:textSize="18sp" />
     </GridLayout>
 
-    <ImageView
-        android:id="@+id/identity_next_btn_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/btn_next_off"
+    <TextView
+        android:id="@+id/identity_next_btn_tv"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="다음"
+        android:textColor="@color/white"
+        android:fontFamily="@font/pretendard_semi_bold"
+        android:textSize="20sp"
+        android:background="@drawable/bg_color_off"
+        android:gravity="center"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="40dp"
         />
 
