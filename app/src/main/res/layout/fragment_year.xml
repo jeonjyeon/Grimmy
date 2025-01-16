@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darker"
-    tools:context=".NicknameFragment">
+    tools:context=".YearFragment">
 
     <TextView
-        android:id="@+id/nickname_page_count_tv"
+        android:id="@+id/year_page_count_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1/4"
+        android:text="2/4"
         android:fontFamily="@font/pretendard_bold"
         android:textSize="24sp"
         android:textColor="@color/gray3"
@@ -22,10 +22,10 @@
         />
 
     <TextView
-        android:id="@+id/nickname_title_tv"
+        android:id="@+id/year_nickname_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="가입을 축하드려요!\n닉네임을 설정해 주세요"
+        android:text="ㅇㅇㅇ님의"
         android:fontFamily="@font/pretendard_bold"
         android:textColor="@color/white"
         android:textSize="28sp"
@@ -35,38 +35,32 @@
         android:layout_marginTop="124dp"
         />
 
-    <EditText
-        android:id="@+id/nickname_nickname_et"
+    <TextView
+        android:id="@+id/year_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="5글자 내로 입력해 주세요"
-        android:textColorHint="@color/gray3"
-        android:maxLength="5"
-        android:fontFamily="@font/pretendard_semi_bold"
+        android:text="출생년도를 알려주세요"
+        android:fontFamily="@font/pretendard_bold"
         android:textColor="@color/white"
-        android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nickname_title_tv"
-        app:layout_constraintBottom_toTopOf="@id/nickname_next_btn_iv"
-        android:layout_marginStart="20dp"
+        android:textSize="28sp"
+        app:layout_constraintStart_toStartOf="@id/year_nickname_tv"
+        app:layout_constraintTop_toBottomOf="@id/year_nickname_tv"
         />
 
-    <TextView
-        android:id="@+id/nickname_nickname_count_tv"
-        android:layout_width="wrap_content"
+    <NumberPicker
+        android:id="@+id/year_picker_np"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0/5"
-        android:fontFamily="@font/pretendard_semi_bold"
-        android:textColor="@color/gray3"
-        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/nickname_nickname_et"
-        app:layout_constraintBottom_toBottomOf="@id/nickname_nickname_et"
+        app:layout_constraintTop_toTopOf="@id/year_title_tv"
+        app:layout_constraintBottom_toBottomOf="@id/year_next_btn_iv"
+        android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         />
 
     <ImageView
-        android:id="@+id/nickname_next_btn_iv"
+        android:id="@+id/year_next_btn_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/btn_next_off"

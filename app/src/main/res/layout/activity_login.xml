@@ -44,22 +44,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/login_subtitle_tv"
-        app:layout_constraintBottom_toTopOf="@id/login_kakao_iv"
+        app:layout_constraintBottom_toTopOf="@id/login_kakao_btn_iv"
         />
 
     <ImageView
-        android:id="@+id/login_kakao_iv"
+        android:id="@+id/login_kakao_btn_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/btn_kakao_login"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/login_naver_iv"
+        app:layout_constraintBottom_toTopOf="@id/login_naver_btn_iv"
         android:layout_marginBottom="20dp"
         />
 
     <ImageView
-        android:id="@+id/login_naver_iv"
+        android:id="@+id/login_naver_btn_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/btn_naver_login"
