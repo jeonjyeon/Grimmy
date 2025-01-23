@@ -72,7 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="다음"
-        android:textColor="@color/white"
+        android:textColor="@color/gray8"
         android:fontFamily="@font/pretendard_semi_bold"
         android:textSize="20sp"
         android:background="@drawable/bg_color_off"
