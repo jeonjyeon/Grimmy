@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darker"
-    tools:context=".IdentityFragment">
+    tools:context=".StudentStatusFragment">
 
     <TextView
         android:id="@+id/identity_page_count_tv"
