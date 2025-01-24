@@ -35,23 +35,60 @@
         android:layout_marginTop="124dp"
         />
 
-    <EditText
-        android:id="@+id/nickname_nickname_et"
+    <LinearLayout
+        android:id="@+id/nickname_input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="5글자 내로 입력해 주세요"
-        android:textColorHint="@color/gray3"
-        android:maxLength="5"
-        android:fontFamily="@font/pretendard_semi_bold"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/nickname_nickname_count_tv"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/nickname_title_tv"
         app:layout_constraintBottom_toTopOf="@id/nickname_next_btn_tv"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/nickname_nickname_count_tv"
+        android:layout_marginStart="20dp">
+
+        <EditText
+            android:id="@+id/nickname_nickname_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="5글자 내로 입력해 주세요"
+            android:textColorHint="@color/gray3"
+            android:maxLength="5"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:layout_marginEnd="20dp"
+            />
+
+        <TextView
+            android:id="@+id/nickname_guide_sentence_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="닉네임에는 공백을 포함할 수 없습니다."
+            android:fontFamily="@font/pretendard_medium"
+            android:textColor="@color/gray3"
+            android:textSize="12sp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            />
+
+    </LinearLayout>
+<!--    <EditText-->
+<!--        android:id="@+id/nickname_nickname_et"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="5글자 내로 입력해 주세요"-->
+<!--        android:textColorHint="@color/gray3"-->
+<!--        android:maxLength="5"-->
+<!--        android:fontFamily="@font/pretendard_semi_bold"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="22sp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/nickname_nickname_count_tv"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/nickname_title_tv"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/nickname_next_btn_tv"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        />-->
 
     <TextView
         android:id="@+id/nickname_nickname_count_tv"
@@ -62,10 +99,24 @@
         android:textColor="@color/gray3"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/nickname_nickname_et"
-        app:layout_constraintBottom_toBottomOf="@id/nickname_nickname_et"
+        app:layout_constraintTop_toTopOf="@id/nickname_input_layout"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         />
+
+<!--    <TextView-->
+<!--        android:id="@+id/nickname_guide_sentence_tv"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="공백이 포함되지 않아야 합니다."-->
+<!--        android:fontFamily="@font/pretendard_medium"-->
+<!--        android:textColor="@color/gray3"-->
+<!--        app:layout_constraintStart_toStartOf="@id/nickname_nickname_et"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/nickname_nickname_et"-->
+<!--        android:layout_marginTop="5dp"-->
+<!--        android:layout_marginStart="5dp"-->
+
+<!--        />-->
 
     <TextView
         android:id="@+id/nickname_next_btn_tv"
