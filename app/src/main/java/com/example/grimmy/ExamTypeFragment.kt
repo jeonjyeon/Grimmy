@@ -13,10 +13,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [IdentityFragment.newInstance] factory method to
+ * Use the [ExamTypeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class IdentityFragment : Fragment() {
+class ExamTypeFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -34,7 +34,7 @@ class IdentityFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_identity, container, false)
+        return inflater.inflate(R.layout.fragment_exam_type, container, false)
     }
 
     companion object {
@@ -44,12 +44,12 @@ class IdentityFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment IdentityFragment.
+         * @return A new instance of fragment TypeFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            IdentityFragment().apply {
+            ExamTypeFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
