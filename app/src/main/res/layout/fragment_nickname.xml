@@ -36,7 +36,7 @@
         />
 
     <LinearLayout
-        android:id="@+id/nickname_input_layout"
+        android:id="@+id/nickname_input_ll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -83,7 +83,7 @@
         android:textColor="@color/gray3"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/nickname_input_layout"
+        app:layout_constraintTop_toTopOf="@id/nickname_input_ll"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
 
