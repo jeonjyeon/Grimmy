@@ -51,6 +51,7 @@
         android:id="@+id/year_picker_np"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:theme="@style/NumberPickerStyle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/year_title_tv"
