@@ -21,9 +21,9 @@ class NicknameFragment : Fragment() {
     private val nicknameRegex = "^[가-힣a-zA-Z0-9]+\$".toRegex() // 닉네임으로 허용되는 문자
     private val maxLength = 5 // 닉네임 최대 길이
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -38,7 +38,8 @@ class NicknameFragment : Fragment() {
 
         // 초기 글자 수 카운트 0/5 설정
         updateCharCount(0)
-        setInitialButtonState()
+        nextTextView.isEnabled = false
+//        setInitialButtonState()
         showGuideMessage("한글, 영문, 숫자만 입력해 주세요.")
 
         // EditText에 입력된 텍스트를 감지
@@ -54,7 +55,7 @@ class NicknameFragment : Fragment() {
                 // 입력된 닉네임이 없는 경우
                 if (nickname.isEmpty()) {
                     showGuideMessage("한글, 영문, 숫자만 입력해 주세요.")
-                    setInitialButtonState()
+//                    setInitialButtonState()
                     return
                 }
 
@@ -79,10 +80,10 @@ class NicknameFragment : Fragment() {
     }
 
     // 다음 버튼 초기 설정
-    private fun setInitialButtonState() {
-        nextTextView.setBackgroundResource(R.drawable.bg_color_off)
-        nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
-    }
+//    private fun setInitialButtonState() {
+//        nextTextView.setBackgroundResource(R.drawable.bg_color_off)
+//        nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
+//    }
 
     // 글자 수 카운트 업데이트
     private fun updateCharCount(currentLength: Int) {
@@ -102,10 +103,12 @@ class NicknameFragment : Fragment() {
 
     private fun validateNickname(nickname: String) {
         if (!isValidNickname(nickname)) {
+            nextTextView.isEnabled = false
             nextTextView.setBackgroundResource(R.drawable.bg_color_off)
             nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
             showGuideMessage("초성, 공백, 특수문자는 포함할 수 없습니다.")
         } else {
+            nextTextView.isEnabled = true
             nextTextView.setBackgroundResource(R.drawable.bg_color_on)
             nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             showGuideMessage("사용 가능한 닉네임입니다.")

@@ -5,55 +5,61 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [BirthYearFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class BirthYearFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var yearPicker: NumberPicker
+    private lateinit var nextTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_brith_year, container, false)
+        val view = inflater.inflate(R.layout.fragment_brith_year, container, false)
+
+        // UI 요소 초기화
+        yearPicker = view.findViewById(R.id.year_picker_np)
+        nextTextView = view.findViewById(R.id.year_next_btn_tv)
+
+        // NumberPicker 설정
+        setupNumberPicker()
+//        setInitialButtonState()
+
+        // 초기 상태에서 TextView 비활성화
+        nextTextView.isEnabled = false
+        nextTextView.alpha = 0.5f // 비활성화된 상태의 시각적 표현
+
+        // NumberPicker 값 변경 리스너 설정
+        yearPicker.setOnValueChangedListener { _, _, _ ->
+            nextTextView.isEnabled = true
+            nextTextView.alpha = 1.0f // 활성화된 상태의 시각적 표현
+            nextTextView.setBackgroundResource(R.drawable.bg_color_on)
+            nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+        }
+
+        // TextView 클릭 이벤트 처리
+        nextTextView.setOnClickListener {
+            (activity as OnboardingActivity).viewPager.currentItem += 1
+        }
+
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment YearFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BirthYearFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+//    // 다음 버튼 초기 설정
+//    private fun setInitialButtonState() {
+//        nextTextView.setBackgroundResource(R.drawable.bg_color_off)
+//        nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
+//    }
+
+    private fun setupNumberPicker() {
+        val currentYear = 2025 // 현재 연도를 가져올 수 있도록 수정 가능
+        yearPicker.minValue = 1950 // 최소값
+        yearPicker.maxValue = currentYear // 최대값
+        yearPicker.value = currentYear // 기본값-
     }
+
 }

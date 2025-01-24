@@ -11,9 +11,9 @@ class OnboardingPagerAdapter (activity: FragmentActivity) : FragmentStateAdapter
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> NicknameFragment()
-            1 -> YearFragment()
-            2 -> IdentityFragment()
-            3 -> TypeFragment()
+            1 -> BirthYearFragment()
+            2 -> StudentStatusFragment()
+            3 -> ExamTypeFragment()
             else -> throw IllegalStateException("Unexpected position: $position")
         }
     }
