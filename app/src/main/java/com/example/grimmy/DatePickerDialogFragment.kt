@@ -2,6 +2,7 @@ package com.example.grimmy
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,11 +14,17 @@ import java.util.Calendar
 
 class DatePickerDialogFragment : DialogFragment() {
 
-    private lateinit var binding : DialogDatePickerBinding
+    interface OnDateSelectedListener {
+        fun onDateSelected(year: Int, month: Int)
+    }
+
+    var listener: OnDateSelectedListener? = null
+
+    private lateinit var binding: DialogDatePickerBinding
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
         binding = DialogDatePickerBinding.inflate(layoutInflater)
+        val dialog = Dialog(requireContext())
         dialog.setContentView(binding.root)
 
         setupNumberPickers()
@@ -25,7 +32,7 @@ class DatePickerDialogFragment : DialogFragment() {
         binding.datePickerOkBtnTv.setOnClickListener {
             val year = binding.datePickerYearNp.value
             val month = binding.datePickerMonthNp.value
-            handleDateSelected(year,month)
+            listener?.onDateSelected(year, month)
             dismiss()
         }
         binding.datePickerCancelBtnTv.setOnClickListener {
@@ -45,12 +52,7 @@ class DatePickerDialogFragment : DialogFragment() {
             minValue = 1
             maxValue = 12
             value = Calendar.getInstance().get(Calendar.MONTH) + 1
-            displayedValues = arrayOf("1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
+            displayedValues = arrayOf("1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월")
         }
     }
-
-    private fun handleDateSelected(year:Int,month:Int) {
-        // api연동 시 선택된 달의 달력 띄우기
-    }
-
 }
