@@ -45,8 +45,6 @@ class BirthYearFragment : Fragment() {
         nextTextView.setOnClickListener {
             (activity as OnboardingActivity).viewPager.currentItem += 1
         }
-
-
         return view
     }
 
@@ -61,7 +59,9 @@ class BirthYearFragment : Fragment() {
         val studentBirthYear = currentYear - 18 // 현재 연도를 가져올 수 있도록 수정 가능
         yearPicker.minValue = currentYear - 50 // 최소값
         yearPicker.maxValue = currentYear // 최대값: 현재 연도
-        yearPicker.value = studentBirthYear // 기본값: 고3 수험생 출생년도
+        yearPicker.value = currentYear //기본값: 현재 연도
+//        yearPicker.maxValue = currentYear // 최대값: 현재 연도
+//        yearPicker.value = studentBirthYear // 기본값: 고3 수험생 출생년도
     }
 
 }
