@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".HomeWeeklyFragment"
+    android:background="@color/darker">
+
+    <LinearLayout
+        android:id="@+id/weekly_datepicker_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="27dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/weekly_datepicker_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="날짜선택"
+            android:textSize="22sp"
+            android:textColor="@color/gray8"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/monthly_datepicker_icon_iv"
+            android:layout_width="12dp"
+            android:layout_height="8dp"
+            android:src="@drawable/ic_date_picker"
+            android:layout_marginStart="10dp"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/monthly_toggle_btn_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_toggle_left"
+        app:layout_constraintTop_toTopOf="@id/weekly_datepicker_ll"
+        app:layout_constraintBottom_toBottomOf="@id/weekly_datepicker_ll"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
