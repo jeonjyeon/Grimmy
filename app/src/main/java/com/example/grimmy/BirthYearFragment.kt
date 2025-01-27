@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.icu.util.Calendar
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -56,10 +57,11 @@ class BirthYearFragment : Fragment() {
 //    }
 
     private fun setupNumberPicker() {
-        val currentYear = 2025 // 현재 연도를 가져올 수 있도록 수정 가능
-        yearPicker.minValue = 1950 // 최소값
-        yearPicker.maxValue = currentYear // 최대값
-        yearPicker.value = currentYear // 기본값-
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR) // 현재 연도
+        val studentBirthYear = currentYear - 18 // 현재 연도를 가져올 수 있도록 수정 가능
+        yearPicker.minValue = currentYear - 50 // 최소값
+        yearPicker.maxValue = currentYear // 최대값: 현재 연도
+        yearPicker.value = studentBirthYear // 기본값: 고3 수험생 출생년도
     }
 
 }
