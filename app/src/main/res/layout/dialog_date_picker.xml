@@ -25,13 +25,17 @@
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/date_picker_title_tv"
-        android:layout_marginTop="27dp">
+        android:layout_marginTop="17dp">
 
         <NumberPicker
             android:id="@+id/date_picker_year_np"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
+
+        <Space
+            android:layout_width="34dp"
+            android:layout_height="0dp"/>
 
         <NumberPicker
             android:id="@+id/date_picker_month_np"
@@ -54,6 +58,14 @@
         android:layout_marginTop="31dp"
         app:layout_constraintTop_toBottomOf="@id/date_picker_ll"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_space"/>
+
+    <Space
+        android:id="@+id/btn_space"
+        android:layout_width="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/date_picker_ok_btn_tv"
+        app:layout_constraintStart_toEndOf="@id/date_picker_cancel_btn_tv"
         app:layout_constraintEnd_toStartOf="@id/date_picker_ok_btn_tv"/>
 
     <TextView
@@ -68,7 +80,7 @@
         android:paddingVertical="18dp"
         android:layout_marginTop="31dp"
         app:layout_constraintTop_toBottomOf="@id/date_picker_ll"
-        app:layout_constraintStart_toEndOf="@id/date_picker_cancel_btn_tv"
+        app:layout_constraintStart_toEndOf="@id/btn_space"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

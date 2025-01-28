@@ -34,5 +34,20 @@
             android:layout_marginStart="10dp"/>
 
     </LinearLayout>
+    
+    <GridLayout
+        android:id="@+id/monthly_calendar_gl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="20dp"
+        android:alignmentMode="alignMargins"
+        android:columnCount="7"
+        android:foregroundGravity="center"
+        app:layout_constraintTop_toBottomOf="@id/monthly_datepicker_ll"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
