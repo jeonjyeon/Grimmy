@@ -141,13 +141,12 @@
     <ScrollView
         android:id="@+id/schedule_timetable_sv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/schedule_timetable_title_ll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="125dp"
         >
 
         <!-- 시간표 그리드 -->
@@ -521,5 +520,131 @@
                 android:tag="friday1300"/>
         </GridLayout>
     </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/schedule_class_add_cl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:visibility="gone"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dialog_add_class_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="20dp"
+            android:background="@color/darker"
+            >
+
+            <TextView
+                android:id="@+id/schedule_class_add_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="+ 수업 추가"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:textColor="@color/font4"
+                android:textSize="18sp"
+                android:background="@drawable/bg_bottom_border"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/schedule_class_add_ok_tv"
+                android:layout_width="70dp"
+                android:layout_height="45dp"
+                android:text="완료"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:background="@drawable/bg_ok_btn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/dialog_add_class_ll"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="273dp"
+            android:padding="20dp"
+            android:background="@color/box_color"
+            >
+            <EditText
+                android:id="@+id/dialog_class_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="수업명"
+                android:background="@drawable/bg_box_border"
+                android:textColor="@color/font3"
+                android:textColorHint="@color/font3"
+                android:fontFamily="@font/pretendard_medium"
+                android:textSize="18sp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="10dp"
+                />
+
+            <EditText
+                android:id="@+id/class_place_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="장소"
+                android:background="@drawable/bg_box_border"
+                android:textColor="@color/font3"
+                android:textColorHint="@color/font3"
+                android:fontFamily="@font/pretendard_medium"
+                android:textSize="18sp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="20dp"
+                />
+
+
+            <Spinner
+                android:id="@+id/class_day_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_box_border"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="20dp"
+                />
+
+
+            <TextView
+                android:id="@+id/add_class_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="+ 추가 수업 등록"
+                android:textColor="@color/font3"
+                android:background="@drawable/bg_bottom_border"
+                android:layout_marginTop="20dp"
+                />
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
