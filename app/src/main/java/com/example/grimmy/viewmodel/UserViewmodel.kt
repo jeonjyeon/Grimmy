@@ -19,8 +19,8 @@ class UserViewModel : ViewModel() {
 //    }
 
     // 사용자 정보 설정
-    fun setUser(nickname: String?, birthYear: String?, studentStatus: String?, examType: String?) {
-        val currentUser = _user.value ?: User("", "", "", "")
+    fun setUser(nickname: String?, birthYear: String?, studentStatus: String?, examType: List<String>?) {
+        val currentUser = _user.value ?: User("", "", "", listOf())
         _user.value = currentUser.copy(
             nickname = nickname ?: currentUser.nickname,
             birthYear = birthYear ?: currentUser.birthYear,
@@ -49,7 +49,7 @@ class UserViewModel : ViewModel() {
 
     }
 
-    fun setExamType(examType: String) {
+    fun setExamType(examType: List<String>) {
         setUser(null, null, null, examType)
         Log.d("UserViewModel", "입시 유형이 설정되었습니다: $examType") // 로그 출력
 

@@ -59,8 +59,10 @@ class BirthYearFragment : Fragment() {
 
             // 서버에 출생 년도 저장
 
-            // 다음 프래그먼트로 넘어감
-            (activity as OnboardingActivity).goToNextPage()
+            // 잠시 대기 후 다음 페이지로 넘어가기
+            binding.yearNextBtnTv.postDelayed({
+                (activity as OnboardingActivity).goToNextPage()
+            }, 300) // 300ms 지연
         }
         return binding.root
     }

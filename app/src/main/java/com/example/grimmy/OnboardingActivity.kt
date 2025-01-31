@@ -20,8 +20,8 @@ class OnboardingActivity : AppCompatActivity() {
         adapter = OnboardingPagerAdapter(this)
         binding.onboardingViewPager.adapter = adapter
 
-        // 페이지 슬라이드 허용
-        binding.onboardingViewPager.isUserInputEnabled = true // 필요에 따라 조정
+        // 페이지 슬라이드 비활성화
+        binding.onboardingViewPager.isUserInputEnabled = false
 
         // 페이지 변경 시 진행 상태 업데이트 위한 콜백 등록
         binding.onboardingViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

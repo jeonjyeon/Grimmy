@@ -52,6 +52,7 @@ class NicknameFragment : Fragment() {
                 // 입력된 닉네임이 없는 경우
                 if (nickname.isEmpty()) {
                     showGuideMessage("한글, 영문, 숫자만 입력해 주세요.")
+                    binding.nicknameNextBtnTv.isEnabled = false // "다음" 버튼 비활성화
                     return
                 }
 
