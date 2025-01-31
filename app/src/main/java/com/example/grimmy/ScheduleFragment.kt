@@ -21,13 +21,13 @@ class ScheduleFragment : Fragment() {
         // ViewBinding을 사용하여 binding 객체 초기화
         binding = FragmentScheduleBinding.inflate(inflater, container, false)
 
-        // schedule_class_add_iv에 대한 참조
-        binding.scheduleClassAddIv.setOnClickListener {
-            binding.scheduleClassAddCl.visibility = View.VISIBLE
-        }
-        binding.scheduleClassAddOkTv.setOnClickListener {
-            binding.scheduleClassAddCl.visibility = View.GONE
-        }
+//        // schedule_class_add_iv에 대한 참조
+//        binding.scheduleAddClassIv.setOnClickListener {
+//            binding.scheduleAddClassFrame.visibility = View.VISIBLE
+//        }
+//        binding.schedulesetOnClickListener {
+//            binding.scheduleClassAddCl.visibility = View.GONE
+//        }
 
         binding.scheduleAddClassIv.setOnClickListener(){
             // ScheduleAddClassFragment로 전환
