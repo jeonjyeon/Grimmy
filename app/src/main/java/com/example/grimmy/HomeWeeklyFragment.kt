@@ -9,7 +9,9 @@ import android.widget.GridLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.grimmy.databinding.FragmentHomeWeeklyBinding
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedListener {
 
@@ -22,9 +24,10 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
         // Initial calendar setup for the current week
         adjustToStartOfWeek()
-
-        // Update the calendar for the current week
         updateCalendarWeek()
+
+        // Set the default value of the date text view to the current month
+        updateDateTextView(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1) // +1 because Calendar.MONTH is 0-based
 
         // Set up the listeners for previous and next week buttons
         binding.weeklyCalendarPreviousBtnIv.setOnClickListener { changeWeek(-1) }
@@ -41,17 +44,12 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         return binding.root
     }
 
-    // Updates the calendar to show the start of the current week
     private fun adjustToStartOfWeek() {
-        // Calculate the day of the week for the first day of the month
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-        // Adjust to the previous Sunday if the first day is not Sunday
-        val delta = Calendar.SUNDAY - dayOfWeek
-        calendar.add(Calendar.DAY_OF_MONTH, delta)
+        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            calendar.add(Calendar.DATE, -1)
+        }
     }
 
-    // Updates the weekly calendar view
     private fun updateCalendarWeek() {
         binding.weeklyCalendarGl.removeAllViews()
         for (i in 0 until 7) {
@@ -60,28 +58,27 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             textView.text = "${calendar.get(Calendar.DAY_OF_MONTH)}"
 
             binding.weeklyCalendarGl.addView(dayView)
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            calendar.add(Calendar.DATE, 1)
         }
-        calendar.add(Calendar.DAY_OF_MONTH, -7) // Reset the calendar to the start of the week
+        calendar.add(Calendar.DATE, -7)  // Reset the calendar to the start of the week
     }
 
-    // Changes the week based on the direction (-1 for previous, 1 for next)
     private fun changeWeek(direction: Int) {
         calendar.add(Calendar.DATE, direction * 7)
         updateCalendarWeek()
+        updateDateTextView(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1) // Update the text view with the new month
     }
 
-    // Handles the date selected from the DatePickerDialog
+    private fun updateDateTextView(year: Int, month: Int) {
+        binding.weeklyDatepickerBtnTv.text = String.format("%d년 %d월", year, month)
+    }
+
     override fun onDateSelected(year: Int, month: Int) {
-        // Set the calendar to the first day of the selected month
         calendar.set(Calendar.YEAR, year)
-        calendar.set(Calendar.MONTH, month - 1) // Month is zero-based
-        calendar.set(Calendar.DAY_OF_MONTH, 1) // Set to the first day of the month
-
-        // Adjust calendar to the Sunday of the week that contains the first day of the month
+        calendar.set(Calendar.MONTH, month - 1)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
         adjustToStartOfWeek()
-
-        // Update the weekly calendar view
         updateCalendarWeek()
+        updateDateTextView(year, month)
     }
 }
