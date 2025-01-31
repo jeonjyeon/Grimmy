@@ -57,8 +57,8 @@
             android:textColor="@color/white"
             android:textSize="22sp"
             android:layout_marginEnd="20dp"
-            android:inputType="text"
-            />
+            android:imeOptions="actionDone"
+            android:inputType="text|textNoSuggestions" />
 
         <TextView
             android:id="@+id/nickname_guide_sentence_tv"

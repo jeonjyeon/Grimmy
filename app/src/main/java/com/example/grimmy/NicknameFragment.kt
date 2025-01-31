@@ -1,63 +1,57 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import com.example.grimmy.databinding.FragmentNicknameBinding
+import com.example.grimmy.viewmodel.UserViewModel
+import androidx.fragment.app.activityViewModels
+
 
 
 class NicknameFragment : Fragment() {
-    private lateinit var nicknameInput: EditText
-    private lateinit var nextTextView: TextView
-    private lateinit var charCountTextView: TextView // 글자 수 카운트 TextView
-    private lateinit var guideTextView: TextView // 공백 안내 메시지 TextView
+    private lateinit var binding: FragmentNicknameBinding
+    private val userViewModel: UserViewModel by activityViewModels() // ViewModel 사용
+
     private val nicknameRegex = "^[가-힣a-zA-Z0-9]+\$".toRegex() // 닉네임으로 허용되는 문자
     private val maxLength = 5 // 닉네임 최대 길이
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_nickname, container, false)
-
-        // UI 요소 초기화
-        nicknameInput = view.findViewById(R.id.nickname_nickname_et)
-        nextTextView = view.findViewById(R.id.nickname_next_btn_tv)
-        charCountTextView = view.findViewById(R.id.nickname_nickname_count_tv)
-        guideTextView = view.findViewById(R.id.nickname_guide_sentence_tv)
+        binding = FragmentNicknameBinding.inflate(inflater, container, false)
 
         // 초기 글자 수 카운트 0/5 설정
         updateCharCount(0)
-        nextTextView.isEnabled = false
-//        setInitialButtonState()
+        binding.nicknameNextBtnTv.isEnabled = false
         showGuideMessage("한글, 영문, 숫자만 입력해 주세요.")
 
         // EditText에 입력된 텍스트를 감지
-        nicknameInput.addTextChangedListener(object : TextWatcher {
+        binding.nicknameNicknameEt.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val nickname = s.toString() // 닉네임
-
+                // 입력 중에 끝에 공백이 있으면 제거
+                val nickname = s.toString().trimEnd()
+                if (nickname != s.toString()) {
+                    binding.nicknameNicknameEt.setText(nickname)
+                    binding.nicknameNicknameEt.setSelection(nickname.length) // 커서 위치 조정
+                }
                 // 글자 수 카운트 업데이트
                 updateCharCount(nickname.length)
 
                 // 입력된 닉네임이 없는 경우
                 if (nickname.isEmpty()) {
                     showGuideMessage("한글, 영문, 숫자만 입력해 주세요.")
-//                    setInitialButtonState()
                     return
                 }
 
@@ -68,34 +62,38 @@ class NicknameFragment : Fragment() {
         })
 
         // TextView 클릭 이벤트 처리
-        nextTextView.setOnClickListener {
-            val nickname = nicknameInput.text.toString()
+        binding.nicknameNextBtnTv.setOnClickListener {
+            hideKeyboard()
+            binding.nicknameNicknameEt.clearFocus()
+            val nickname = binding.nicknameNicknameEt.text.toString().trim()
 
             // 유효한 닉네임인지 체크 후 다음 페이지로 이동
             if (isValidNickname(nickname)) {
-                (activity as OnboardingActivity).viewPager.currentItem += 1
+                // ViewModel에 닉네임 저장
+                userViewModel.setNickname(nickname)
+
+                // 서버에 닉네임 저장
+
+                // 다음 프래그먼트로 넘어감
+                binding.nicknameNextBtnTv.postDelayed({
+                    (activity as OnboardingActivity).goToNextPage()
+                }, 300) // 300ms 지연
             } else {
                 showGuideMessage("유효한 닉네임을 입력해주세요.")
             }
         }
-        return view
+        return binding.root
     }
-
-    // 다음 버튼 초기 설정
-//    private fun setInitialButtonState() {
-//        nextTextView.setBackgroundResource(R.drawable.bg_color_off)
-//        nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
-//    }
 
     // 글자 수 카운트 업데이트
     private fun updateCharCount(currentLength: Int) {
-        charCountTextView.text = "$currentLength/$maxLength"
+        binding.nicknameNicknameCountTv.text = "$currentLength/$maxLength"
     }
 
     // 안내 메시지 표시 함수
     private fun showGuideMessage(message: String) {
-        if (guideTextView.text.toString() != message) { // 동일 메시지가 아닐 경우에만 업데이트
-            guideTextView.text = message
+        if (binding.nicknameGuideSentenceTv.text.toString() != message) { // 동일 메시지가 아닐 경우에만 업데이트
+            binding.nicknameGuideSentenceTv.text = message
         }
     }
 
@@ -104,16 +102,16 @@ class NicknameFragment : Fragment() {
     }
 
     private fun validateNickname(nickname: String) {
-        if (!isValidNickname(nickname)) {
-            nextTextView.isEnabled = false
-            nextTextView.setBackgroundResource(R.drawable.bg_color_off)
-            nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray8))
-            showGuideMessage("초성, 공백, 특수문자는 포함할 수 없습니다.")
-        } else {
-            nextTextView.isEnabled = true
-            nextTextView.setBackgroundResource(R.drawable.bg_color_on)
-            nextTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            showGuideMessage("사용 가능한 닉네임입니다.")
-        }
+        val isValid = isValidNickname(nickname)
+        binding.nicknameNextBtnTv.isEnabled = isValid
+        binding.nicknameNextBtnTv.setBackgroundResource(if (isValid) R.drawable.bg_color_on else R.drawable.bg_color_off)
+        binding.nicknameNextBtnTv.setTextColor(ContextCompat.getColor(requireContext(), if (isValid) R.color.white else R.color.gray8))
+        showGuideMessage(if (isValid) "사용 가능한 닉네임입니다." else "초성, 공백, 특수문자는 포함할 수 없습니다.")
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val view = activity?.currentFocus ?: View(context)
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
