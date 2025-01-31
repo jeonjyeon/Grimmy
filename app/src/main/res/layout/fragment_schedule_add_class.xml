@@ -86,7 +86,9 @@
                 android:paddingBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:imeOptions="actionNext"
-                android:inputType="text|textNoSuggestions|textMultiLine" /> <!-- 자동 교정 및 대문자 비활성화 -->
+                android:inputType="text|textNoSuggestions"
+                android:singleLine="true"
+                />
 
             <EditText
                 android:id="@+id/schedule_add_class_place_et"
@@ -104,7 +106,9 @@
                 android:paddingBottom="10dp"
                 android:layout_marginTop="20dp"
                 android:imeOptions="actionDone"
-                android:inputType="text|textNoSuggestions|textMultiLine" /> <!-- 자동 교정 및 대문자 비활성화 -->
+                android:inputType="text|textNoSuggestions"
+                android:singleLine="true"
+                />
 
 
             <LinearLayout
