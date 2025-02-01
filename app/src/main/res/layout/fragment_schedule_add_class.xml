@@ -28,7 +28,6 @@
                 android:fontFamily="@font/pretendard_semi_bold"
                 android:textColor="@color/font4"
                 android:textSize="18sp"
-                android:background="@drawable/bg_bottom_border"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

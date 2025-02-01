@@ -9,10 +9,11 @@ import android.view.ViewGroup
 import com.example.grimmy.databinding.FragmentScheduleAddClassBinding
 
 class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTimeSetListener,
-    EndTimePickerDialogFragment.OnTimeSetListener {
+    EndTimePickerDialogFragment.OnTimeSetListener, DayPickerDialogFragment.OnDaySetListener {
     private lateinit var binding: FragmentScheduleAddClassBinding
     val startTimePickerDialog = StartTimePickerDialogFragment()
     val endTimePickerDialog = EndTimePickerDialogFragment()
+    val dayPickerDialog = DayPickerDialogFragment()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,6 +26,13 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
             val classPlace = binding.scheduleAddClassPlaceEt.text.toString().trim()
             saveData(className, classPlace)
             requireActivity().supportFragmentManager.popBackStack()
+        }
+
+        binding.scheduleAddClassDayLl.setOnClickListener {
+            val currentDay = binding.scheduleAddClassDaypickerBtnTv.text.toString()
+            dayPickerDialog.setInitialDay(currentDay)
+            dayPickerDialog.setOnDaySetListener(this)
+            dayPickerDialog.show(parentFragmentManager, "dayPicker")
         }
 
         binding.scheduleAddClassStartTimeLl.setOnClickListener {
@@ -82,5 +90,9 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         } else if (endTimePickerDialog.isVisible) {
             binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", hour, adjustedMinute)
         }
+    }
+
+    override fun onDaySet(day: String) {
+        binding.scheduleAddClassDaypickerBtnTv.text = day
     }
 }

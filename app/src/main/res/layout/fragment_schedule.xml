@@ -97,16 +97,6 @@
             android:fontFamily="@font/pretendard_semi_bold"
             android:textSize="22sp"
             android:layout_marginStart="5dp"/>
-
-        <!--        시간표 아래 화살표..?-->
-        <ImageView
-            android:id="@+id/schedule_timetable_title_down_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_date_picker"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            />
     </LinearLayout>
 
     <LinearLayout
