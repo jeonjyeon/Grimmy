@@ -130,67 +130,89 @@
                 android:background="@drawable/bg_box_border"
                 >
 
-                <TextView
-                    android:id="@+id/schedule_add_class_weekpicker_btn_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="월요일"
-                    android:fontFamily="@font/pretendard_medium"
-                    android:textColor="@color/font3"
-                    android:textSize="18sp"
-                    />
 
-                <ImageView
-                    android:id="@+id/schedule_add_class_weekpicker_icon_iv"
+                <LinearLayout
+                    android:id="@+id/schedule_add_class_day_ll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_down_arrow"
-                    android:layout_marginStart="10dp"
-                    />
+                    android:gravity="center"
+                    >
+                    <TextView
+                        android:id="@+id/schedule_add_class_daypicker_btn_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="월요일"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/font3"
+                        android:textSize="18sp"
+                        />
+
+                    <ImageView
+                        android:id="@+id/schedule_add_class_daypicker_icon_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_down_arrow"
+                        android:layout_marginStart="10dp"
+                        />
+                </LinearLayout>
+
 
                 <Space
-                    android:layout_width="70dp"
+                    android:layout_width="66dp"
                     android:layout_height="0dp"/>
 
-                <TextView
-                    android:id="@+id/schedule_add_class_start_timepicker_btn_tv"
+                <LinearLayout
+                    android:id="@+id/schedule_add_class_start_time_ll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
-                    android:fontFamily="@font/pretendard_medium"
-                    android:textColor="@color/font3"
-                    android:textSize="18sp"
-                    />
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/schedule_add_class_start_timepicker_btn_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/font3"
+                        android:textSize="18sp"
+                        />
 
-                <ImageView
-                    android:id="@+id/schedule_add_class_start_timepicker_icon_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_down_arrow"
-                    android:layout_marginStart="10dp"
-                    />
+                    <ImageView
+                        android:id="@+id/schedule_add_class_start_timepicker_icon_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_down_arrow"
+                        android:layout_marginStart="10dp"
+                        />
+                </LinearLayout>
+
 
                 <Space
-                    android:layout_width="20dp"
+                    android:layout_width="10dp"
                     android:layout_height="0dp"/>
 
-                <TextView
-                    android:id="@+id/schedule_add_class_end_timepicker_btn_tv"
+                <LinearLayout
+                    android:id="@+id/schedule_add_class_end_time_ll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
-                    android:fontFamily="@font/pretendard_medium"
-                    android:textColor="@color/font3"
-                    android:textSize="18sp"/>
+                    android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/schedule_add_class_end_timepicker_icon_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_down_arrow"
-                    android:layout_marginStart="10dp"
-                    />
+                    <TextView
+                        android:id="@+id/schedule_add_class_end_timepicker_btn_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/font3"
+                        android:textSize="18sp"/>
 
+                    <ImageView
+                        android:id="@+id/schedule_add_class_end_timepicker_icon_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_down_arrow"
+                        android:layout_marginStart="10dp"
+                        />
+                </LinearLayout>
             </LinearLayout>
 
             <TextView

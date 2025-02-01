@@ -5,4 +5,11 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textColorPrimary">@color/white</item>
     </style>
+    <style name="NumberPickerStyle2">
+        <item name="fontFamily">@font/pretendard_medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="colorControlNormal">@color/main_color</item>
+    </style>
+
 </resources>
