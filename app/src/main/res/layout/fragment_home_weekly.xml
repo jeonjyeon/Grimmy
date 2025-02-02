@@ -169,4 +169,491 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/weekly_calendar_gl"/>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_today_drawing_cl"
+        android:layout_width="match_parent"
+        android:layout_height="423dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_calendar_gl"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/bg_rectangle"
+        android:layout_marginHorizontal="20dp">
+
+        <TextView
+            android:id="@+id/weekly_today_drawing_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘의 그림"
+            android:textColor="@color/font4"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="22dp"
+            android:layout_marginStart="28dp"/>
+        
+        <ImageView
+            android:id="@+id/weekly_today_drawing_pin_btn_iv"
+            android:layout_width="22dp"
+            android:layout_height="23dp"
+            android:src="@drawable/btn_pin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="30dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_today_drawing_plus_btn_iv"
+            android:layout_width="21dp"
+            android:layout_height="20dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/weekly_today_drawing_pin_btn_iv"
+            android:layout_marginTop="23dp"
+            android:layout_marginEnd="17dp"/>
+        
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/weekly_today_drawing_box_cl"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_picture_box"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weekly_today_drawing_title_tv"
+            android:layout_margin="28dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/weekly_add_picture_icon_iv"
+                    android:layout_width="78dp"
+                    android:layout_height="51dp"
+                    android:src="@drawable/ic_add_drawing"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="그림 사진을 올려 주세요"
+                    android:textSize="11sp"
+                    android:textColor="@color/bg_black"
+                    android:fontFamily="@font/pretendard_regular"
+                    android:layout_marginTop="10dp"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_time_taken_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_today_drawing_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="17dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_time_taken_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="소요시간"
+            android:textColor="@color/font4"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="10dp"/>
+        
+        <ImageView
+            android:id="@+id/weekly_time_taken_reload_btn_iv"
+            android:layout_width="15dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_reload"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="15dp"/>
+        
+        <TextView
+            android:id="@+id/weekly_time_taken_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00시간 00분"
+            android:textColor="@color/font3"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weekly_time_taken_title_tv"
+            android:layout_marginTop="22dp"
+            android:fontFamily="@font/pretendard_bold"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_feedback_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_time_taken_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_feedback_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="피드백"
+            android:textSize="16sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_feedback_add_btn_iv"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:foregroundTint="@color/font4"/>
+
+        <EditText
+            android:id="@+id/weekly_feedback_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/gray4"
+            android:textColorHint="@color/bg_black2"
+            android:hint="피드백을 입력해 주세요"
+            android:background="@drawable/bg_home_edit_text"
+            android:paddingVertical="14dp"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_feedback_title_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_hard_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_feedback_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_hard_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="어려웠던 점"
+            android:textSize="16sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_hard_add_btn_iv"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:foregroundTint="@color/font4"/>
+
+        <EditText
+            android:id="@+id/weekly_hard_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/gray4"
+            android:textColorHint="@color/bg_black2"
+            android:hint="어려웠던 점을 입력해 주세요"
+            android:background="@drawable/bg_home_edit_text"
+            android:paddingVertical="14dp"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_hard_title_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_good_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_hard_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_good_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="칭찬할 점"
+            android:textSize="16sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_good_add_btn_iv"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:foregroundTint="@color/font4"/>
+
+        <EditText
+            android:id="@+id/weekly_good_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/gray4"
+            android:textColorHint="@color/bg_black2"
+            android:hint="칭찬할 점을 입력해 주세요"
+            android:background="@drawable/bg_home_edit_text"
+            android:paddingVertical="14dp"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_good_title_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_feel_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_good_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_feel_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘의 기분"
+            android:textSize="16sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_feel_add_btn_iv"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:foregroundTint="@color/font4"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/weekly_feel_emotion_cl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_feel_title_tv"
+            android:layout_marginTop="24dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/emotion_love_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_love"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/emotion_sad_iv"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/emotion_sad_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_sad"
+                app:layout_constraintStart_toEndOf="@id/emotion_love_iv"
+                app:layout_constraintEnd_toStartOf="@id/emotion_lightening_iv"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/emotion_lightening_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_lightening"
+                app:layout_constraintStart_toEndOf="@id/emotion_sad_iv"
+                app:layout_constraintEnd_toStartOf="@id/emotion_sleepy_iv"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/emotion_sleepy_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_sleepy"
+                app:layout_constraintStart_toEndOf="@id/emotion_lightening_iv"
+                app:layout_constraintEnd_toStartOf="@id/emotion_happy_iv"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/emotion_happy_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_happy"
+                app:layout_constraintStart_toEndOf="@id/emotion_sleepy_iv"
+                app:layout_constraintEnd_toStartOf="@id/emotion_angry_iv"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/emotion_angry_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/img_emotion_angry"
+                app:layout_constraintStart_toEndOf="@id/emotion_happy_iv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <EditText
+            android:id="@+id/weekly_feel_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/gray4"
+            android:textColorHint="@color/bg_black2"
+            android:hint="오늘의 기분을 기록해 보세요"
+            android:background="@drawable/bg_home_edit_text"
+            android:paddingVertical="14dp"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_feel_emotion_cl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="11dp"
+            android:layout_marginHorizontal="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weekly_question_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_feel_cl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@drawable/bg_rectangle">
+
+        <TextView
+            android:id="@+id/weekly_question_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="질문"
+            android:textSize="16sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/weekly_question_add_btn_iv"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:foregroundTint="@color/font4"/>
+
+        <EditText
+            android:id="@+id/weekly_question_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/gray4"
+            android:textColorHint="@color/bg_black2"
+            android:hint="오늘 실수 했던 것이 있나요?"
+            android:background="@drawable/bg_home_edit_text"
+            android:paddingVertical="14dp"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintTop_toBottomOf="@id/weekly_question_title_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/weekly_page_up_btn_iv"
+        android:layout_width="61dp"
+        android:layout_height="63dp"
+        android:src="@drawable/btn_page_up"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weekly_question_cl"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="38dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/weekly_page_up_btn_iv"
+        android:layout_marginTop="15dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

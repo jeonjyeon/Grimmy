@@ -31,7 +31,7 @@
             android:id="@+id/date_picker_year_np"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
 
         <Space
             android:layout_width="34dp"

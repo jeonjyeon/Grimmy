@@ -3,6 +3,8 @@ package com.example.grimmy
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,16 +45,24 @@ class DatePickerDialogFragment : DialogFragment() {
     }
 
     private fun setupNumberPickers() {
+        val years = Array(101) { (2000 + it).toString() + "년" } // 2000년부터 2100년까지의 배열 생성
         binding.datePickerYearNp.apply {
-            minValue = 2000
-            maxValue = 2100
-            value = Calendar.getInstance().get(Calendar.YEAR)
+            minValue = 0
+            maxValue = years.size - 1
+            displayedValues = years  // 미리 정의한 년도 배열을 설정
+            value = Calendar.getInstance().get(Calendar.YEAR) - 2000  // 현재 년도의 인덱스를 계산하여 설정
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                textColor = Color.WHITE
+            }
         }
         binding.datePickerMonthNp.apply {
             minValue = 1
             maxValue = 12
             value = Calendar.getInstance().get(Calendar.MONTH) + 1
             displayedValues = arrayOf("1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                textColor = Color.WHITE
+            }
         }
     }
 }
