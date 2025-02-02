@@ -1,12 +1,17 @@
 package com.example.grimmy
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
+import com.example.grimmy.databinding.DialogAlertCustomBinding
 import com.example.grimmy.databinding.FragmentScheduleAddClassBinding
 import com.example.grimmy.viewmodel.ScheduleViewModel
 
@@ -42,14 +47,22 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
             val startTime = binding.scheduleAddClassStartTimepickerBtnTv.text.toString()
             val endTime = binding.scheduleAddClassEndTimepickerBtnTv.text.toString()
 
-            if (className.isNotEmpty() && classDay.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty()) {
+            if (className.isEmpty() || classPlace.isEmpty()) {
+                showAlert("수업 명과 장소를 입력해 주세요.")
+            } else {
+                // 수업 등록 로직
                 val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
                 scheduleViewModel.addClass(newClass)
+
+                Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
+
+                requireActivity().supportFragmentManager.popBackStack()
             }
 
-            Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
-
-            requireActivity().supportFragmentManager.popBackStack()
+//            if (className.isNotEmpty() && classDay.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty()) {
+//                val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
+//                scheduleViewModel.addClass(newClass)
+//            }
         }
 
         binding.scheduleAddClassDayLl.setOnClickListener {
@@ -124,6 +137,28 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
     override fun onDaySet(day: String) {
         binding.scheduleAddClassDaypickerBtnTv.text = day
     }
+
+    private fun showAlert(message: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        val dialogBinding = DialogAlertCustomBinding.inflate(layoutInflater) // 커스텀 레이아웃의 ViewBinding 생성
+        builder.setView(dialogBinding.root)
+
+        // 다이얼로그의 배경을 투명하게 설정
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+
+        // ViewBinding을 사용하여 TextView와 Button에 접근
+        dialogBinding.alertDialogMessageTv.text = message
+
+        dialogBinding.alertDialogBtnTv.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+
 
     private fun setDefaultTimes() {
         // 기본 시간 설정

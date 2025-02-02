@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
-                android:hint="수업명"
+                android:hint="수업 명"
                 android:background="@drawable/bg_box_border"
                 android:textColor="@color/font3"
                 android:textColorHint="@color/font3"
