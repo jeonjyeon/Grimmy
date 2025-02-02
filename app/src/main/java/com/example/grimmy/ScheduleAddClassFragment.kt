@@ -6,11 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import com.example.grimmy.databinding.FragmentScheduleAddClassBinding
+import com.example.grimmy.viewmodel.ScheduleViewModel
 
 class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTimeSetListener,
     EndTimePickerDialogFragment.OnTimeSetListener, DayPickerDialogFragment.OnDaySetListener {
     private lateinit var binding: FragmentScheduleAddClassBinding
+    private lateinit var scheduleViewModel: ScheduleViewModel
+
     val startTimePickerDialog = StartTimePickerDialogFragment()
     val endTimePickerDialog = EndTimePickerDialogFragment()
     val dayPickerDialog = DayPickerDialogFragment()
@@ -20,11 +24,23 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentScheduleAddClassBinding.inflate(inflater, container, false)
+        scheduleViewModel = ViewModelProvider(requireActivity()).get(ScheduleViewModel::class.java)
 
         binding.scheduleClassAddOkTv.setOnClickListener {
+//            val className = binding.scheduleAddClassNameEt.text.toString().trim()
+//            val classPlace = binding.scheduleAddClassPlaceEt.text.toString().trim()
+//            saveData(className, classPlace)
             val className = binding.scheduleAddClassNameEt.text.toString().trim()
             val classPlace = binding.scheduleAddClassPlaceEt.text.toString().trim()
-            saveData(className, classPlace)
+            val classDay = binding.scheduleAddClassDaypickerBtnTv.text.toString()
+            val startTime = binding.scheduleAddClassStartTimepickerBtnTv.text.toString()
+            val endTime = binding.scheduleAddClassEndTimepickerBtnTv.text.toString()
+
+            if (className.isNotEmpty() && classDay.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty()) {
+                val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
+                scheduleViewModel.addClass(newClass)
+            }
+
             requireActivity().supportFragmentManager.popBackStack()
         }
 

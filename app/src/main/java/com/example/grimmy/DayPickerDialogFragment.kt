@@ -17,6 +17,8 @@ class DayPickerDialogFragment : DialogFragment() {
         fun onDaySet(day: String)
     }
 
+    private var selectedDay: String = ""
+
     fun setInitialDay(day: String) {
         selectedDay = day
     }
@@ -33,15 +35,9 @@ class DayPickerDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // 초기 값 설정
-        when (selectedDay) {
-            "월요일" -> binding.dayPickerMonday.isSelected = true
-            "화요일" -> binding.dayPickerTuesday.isSelected = true
-            "수요일" -> binding.dayPickerWednesday.isSelected = true
-            "목요일" -> binding.dayPickerThursday.isSelected = true
-            "금요일" -> binding.dayPickerFriday.isSelected = true
-            "토요일" -> binding.dayPickerSaturday.isSelected = true
-            "일요일" -> binding.dayPickerSunday.isSelected = true
-        }
+        highlightSelectedDay(selectedDay)
+
+        // 요일 클릭 리스너 설정
         binding.dayPickerMonday.setOnClickListener { selectDay("월요일") }
         binding.dayPickerTuesday.setOnClickListener { selectDay("화요일") }
         binding.dayPickerWednesday.setOnClickListener { selectDay("수요일") }
@@ -51,7 +47,7 @@ class DayPickerDialogFragment : DialogFragment() {
         binding.dayPickerSunday.setOnClickListener { selectDay("일요일") }
 
         binding.dayPickerOkBtnTv.setOnClickListener {
-            listener?.onDaySet(selectedDay)
+            listener?.onDaySet(selectedDay) // 선택된 요일 전달
             dismiss()
         }
 
@@ -60,15 +56,39 @@ class DayPickerDialogFragment : DialogFragment() {
         }
     }
 
-    private var selectedDay: String = ""
-
     private fun selectDay(day: String) {
-        selectedDay = day
-        // 선택된 요일을 강조 표시하는 로직을 추가할 수 있습니다.
+        // 이전에 선택된 요일 색상 원래대로 변경
+        resetDayColor(selectedDay)
+
+        selectedDay = day // 새로운 요일 선택
+        highlightSelectedDay(day) // 선택된 요일 강조
+    }
+
+    private fun highlightSelectedDay(day: String) {
+        when (day) {
+            "월요일" -> binding.dayPickerMonday.setTextColor(resources.getColor(R.color.main_color))
+            "화요일" -> binding.dayPickerTuesday.setTextColor(resources.getColor(R.color.main_color))
+            "수요일" -> binding.dayPickerWednesday.setTextColor(resources.getColor(R.color.main_color))
+            "목요일" -> binding.dayPickerThursday.setTextColor(resources.getColor(R.color.main_color))
+            "금요일" -> binding.dayPickerFriday.setTextColor(resources.getColor(R.color.main_color))
+            "토요일" -> binding.dayPickerSaturday.setTextColor(resources.getColor(R.color.main_color))
+            "일요일" -> binding.dayPickerSunday.setTextColor(resources.getColor(R.color.main_color))
+        }
+    }
+
+    private fun resetDayColor(day: String) {
+        when (day) {
+            "월요일" -> binding.dayPickerMonday.setTextColor(resources.getColor(R.color.gray8))
+            "화요일" -> binding.dayPickerTuesday.setTextColor(resources.getColor(R.color.gray8))
+            "수요일" -> binding.dayPickerWednesday.setTextColor(resources.getColor(R.color.gray8))
+            "목요일" -> binding.dayPickerThursday.setTextColor(resources.getColor(R.color.gray8))
+            "금요일" -> binding.dayPickerFriday.setTextColor(resources.getColor(R.color.gray8))
+            "토요일" -> binding.dayPickerSaturday.setTextColor(resources.getColor(R.color.gray8))
+            "일요일" -> binding.dayPickerSunday.setTextColor(resources.getColor(R.color.gray8))
+        }
     }
 
     fun setOnDaySetListener(listener: OnDaySetListener) {
         this.listener = listener
     }
 }
-
