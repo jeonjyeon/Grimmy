@@ -14,4 +14,9 @@ class ScheduleViewModel : ViewModel() {
         _classSchedules.value?.add(classSchedule)
         _classSchedules.value = _classSchedules.value // LiveData 업데이트
     }
+
+    fun removeClass(className: String) {
+        _classSchedules.value?.removeIf { it.className == className }
+        _classSchedules.value = _classSchedules.value // Notify observers
+    }
 }
