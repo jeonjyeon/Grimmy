@@ -30,4 +30,7 @@
     <color name="gray8">#E7E6E4</color>
     <color name="gray9">#F1EFEE</color>
     <color name="gray10">#F9F9F9</color>
+
+    <color name="bg_black">#3B3B3B</color>
+    <color name="bg_black2">#4B4B4B</color>
 </resources>
