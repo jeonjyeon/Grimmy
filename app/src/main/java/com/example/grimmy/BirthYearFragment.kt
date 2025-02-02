@@ -47,7 +47,7 @@ class BirthYearFragment : Fragment() {
         binding.yearPickerNp.setOnValueChangedListener { _, _, _ ->
             binding.yearNextBtnTv.isEnabled = true
             binding.yearNextBtnTv.alpha = 1.0f // 활성화된 상태의 시각적 표현
-            binding.yearNextBtnTv.setBackgroundResource(R.drawable.bg_color_on)
+            binding.yearNextBtnTv.setBackgroundResource(R.drawable.bg_ok_btn)
             binding.yearNextBtnTv.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         }

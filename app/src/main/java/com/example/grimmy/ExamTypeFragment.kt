@@ -102,7 +102,7 @@ class ExamTypeFragment : Fragment() {
         with(binding.typeNextBtnTv) {
             isEnabled = hasSelection // 최소 1개 이상 선택 시 활성화
             setBackgroundResource(
-                if (hasSelection) R.drawable.bg_color_on else R.drawable.bg_color_off
+                if (hasSelection) R.drawable.bg_ok_btn else R.drawable.bg_cancel_btn
             )
             setTextColor(
                 ContextCompat.getColor(
