@@ -58,7 +58,7 @@
         android:id="@+id/schedule_alarm_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_alarm"
+        android:src="@drawable/ic_notify"
         android:contentDescription="알람"
         app:layout_constraintTop_toTopOf="@id/schedule_profile_image_fl"
         app:layout_constraintBottom_toBottomOf="@id/schedule_profile_image_fl"

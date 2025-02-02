@@ -50,4 +50,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha09" // 최신 버전
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.9.0-alpha09" // 최신 버전
     implementation "androidx.fragment:fragment-ktx:1.8.5" // activityViewModels() 작동 안해서 추가해줌
+
 }
