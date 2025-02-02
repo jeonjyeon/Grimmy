@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -51,5 +52,15 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    // 바텀 네비게이션 바 숨기기
+    fun hideBottomNav() {
+        binding.bottomNav.visibility = View.GONE
+    }
+
+    // 바텀 네비게이션 바 보이기
+    fun showBottomNav() {
+        binding.bottomNav.visibility = View.VISIBLE
     }
 }

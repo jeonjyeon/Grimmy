@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-<!--    Main Colors-->
+    <!--    Main Colors-->
     <color name="main_color">#FF6E1D</color>
     <color name="subtle_color">#FF9E59</color>
     <color name="darker">#0F0F0F</color>
@@ -13,13 +13,13 @@
     <color name="transparent">#00FF6E1D</color>
     <color name="dark_line">#2C2C2E</color>
 
-<!--    Font Colors-->
+    <!--    Font Colors-->
     <color name="font1">#222222</color>
     <color name="font2">#616161</color>
     <color name="font3">#9E9E9E</color>
     <color name="font4">#BDBDBD</color>
 
-<!--    Gray Colors-->
+    <!--    Gray Colors-->
     <color name="gray1">#0F0F0F</color>
     <color name="gray2">#202020</color>
     <color name="gray3">#787272</color>

@@ -150,7 +150,7 @@
         android:textColor="@color/gray8"
         android:fontFamily="@font/pretendard_semi_bold"
         android:textSize="20sp"
-        android:background="@drawable/bg_color_off"
+        android:background="@drawable/bg_cancel_btn"
         android:gravity="center"
 
         app:layout_constraintStart_toStartOf="parent"
