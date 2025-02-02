@@ -25,7 +25,7 @@
         android:id="@+id/status_nickname_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ㅇㅇㅇ님의"
+        android:text="ㅇㅇㅇㅇㅇ"
         android:fontFamily="@font/pretendard_bold"
         android:textColor="@color/white"
         android:textSize="28sp"
@@ -33,6 +33,18 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginTop="124dp"
+        />
+    <TextView
+        android:id="@+id/status_nickname2_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="님의"
+        android:fontFamily="@font/pretendard_bold"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        app:layout_constraintStart_toEndOf="@id/status_nickname_tv"
+        app:layout_constraintTop_toTopOf="@id/status_nickname_tv"
+        app:layout_constraintBottom_toBottomOf="@id/status_nickname_tv"
         />
 
     <TextView
