@@ -221,6 +221,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="+ 추가 수업 등록"
+                android:fontFamily="@font/pretendard_medium"
                 android:textColor="@color/font3"
                 android:background="@drawable/bg_bottom_border"
                 android:layout_marginTop="20dp"
