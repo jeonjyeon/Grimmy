@@ -105,7 +105,7 @@ class NicknameFragment : Fragment() {
     private fun validateNickname(nickname: String) {
         val isValid = isValidNickname(nickname)
         binding.nicknameNextBtnTv.isEnabled = isValid
-        binding.nicknameNextBtnTv.setBackgroundResource(if (isValid) R.drawable.bg_color_on else R.drawable.bg_color_off)
+        binding.nicknameNextBtnTv.setBackgroundResource(if (isValid) R.drawable.bg_ok_btn else R.drawable.bg_cancel_btn)
         binding.nicknameNextBtnTv.setTextColor(ContextCompat.getColor(requireContext(), if (isValid) R.color.white else R.color.gray8))
         showGuideMessage(if (isValid) "사용 가능한 닉네임입니다." else "초성, 공백, 특수문자는 포함할 수 없습니다.")
     }

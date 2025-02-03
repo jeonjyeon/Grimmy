@@ -109,7 +109,7 @@ class StudentStatusFragment : Fragment() {
         with(binding.statusNextBtnTv) {
             isEnabled = selectedOption != null
             setBackgroundResource(
-                if (selectedOption != null) R.drawable.bg_color_on else R.drawable.bg_color_off
+                if (selectedOption != null) R.drawable.bg_ok_btn else R.drawable.bg_cancel_btn
             )
             setTextColor(
                 ContextCompat.getColor(

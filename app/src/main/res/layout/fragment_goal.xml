@@ -1,14 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GoalFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".GoalFragment"
+    android:background="@color/darker">
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/goal_icon_grimmy_iv"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
+        android:src="@drawable/img_default_profile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="20dp"/>
+    
+    <ImageView
+        android:id="@+id/goal_title_iv"
+        android:layout_width="52dp"
+        android:layout_height="18dp"
+        android:src="@drawable/img_grimmy_title"
+        app:layout_constraintStart_toEndOf="@id/goal_icon_grimmy_iv"
+        app:layout_constraintTop_toTopOf="@id/goal_icon_grimmy_iv"
+        app:layout_constraintBottom_toBottomOf="@id/goal_icon_grimmy_iv"
+        android:layout_marginStart="7dp"/>
+    
+    <ImageView
+        android:id="@+id/goal_notify_icon_iv"
+        android:layout_width="22dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_notify"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/goal_icon_grimmy_iv"
+        app:layout_constraintBottom_toBottomOf="@id/goal_icon_grimmy_iv"
+        android:layout_marginEnd="22dp"/>
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="GoalFragment" />
+        android:id="@+id/goal_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="000님\n2월 그림 목표를 세워보세요!"
+        android:textColor="@color/gray9"
+        android:textSize="22sp"
+        android:fontFamily="@font/pretendard_regular"
+        app:layout_constraintStart_toStartOf="@id/goal_icon_grimmy_iv"
+        app:layout_constraintTop_toBottomOf="@id/goal_icon_grimmy_iv"
+        android:layout_marginTop="37dp"/>
 
-</FrameLayout>
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/goal_graph_pc"
+        android:layout_width="match_parent"
+        android:layout_height="353dp"
+        app:layout_constraintTop_toBottomOf="@id/goal_title_tv"
+        android:layout_marginTop="41dp"
+        android:layout_marginHorizontal="64dp"/>
+
+    <TextView
+        android:id="@+id/goal_week_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이번 달 목표"
+        android:textSize="19sp"
+        android:textColor="@color/font4"
+        android:fontFamily="@font/pretendard_semi_bold"
+        app:layout_constraintTop_toBottomOf="@id/goal_graph_pc"
+        android:layout_marginTop="64dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"/>
+    
+    <ImageView
+        android:id="@+id/goal_week_extra_btn_iv"
+        android:layout_width="21dp"
+        android:layout_height="21dp"
+        android:src="@drawable/btn_extra"
+        app:layout_constraintTop_toTopOf="@id/goal_week_tv"
+        app:layout_constraintBottom_toBottomOf="@id/goal_week_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"/>
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/goal_week_tv"
+        android:layout_marginTop="23dp"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/bg_rectangle">
+        
+        <TextView
+            android:id="@+id/goal_week_title_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="타이틀"
+            android:textColor="@color/font3"
+            android:textSize="16sp"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"/>
+        
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:src="@drawable/btn_plus"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="19dp"
+            android:layout_marginEnd="27dp"
+            app:tint="@color/font4"/>
+
+        <EditText
+            android:id="@+id/goa_week_edittext_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_home_edit_text"
+            android:hint="이번 주의 목표를 작성해보세요"
+            android:textColorHint="@color/bg_black2"
+            android:textSize="14sp"
+            android:textColor="@color/font4"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintTop_toBottomOf="@id/goal_week_title_title_tv"
+            android:layout_marginTop="23dp"
+            android:paddingVertical="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:paddingStart="45dp"
+            android:layout_marginBottom="13dp"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/goa_week_edittext_et"
+            app:layout_constraintTop_toTopOf="@id/goa_week_edittext_et"
+            app:layout_constraintBottom_toBottomOf="@id/goa_week_edittext_et"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
