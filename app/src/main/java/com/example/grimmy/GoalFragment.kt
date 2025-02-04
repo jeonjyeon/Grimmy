@@ -1,11 +1,13 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.grimmy.databinding.FragmentGoalBinding
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
@@ -18,67 +20,50 @@ import com.github.mikephil.charting.utils.ColorTemplate.COLORFUL_COLORS
 
 class GoalFragment : Fragment() {
 
-    private lateinit var binding : FragmentGoalBinding
+    private lateinit var binding: FragmentGoalBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentGoalBinding.inflate(inflater, container, false)
 
-        binding = FragmentGoalBinding.inflate(inflater,container,false)
-
-        // Initialize the PieChart
-        initPieChart()
-
+        // 각 차트의 progressColor를 개별적으로 설정
+        setupPieChart(binding.goalMonthGraphPc, 70f, R.color.main_color, 85f) // 이번 달 목표 70%
+        setupPieChart(binding.goalWeekGraphPc, 60f, R.color.graph_color, 80f) // 이번 주 목표 60%
 
         return binding.root
     }
 
-    private fun initPieChart() {
-        val pieChart = binding.goalGraphPc
-        pieChart.isDrawHoleEnabled = true
-        pieChart.setHoleColor(Color.BLACK)
-        pieChart.setTransparentCircleColor(Color.BLACK)
-        pieChart.setTransparentCircleAlpha(110)
-        pieChart.holeRadius = 58f
-        pieChart.transparentCircleRadius = 61f
-        pieChart.setDrawCenterText(true)
-        pieChart.setCenterTextSize(20f)
-        pieChart.description.isEnabled = false
+    private fun setupPieChart(pieChart: PieChart, percentage: Float, colorResId: Int, holeRadius: Float) {
+        pieChart.apply {
+            description.isEnabled = false
+            isDrawHoleEnabled = true
+            this.holeRadius = holeRadius
+            transparentCircleRadius = 0f  // 투명한 원을 제거합니다.
+            setHoleColor(Color.BLACK)  // 구멍의 색상을 검은색으로 설정합니다.
+            setUsePercentValues(true)
+            rotationAngle = 270f
+            legend.isEnabled = false
+            setTouchEnabled(false)
+            setDrawCenterText(false)
+        }
 
-        // 레전드 설정
-        val legend = pieChart.legend
-        legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-        legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-        legend.orientation = Legend.LegendOrientation.HORIZONTAL
-        legend.setDrawInside(false)
-        legend.isEnabled = true
+        val entries = ArrayList<PieEntry>().apply {
+            add(PieEntry(percentage))
+            add(PieEntry(100f - percentage))
+        }
 
-        // 데이터 설정
-        setPieChartData(pieChart)
-    }
+        val dataSet = PieDataSet(entries, "").apply {
+            val progressColor = ContextCompat.getColor(requireContext(), colorResId)
+            val remainColor = ContextCompat.getColor(requireContext(), R.color.bg_black2)
 
-    private fun setPieChartData(pieChart: PieChart) {
-        val entries = listOf(
-            PieEntry(70f, "이번 달 목표"),
-            PieEntry(60f, "이번 주 목표")
-        )
-        val dataSet = PieDataSet(entries, "")
-        dataSet.sliceSpace = 3f
-        dataSet.selectionShift = 5f
-        dataSet.setColors(listOf(Color.parseColor("#FFA726"), Color.parseColor("#66BB6A")))
-        dataSet.valueLinePart1OffsetPercentage = 80f // Value lines to outside
-        dataSet.valueLinePart1Length = 0.5f
-        dataSet.valueLinePart2Length = 0.5f
-        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            setColors(listOf(progressColor, remainColor))
+        }
 
-        val data = PieData(dataSet)
-        data.setValueTextSize(16f)
-        data.setValueTextColor(Color.WHITE)
+        val data = PieData(dataSet).apply {
+            setValueTextSize(0f) // 값 텍스트 숨기기
+        }
 
         pieChart.data = data
-        pieChart.centerText = "이번 달 목표\n70%\n이번 주 목표\n60%"
-        pieChart.invalidate() // refresh the chart
+        pieChart.invalidate() // 차트 갱신
     }
-
 }

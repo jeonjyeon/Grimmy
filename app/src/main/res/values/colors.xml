@@ -6,6 +6,7 @@
     <!--    Main Colors-->
     <color name="main_color">#FF6E1D</color>
     <color name="subtle_color">#FF9E59</color>
+    <color name="graph_color">#FFB48A</color>
     <color name="darker">#0F0F0F</color>
     <color name="subtle">#212123</color>
     <color name="lighter">#616161</color>
