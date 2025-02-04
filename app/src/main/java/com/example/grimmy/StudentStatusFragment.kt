@@ -91,7 +91,7 @@ class StudentStatusFragment : Fragment() {
 
     private fun clearSelection() {
         selectedOption?.apply {
-            setBackgroundResource(R.drawable.bg_circle)
+            setBackgroundResource(R.drawable.bg_circle_box_color)
             setTextColor(ContextCompat.getColor(requireContext(), R.color.font3))
         }
         selectedOption = null

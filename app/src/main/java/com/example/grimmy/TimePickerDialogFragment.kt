@@ -9,50 +9,69 @@ import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
-import com.example.grimmy.databinding.DialogEndTimePickerBinding
+import androidx.fragment.app.activityViewModels
+import com.example.grimmy.databinding.DialogAlarmTimePickerBinding
+import com.example.grimmy.viewmodel.TimeViewModel
 
-class EndTimePickerDialogFragment : DialogFragment() {
-    private lateinit var binding: DialogEndTimePickerBinding
+class TimePickerDialogFragment : DialogFragment() {
+
+    private lateinit var binding: DialogAlarmTimePickerBinding
+    private val viewModel: TimeViewModel by activityViewModels() // ViewModel 초기화
+    private var isMaterialReminder: Boolean = true // 기본값을 재료 알림으로 설정
     var listener: OnTimeSetListener? = null
 
     interface OnTimeSetListener {
         fun onTimeSet(hour: Int, minute: Int)
     }
 
-    fun setInitialTime(hour: Int, minute: Int) {
-        val adjustedMinute = minute / 5
-        binding.endTimePickerTp.hour = hour
-        binding.endTimePickerTp.minute = adjustedMinute
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DialogEndTimePickerBinding.inflate(inflater, container, false)
+        binding = DialogAlarmTimePickerBinding.inflate(inflater, container, false)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.endTimePickerTp.setIs24HourView(true)
-        setMinuteInterval(binding.endTimePickerTp, 5)
+        binding.alarmTimePickerTp.setIs24HourView(true)
+        setMinuteInterval(binding.alarmTimePickerTp, 5)
 
+        // 초기 시간 설정
         val initialHour = arguments?.getInt("initialHour") ?: 0
         val initialMinute = arguments?.getInt("initialMinute") ?: 0
         setInitialTime(initialHour, initialMinute)
 
-        binding.endTimePickerOkBtnTv.setOnClickListener {
-            val hour = binding.endTimePickerTp.hour
-            val minute = binding.endTimePickerTp.minute
-            val adjustedMinute = minute * 5
-            listener?.onTimeSet(hour, adjustedMinute)
+        binding.alarmTimePickerOkBtnTv.setOnClickListener {
+            val hour = binding.alarmTimePickerTp.hour
+            val minute = binding.alarmTimePickerTp.minute
+            val selectedMinutes = minute * 5
+
+            // 선택된 시간 ViewModel에 저장
+            if (isMaterialReminder) {
+                viewModel.setMaterialReminderTime(hour, selectedMinutes)
+            } else {
+                viewModel.setPaintingReminderTime(hour, selectedMinutes)
+            }
+
+            // 선택된 시간 전달
+            listener?.onTimeSet(hour, selectedMinutes)
             dismiss()
         }
-        binding.endTimePickerCancelBtnTv.setOnClickListener {
+
+        binding.alarmTimePickerCancelBtnTv.setOnClickListener {
             dismiss()
         }
+
+        fun setReminderType(isMaterial: Boolean) {
+            this.isMaterialReminder = isMaterial
+        }
+    }
+
+    private fun setInitialTime(hour: Int, minute: Int) {
+        binding.alarmTimePickerTp.hour = hour
+        binding.alarmTimePickerTp.minute = minute
     }
 
     private fun setMinuteInterval(timePicker: TimePicker, interval: Int) {

@@ -26,17 +26,18 @@ class DatePickerDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogDatePickerBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(requireContext(), R.style.TransparentDialog) //다이얼로그 코너 투명 적용
         dialog.setContentView(binding.root)
 
         setupNumberPickers()
 
         binding.datePickerOkBtnTv.setOnClickListener {
-            val year = binding.datePickerYearNp.value
+            val year = 2000 + binding.datePickerYearNp.value  // 2000년을 기준으로 추가
             val month = binding.datePickerMonthNp.value
             listener?.onDateSelected(year, month)
             dismiss()
         }
+
         binding.datePickerCancelBtnTv.setOnClickListener {
             dismiss()
         }
@@ -55,10 +56,11 @@ class DatePickerDialogFragment : DialogFragment() {
                 textColor = Color.WHITE
             }
         }
+
         binding.datePickerMonthNp.apply {
             minValue = 1
             maxValue = 12
-            value = Calendar.getInstance().get(Calendar.MONTH) + 1
+            value = Calendar.getInstance().get(Calendar.MONTH) + 1  // 현재 월 설정
             displayedValues = arrayOf("1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 textColor = Color.WHITE
