@@ -24,11 +24,20 @@ class ScheduleFragment : Fragment() {
         // ViewBinding을 사용하여 binding 객체 초기화
         binding = FragmentScheduleBinding.inflate(inflater, container, false)
 
+        binding.scheduleAlarmIv.setOnClickListener{
+            // AlarmFragment로 전환
+            val alarmFragment = AlarmFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.schedule_frame, alarmFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
+                .addToBackStack(null) // 뒤로 가기 스택에 추가
+                .commit()
+        }
+
         binding.scheduleAddClassIv.setOnClickListener(){
             // ScheduleAddClassFragment로 전환
             val scheduleAddClassFragment = ScheduleAddClassFragment()
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.schedule_add_class_frame, scheduleAddClassFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
+                .replace(R.id.schedule_frame, scheduleAddClassFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
                 .addToBackStack(null) // 뒤로 가기 스택에 추가
                 .commit()
         }
@@ -37,7 +46,7 @@ class ScheduleFragment : Fragment() {
             // ScheduleListFragment로 전환
             val scheduleListFragment = ScheduleListFragment()
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.schedule_add_class_frame, scheduleListFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
+                .replace(R.id.schedule_frame, scheduleListFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
                 .addToBackStack(null) // 뒤로 가기 스택에 추가
                 .commit()
         }

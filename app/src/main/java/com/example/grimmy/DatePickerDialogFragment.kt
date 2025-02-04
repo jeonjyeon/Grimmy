@@ -26,7 +26,7 @@ class DatePickerDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogDatePickerBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(requireContext(), R.style.TransparentDialog) //다이얼로그 코너 투명 적용
         dialog.setContentView(binding.root)
 
         setupNumberPickers()

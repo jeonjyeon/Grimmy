@@ -23,7 +23,7 @@
             android:id="@+id/schedule_profile_background_iv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/bg_circle"
+            android:src="@drawable/bg_circle_box_color"
             android:scaleType="centerCrop"
             app:tint="@color/white"/>
 
@@ -511,7 +511,7 @@
     </ScrollView>
 
     <FrameLayout
-        android:id="@+id/schedule_add_class_frame"
+        android:id="@+id/schedule_frame"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"

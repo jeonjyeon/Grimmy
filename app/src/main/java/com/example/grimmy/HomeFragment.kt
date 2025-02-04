@@ -36,6 +36,15 @@ class HomeFragment : Fragment() {
             binding.homeMonthlySelectedBtnIv.visibility = View.VISIBLE
         }
 
+        binding.homeNotifyBtnIv.setOnClickListener{
+            // AlarmFragment로 전환
+            val alarmFragment = AlarmFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.home_notify_frame, alarmFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
+                .addToBackStack(null) // 뒤로 가기 스택에 추가
+                .commit()
+        }
+
         return binding.root
     }
 

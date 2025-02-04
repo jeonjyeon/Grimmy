@@ -46,7 +46,8 @@ class StartTimePickerDialogFragment : DialogFragment() {
         binding.startTimePickerOkBtnTv.setOnClickListener {
             val hour = binding.startTimePickerTp.hour
             val minute = binding.startTimePickerTp.minute
-            listener?.onTimeSet(hour, minute)
+            val adjustedMinute = minute * 5
+            listener?.onTimeSet(hour, adjustedMinute)
             dismiss()
         }
         binding.startTimePickerCancelBtnTv.setOnClickListener {

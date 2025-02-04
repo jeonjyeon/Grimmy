@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp"
-    android:background="@color/dark_line"
+    android:background="@drawable/bg_dialog_dark_line"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -24,6 +24,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/date_picker_title_tv"
         android:layout_marginTop="17dp">
 
