@@ -100,11 +100,10 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
     }
 
     override fun onTimeSet(hour: Int, minute: Int) {
-        val adjustedMinute = minute * 5
         if (startTimePickerDialog.isVisible) {
-            binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", hour, adjustedMinute)
+            binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
         } else if (endTimePickerDialog.isVisible) {
-            binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", hour, adjustedMinute)
+            binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
         }
     }
 

@@ -81,7 +81,7 @@
             android:fontFamily="@font/pretendard_medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             />
 
         <TextView
@@ -93,7 +93,7 @@
             android:fontFamily="@font/pretendard_medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             />
 
         <TextView
@@ -105,7 +105,7 @@
             android:fontFamily="@font/pretendard_medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             />
         <TextView
             android:id="@+id/status_qual_exam_btn_tv"
@@ -116,7 +116,7 @@
             android:fontFamily="@font/pretendard_medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             />
         <TextView
             android:id="@+id/status_n_repeat_btn_tv"
@@ -127,14 +127,14 @@
             android:fontFamily="@font/pretendard_medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             />
 
         <TextView
             android:id="@+id/status_adult_btn_tv"
             android:width="122dp"
             android:height="122dp"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_circle_box_color"
             android:fontFamily="@font/pretendard_medium"
             android:gravity="center"
             android:text="성인"
