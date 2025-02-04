@@ -15,7 +15,8 @@
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:padding="20dp"
+            android:paddingVertical="17dp"
+            android:paddingHorizontal="20dp"
             android:background="@color/darker"
             >
 
@@ -74,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
-                android:hint="수업명"
+                android:hint="수업 명"
                 android:background="@drawable/bg_box_border"
                 android:textColor="@color/font3"
                 android:textColorHint="@color/font3"
@@ -220,6 +221,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="+ 추가 수업 등록"
+                android:fontFamily="@font/pretendard_medium"
                 android:textColor="@color/font3"
                 android:background="@drawable/bg_bottom_border"
                 android:layout_marginTop="20dp"
