@@ -8,48 +8,48 @@
     android:background="@color/transparent">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/schedule_add_class_cl"
-            android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/schedule_add_class_cl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingVertical="17dp"
+        android:paddingHorizontal="20dp"
+        android:background="@color/darker"
+        >
+
+        <TextView
+            android:id="@+id/schedule_class_add_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="center"
+            android:text="+ 수업 추가"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:textColor="@color/font4"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            android:paddingVertical="17dp"
-            android:paddingHorizontal="20dp"
-            android:background="@color/darker"
-            >
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
 
-            <TextView
-                android:id="@+id/schedule_class_add_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="+ 수업 추가"
-                android:fontFamily="@font/pretendard_semi_bold"
-                android:textColor="@color/font4"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                />
+        <TextView
+            android:id="@+id/schedule_class_add_ok_tv"
+            android:layout_width="70dp"
+            android:layout_height="45dp"
+            android:text="완료"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_ok_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
 
-            <TextView
-                android:id="@+id/schedule_class_add_ok_tv"
-                android:layout_width="70dp"
-                android:layout_height="45dp"
-                android:text="완료"
-                android:fontFamily="@font/pretendard_semi_bold"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:background="@drawable/bg_ok_btn"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <ScrollView

@@ -7,70 +7,56 @@
     tools:context=".ScheduleFragment"
     android:background="@color/darker">
 
-    <!-- 상단 프로필 및 알람 -->
-    <FrameLayout
-        android:id="@+id/schedule_profile_image_fl"
+    <ImageView
+        android:id="@+id/schedule_profile_img_iv"
         android:layout_width="43dp"
         android:layout_height="43dp"
+        android:src="@drawable/img_default_profile"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        >
-
-        <!-- 배경 원 -->
-        <ImageView
-            android:id="@+id/schedule_profile_background_iv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg_circle_box_color"
-            android:scaleType="centerCrop"
-            app:tint="@color/white"/>
-
-        <!-- 캐릭터 -->
-        <ImageView
-            android:id="@+id/schedule_profile_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/img_character"
-            android:scaleType="fitCenter"
-            android:padding="5dp"/>
-    </FrameLayout>
-
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="20dp"/>
 
     <TextView
-        android:id="@+id/schedule_user_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="김민우님"
-        android:fontFamily="@font/pretendard_semi_bold"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="@id/schedule_profile_image_fl"
-        app:layout_constraintBottom_toBottomOf="@id/schedule_profile_image_fl"
-        app:layout_constraintStart_toEndOf="@id/schedule_profile_image_fl"
-        android:layout_marginStart="10dp"
-        />
-
-    <ImageView
-        android:id="@+id/schedule_alarm_iv"
+        android:id="@+id/schedule_profile_username_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="김민우"
+        android:fontFamily="@font/pretendard_semi_bold"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/schedule_profile_img_iv"
+        app:layout_constraintTop_toTopOf="@id/schedule_profile_img_iv"
+        app:layout_constraintBottom_toBottomOf="@id/schedule_profile_img_iv"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="님"
+        android:fontFamily="@font/pretendard_semi_bold"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@id/schedule_profile_username_tv"
+        app:layout_constraintTop_toTopOf="@id/schedule_profile_username_tv"
+        app:layout_constraintBottom_toBottomOf="@id/schedule_profile_username_tv"/>
+
+    <ImageView
+        android:id="@+id/schedule_notify_btn_iv"
+        android:layout_width="22dp"
+        android:layout_height="25dp"
         android:src="@drawable/ic_notify"
-        android:contentDescription="알람"
-        app:layout_constraintTop_toTopOf="@id/schedule_profile_image_fl"
-        app:layout_constraintBottom_toBottomOf="@id/schedule_profile_image_fl"
+        app:layout_constraintTop_toTopOf="@id/schedule_profile_img_iv"
+        app:layout_constraintBottom_toBottomOf="@id/schedule_profile_img_iv"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="20dp"
-        />
+        android:layout_marginEnd="22dp"/>
+
 
     <LinearLayout
         android:id="@+id/schedule_timetable_title_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/schedule_profile_image_fl"
+        app:layout_constraintTop_toBottomOf="@id/schedule_profile_img_iv"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:padding="10dp"
@@ -140,11 +126,10 @@
 
         <!-- 시간표 그리드 -->
         <GridLayout
-            android:id="@+id/schedule_timetable_grid_gv"
+            android:id="@+id/schedule_timetable_grid_gl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnCount="6"
-            android:rowCount="6"
             android:orientation="horizontal"
             >
 

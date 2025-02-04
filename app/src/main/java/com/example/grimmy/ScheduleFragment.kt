@@ -24,7 +24,7 @@ class ScheduleFragment : Fragment() {
         // ViewBinding을 사용하여 binding 객체 초기화
         binding = FragmentScheduleBinding.inflate(inflater, container, false)
 
-        binding.scheduleAlarmIv.setOnClickListener{
+        binding.scheduleNotifyBtnIv.setOnClickListener{
             // AlarmFragment로 전환
             val alarmFragment = AlarmFragment()
             requireActivity().supportFragmentManager.beginTransaction()
