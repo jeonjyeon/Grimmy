@@ -52,15 +52,37 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     private fun updateCalendarWeek() {
         binding.weeklyCalendarGl.removeAllViews()
+
+        val today = Calendar.getInstance()
+        val currentYear = today.get(Calendar.YEAR)
+        val currentMonth = today.get(Calendar.MONTH)
+        val currentDate = today.get(Calendar.DAY_OF_MONTH)
+
+        // Identify if the week includes today
+        val thisWeekStart = calendar.clone() as Calendar
+        val thisWeekEnd = (calendar.clone() as Calendar).apply {
+            add(Calendar.DATE, 6)
+        }
+
         for (i in 0 until 7) {
-            val dayView = layoutInflater.inflate(R.layout.item_calendar_day, binding.weeklyCalendarGl, false)
+            val isToday = calendar.get(Calendar.YEAR) == currentYear &&
+                    calendar.get(Calendar.MONTH) == currentMonth &&
+                    calendar.get(Calendar.DAY_OF_MONTH) == currentDate
+
+            val dayView = layoutInflater.inflate(
+                if (isToday) R.layout.item_calendar_today else R.layout.item_calendar_day,
+                binding.weeklyCalendarGl, false
+            )
+
             val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             textView.text = "${calendar.get(Calendar.DAY_OF_MONTH)}"
 
             binding.weeklyCalendarGl.addView(dayView)
             calendar.add(Calendar.DATE, 1)
         }
-        calendar.add(Calendar.DATE, -7)  // Reset the calendar to the start of the week
+
+        // Reset the calendar to the start of the week after filling the view
+        calendar.set(thisWeekStart.get(Calendar.YEAR), thisWeekStart.get(Calendar.MONTH), thisWeekStart.get(Calendar.DAY_OF_MONTH))
     }
 
     private fun changeWeek(direction: Int) {

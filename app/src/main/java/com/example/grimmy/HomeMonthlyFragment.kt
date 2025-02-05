@@ -3,7 +3,8 @@ package com.example.grimmy
 import android.app.DatePickerDialog
     import android.content.Context
     import android.os.Bundle
-    import androidx.fragment.app.Fragment
+import android.util.Log
+import androidx.fragment.app.Fragment
     import android.view.LayoutInflater
     import android.view.View
     import android.view.ViewGroup
@@ -45,6 +46,11 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
         val gridLayout = binding.monthlyCalendarGl
         gridLayout.removeAllViews()  // Clear existing views
 
+        val today = Calendar.getInstance()
+        val currentYear = today.get(Calendar.YEAR)
+        val currentMonth = today.get(Calendar.MONTH)
+        val currentDate = today.get(Calendar.DAY_OF_MONTH)
+
         val calendar = Calendar.getInstance()
         calendar.set(year, month - 1, 1)  // Set to first day of the selected month
 
@@ -60,10 +66,20 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
 
         // Fill actual days of the month
         for (day in 1..maxDayOfMonth) {
-            val dayView = LayoutInflater.from(context).inflate(R.layout.item_calendar_day, gridLayout, false) as ConstraintLayout
+            val isToday = year == currentYear && month - 1 == currentMonth && day == currentDate
+            val dayView = if (isToday) {
+                LayoutInflater.from(context).inflate(R.layout.item_calendar_today, gridLayout, false)
+            } else {
+                LayoutInflater.from(context).inflate(R.layout.item_calendar_day, gridLayout, false)
+            } as ConstraintLayout
+
             val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             textView.text = day.toString()
             gridLayout.addView(dayView)
+
+            if (isToday) {
+                Log.d("UpdateCalendar", "Today's special layout applied: $day")
+            }
         }
 
         // Update the datepicker button text
