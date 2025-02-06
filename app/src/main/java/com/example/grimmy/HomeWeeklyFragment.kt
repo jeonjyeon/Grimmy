@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -39,6 +40,11 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                 listener = this@HomeWeeklyFragment
             }
             pickerFragment.show(parentFragmentManager, "yearmonthPicker")
+        }
+
+        binding.weeklyTodayDrawingBoxCl.setOnClickListener {
+            val intent = Intent(activity, CustomGalleryActivity::class.java)
+            startActivity(intent)
         }
 
         return binding.root
