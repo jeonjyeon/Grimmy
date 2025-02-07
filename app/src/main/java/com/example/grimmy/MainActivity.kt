@@ -2,11 +2,8 @@ package com.example.grimmy
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.R
+
 import com.example.grimmy.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
