@@ -5,14 +5,24 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textColorPrimary">@color/white</item>
     </style>
+
     <style name="NumberPickerStyle2">
         <item name="fontFamily">@font/pretendard_medium</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="colorControlNormal">@color/main_color</item>
     </style>
+
     <style name="TransparentDialog" parent="Theme.AppCompat.Dialog"> <!-- 다이얼로그 코너 투명 적용 -->
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="YAxisLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="fontFamily">@font/pretendard_regular</item>
+        <item name="android:textSize">8sp</item>
+        <item name="android:textColor">@color/font3</item>
+        <item name="android:gravity">bottom</item>
+    </style>
 </resources>
