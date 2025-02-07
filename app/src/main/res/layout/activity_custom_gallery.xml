@@ -61,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/gallery_close_btn_iv"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="12dp"
         android:layout_marginHorizontal="20dp"/>
     
     <androidx.recyclerview.widget.RecyclerView
@@ -70,6 +70,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/gallery_selected_img_rv"
         android:layout_marginTop="28dp"
-        android:layout_marginHorizontal="20dp"/>
+        android:layout_marginHorizontal="20dp"
+        android:paddingBottom="126dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
