@@ -222,6 +222,7 @@
             android:layout_margin="28dp">
 
             <LinearLayout
+                android:id="@+id/weekly_placeholder_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
@@ -247,6 +248,25 @@
                     android:layout_marginTop="10dp"/>
 
             </LinearLayout>
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/drawing_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                android:id="@+id/weekly_dot_indicator_di"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:dotsColor="@color/gray7"
+                app:dotsSize="6dp"
+                app:dotsSpacing="6dp"
+                app:selectedDotColor="@color/dark_line"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
