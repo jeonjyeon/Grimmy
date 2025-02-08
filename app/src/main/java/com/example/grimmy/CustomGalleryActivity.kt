@@ -154,6 +154,7 @@ class CustomGalleryActivity : AppCompatActivity() {
             .setTitle("Select a Folder")
             .setItems(folders) { dialog, which ->
                 val selectedFolder = folders[which]
+                binding.galleryFileNameTv.text = selectedFolder  // 선택된 폴더 이름을 TextView에 설정
                 updateGalleryUI(mapOf(selectedFolder to imageMap[selectedFolder]!!))
             }
             .show()
