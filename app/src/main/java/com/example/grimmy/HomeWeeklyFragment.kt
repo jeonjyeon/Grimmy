@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,6 +29,17 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     companion object {
         const val REQUEST_CODE_CUSTOM_GALLERY = 1001
+    }
+
+    private var pageUpListener: OnPageUpListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnPageUpListener) {
+            pageUpListener = context
+        } else {
+            throw RuntimeException("$context must implement OnPageUpListener")
+        }
     }
 
     override fun onCreateView(
@@ -64,6 +76,19 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         binding.weeklyTodayDrawingPlusBtnIv.setOnClickListener {
             val intent = Intent(activity, CustomGalleryActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
+        }
+
+        // weekly_toggle_btn_iv 클릭 시 HomeWeeklyTestFragment로 화면 전환
+        binding.weeklyToggleBtnIv.setOnClickListener {
+            // 전환할 Fragment의 컨테이너 id를 R.id.fragment_container로 가정 (실제 id로 변경 필요)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.home_frame, HomeWeeklyTestFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        binding.weeklyPageUpBtnIv.setOnClickListener {
+            pageUpListener?.onPageUpClicked()
         }
 
         return binding.root
