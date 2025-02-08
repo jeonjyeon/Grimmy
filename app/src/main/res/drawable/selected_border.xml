@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- 투명 배경 -->
+    <solid android:color="@android:color/transparent" />
+    <!-- 주황색 윤곽선 (두께 2dp) -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/main_color" />
+    <!-- 모서리를 둥글게 처리하려면 다음을 추가 -->
+     <corners android:radius="10dp" />
+</shape>

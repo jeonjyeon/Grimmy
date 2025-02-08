@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content">
+
+<!-- 이미지 뷰 -->
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="127dp"
+        android:layout_margin="3dp"
+        android:background="@drawable/bg_gallery_item"
+        android:scaleType="centerCrop"
+        android:clipToOutline="true"/>
+
+    <!-- 선택 순서를 표시할 오버레이 TextView -->
+    <TextView
+        android:id="@+id/selection_order_tv"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/bg_image_order"
+        android:gravity="center"
+        android:layout_gravity="top|end"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+</FrameLayout>

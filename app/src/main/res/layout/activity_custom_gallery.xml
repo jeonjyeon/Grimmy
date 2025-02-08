@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CustomGalleryActivity"
+    android:background="@color/darker">
+
+    <ImageView
+        android:id="@+id/gallery_close_btn_iv"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/btn_close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="38dp"
+        android:layout_marginStart="30dp"/>
+
+    <LinearLayout
+        android:id="@+id/gallery_toggle_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gallery_close_btn_iv"
+        app:layout_constraintBottom_toBottomOf="@id/gallery_close_btn_iv"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/gallery_file_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="전체보기"
+            android:textSize="20sp"
+            android:textColor="@color/gray8"
+            android:fontFamily="@font/pretendard_semi_bold"/>
+
+        <ImageView
+            android:id="@+id/gallery_toggle_iv"
+            android:layout_width="16dp"
+            android:layout_height="7dp"
+            android:src="@drawable/btn_toggle"
+            android:layout_marginStart="10dp"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/gallery_not_finish_iv"
+        android:layout_width="69dp"
+        android:layout_height="45dp"
+        android:src="@drawable/btn_gallery_finish_off"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gallery_close_btn_iv"
+        app:layout_constraintBottom_toBottomOf="@id/gallery_close_btn_iv"
+        android:layout_marginEnd="20dp"/>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gallery_selected_img_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/gallery_close_btn_iv"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="20dp"/>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gallery_all_img_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/gallery_selected_img_rv"
+        android:layout_marginTop="28dp"
+        android:layout_marginHorizontal="20dp"
+        android:paddingBottom="126dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
