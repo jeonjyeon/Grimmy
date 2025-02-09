@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 import com.example.grimmy.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnPageUpListener {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -20,6 +20,13 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             binding.bottomNav.selectedItemId = com.example.grimmy.R.id.fragment_home
         }
+    }
+
+    override fun onPageUpClicked() {
+        // fragment_home의 인스턴스를 찾은 후 scrollToTop() 메서드를 호출합니다.
+        // 예를 들어, fragment_home은 R.id.home_fragment_container에 배치되었다고 가정합니다.
+        val homeFragment = supportFragmentManager.findFragmentById(R.id.main_frame) as? HomeFragment
+        homeFragment?.scrollToTop()
     }
 
     private fun setBottomNavView() {

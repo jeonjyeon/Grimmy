@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,19 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     companion object {
         const val REQUEST_CODE_CUSTOM_GALLERY = 1001
+    }
+
+    private var pageUpListener: OnPageUpListener? = null
+
+    private lateinit var emotions: List<TestEmotion>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnPageUpListener) {
+            pageUpListener = context
+        } else {
+            throw RuntimeException("$context must implement OnPageUpListener")
+        }
     }
 
     override fun onCreateView(
@@ -64,6 +79,40 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         binding.weeklyTodayDrawingPlusBtnIv.setOnClickListener {
             val intent = Intent(activity, CustomGalleryActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
+        }
+
+        // weekly_toggle_btn_iv 클릭 시 HomeWeeklyTestFragment로 화면 전환
+        binding.weeklyToggleBtnIv.setOnClickListener {
+            // 전환할 Fragment의 컨테이너 id를 R.id.fragment_container로 가정 (실제 id로 변경 필요)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.home_frame, HomeWeeklyTestFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        binding.weeklyPageUpBtnIv.setOnClickListener {
+            pageUpListener?.onPageUpClicked()
+        }
+
+        setupEmotionClickListeners()
+
+        binding.weeklyTimeTakenTimeTv.setOnClickListener {
+            val timePickerFragment = TakenTimeDialogFragment().apply {
+                // TextView에 표시된 현재 시간을 파싱하여 초기값 전달 (없으면 0)
+                val currentText = binding.weeklyTimeTakenTimeTv.text.toString()
+                val initialHours = currentText.substringBefore("시간").trim().toIntOrNull() ?: 0
+                val initialMinutes = currentText.substringAfter("시간").substringBefore("분").trim().toIntOrNull() ?: 0
+                arguments = Bundle().apply {
+                    putInt("initialHours", initialHours)
+                    putInt("initialMinutes", initialMinutes)
+                }
+                listener = object : TakenTimeDialogFragment.OnTimeSelectedListener {
+                    override fun onTimeSelected(hours: Int, minutes: Int) {
+                        binding.weeklyTimeTakenTimeTv.text = String.format("%02d시간 %02d분", hours, minutes)
+                    }
+                }
+            }
+            timePickerFragment.show(parentFragmentManager, "takenTimePicker")
         }
 
         return binding.root
@@ -177,4 +226,39 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             val imageView: ImageView = itemView.findViewById(R.id.drawing_page_iv)
         }
     }
+
+    private fun setupEmotionClickListeners() {
+        // 감정 ImageView들이 binding에 포함되어 있다고 가정합니다.
+        // 각 감정에 대해 활성 이미지와 비활성 이미지 리소스를 지정하세요.
+        emotions = listOf(
+            TestEmotion(binding.emotionLoveIv, R.drawable.img_emotion_love, R.drawable.img_emotion_love_off),
+            TestEmotion(binding.emotionSadIv, R.drawable.img_emotion_sad, R.drawable.img_emotion_sad_off),
+            TestEmotion(binding.emotionLighteningIv, R.drawable.img_emotion_lightening, R.drawable.img_emotion_lightening_off),
+            TestEmotion(binding.emotionSleepyIv, R.drawable.img_emotion_sleepy, R.drawable.img_emotion_sleepy_off),
+            TestEmotion(binding.emotionHappyIv, R.drawable.img_emotion_happy, R.drawable.img_emotion_happy_off),
+            TestEmotion(binding.emotionAngryIv, R.drawable.img_emotion_angry, R.drawable.img_emotion_angry_off),
+            TestEmotion(binding.emotionTiredIv, R.drawable.img_emotion_tired, R.drawable.img_emotion_tired_off),
+            TestEmotion(binding.emotionXxIv, R.drawable.img_emotion_xx, R.drawable.img_emotion_xx_off),
+            TestEmotion(binding.emotionStressIv, R.drawable.img_emotion_stress, R.drawable.img_emotion_stress_off)
+        )
+        emotions.forEach { emotion ->
+            emotion.view.setOnClickListener {
+                selectEmotion(emotion)
+            }
+        }
+    }
+
+    /**
+     * 선택한 감정(Emotion)만 활성 이미지로, 나머지는 비활성 이미지로 변경합니다.
+     */
+    private fun selectEmotion(selectedEmotion: TestEmotion) {
+        for (emotion in emotions) {
+            if (emotion == selectedEmotion) {
+                emotion.view.setImageResource(emotion.activeRes)
+            } else {
+                emotion.view.setImageResource(emotion.disabledRes)
+            }
+        }
+    }
+
 }

@@ -48,4 +48,9 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    // ScrollView의 id가 mainScrollView라고 가정합니다.
+    fun scrollToTop() {
+        binding.homeFrameSv.smoothScrollTo(0, 0)
+    }
+
 }
