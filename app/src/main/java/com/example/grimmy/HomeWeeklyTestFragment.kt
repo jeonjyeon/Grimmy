@@ -89,6 +89,44 @@ class HomeWeeklyTestFragment : Fragment() {
         }
 
         setupEmotionClickListeners()
+
+        binding.testTimeTakenTimeTv.setOnClickListener {
+            val timePickerFragment = TakenTimeDialogFragment().apply {
+                // TextView에 표시된 현재 시간을 파싱하여 초기값 전달 (없으면 0)
+                val currentText = binding.testTimeTakenTimeTv.text.toString()
+                val initialHours = currentText.substringBefore("시간").trim().toIntOrNull() ?: 0
+                val initialMinutes = currentText.substringAfter("시간").substringBefore("분").trim().toIntOrNull() ?: 0
+                arguments = Bundle().apply {
+                    putInt("initialHours", initialHours)
+                    putInt("initialMinutes", initialMinutes)
+                }
+                listener = object : TakenTimeDialogFragment.OnTimeSelectedListener {
+                    override fun onTimeSelected(hours: Int, minutes: Int) {
+                        binding.testTimeTakenTimeTv.text = String.format("%02d시간 %02d분", hours, minutes)
+                    }
+                }
+            }
+            timePickerFragment.show(parentFragmentManager, "takenTimePicker")
+        }
+
+        binding.testScoreTv.setOnClickListener {
+            val scorePicker = ScorePickerDialogFragment().apply {
+                // TextView에 표시된 현재 점수를 파싱하여 초기값 전달 (없으면 0으로)
+                val currentText = binding.testScoreTv.text.toString()
+                // "50 점"과 같은 형식으로 되어 있다면 숫자만 추출
+                val initialScore = currentText.substringBefore(" ").toIntOrNull() ?: 0
+                arguments = Bundle().apply {
+                    putInt("initialScore", initialScore)
+                }
+                listener = object : ScorePickerDialogFragment.OnScoreSelectedListener {
+                    override fun onScoreSelected(score: Int) {
+                        binding.testScoreTv.text = String.format("%d 점", score)
+                    }
+                }
+            }
+            scorePicker.show(parentFragmentManager, "scorePicker")
+        }
+
     }
 
     /**
