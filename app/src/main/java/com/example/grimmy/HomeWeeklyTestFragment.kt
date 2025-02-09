@@ -23,6 +23,8 @@ class HomeWeeklyTestFragment : Fragment() {
 
     private var pageUpListener: OnPageUpListener? = null
 
+    private lateinit var emotions: List<TestEmotion>
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnPageUpListener) {
@@ -85,6 +87,8 @@ class HomeWeeklyTestFragment : Fragment() {
         binding.testPageUpBtnIv.setOnClickListener {
             pageUpListener?.onPageUpClicked()
         }
+
+        setupEmotionClickListeners()
     }
 
     /**
@@ -167,6 +171,40 @@ class HomeWeeklyTestFragment : Fragment() {
      */
     private fun updateDateTextView(year: Int, month: Int) {
         binding.testDatepickerBtnTv.text = String.format("%d년 %d월", year, month)
+    }
+
+    private fun setupEmotionClickListeners() {
+        // 감정 ImageView들이 binding에 포함되어 있다고 가정합니다.
+        // 각 감정에 대해 활성 이미지와 비활성 이미지 리소스를 지정하세요.
+        emotions = listOf(
+            TestEmotion(binding.testEmotionLoveIv, R.drawable.img_emotion_love, R.drawable.img_emotion_love_off),
+            TestEmotion(binding.testEmotionSadIv, R.drawable.img_emotion_sad, R.drawable.img_emotion_sad_off),
+            TestEmotion(binding.testEmotionLighteningIv, R.drawable.img_emotion_lightening, R.drawable.img_emotion_lightening_off),
+            TestEmotion(binding.testEmotionSleepyIv, R.drawable.img_emotion_sleepy, R.drawable.img_emotion_sleepy_off),
+            TestEmotion(binding.testEmotionHappyIv, R.drawable.img_emotion_happy, R.drawable.img_emotion_happy_off),
+            TestEmotion(binding.testEmotionAngryIv, R.drawable.img_emotion_angry, R.drawable.img_emotion_angry_off),
+            TestEmotion(binding.testEmotionTiredIv, R.drawable.img_emotion_tired, R.drawable.img_emotion_tired_off),
+            TestEmotion(binding.testEmotionXxIv, R.drawable.img_emotion_xx, R.drawable.img_emotion_xx_off),
+            TestEmotion(binding.testEmotionStressIv, R.drawable.img_emotion_stress, R.drawable.img_emotion_stress_off)
+        )
+        emotions.forEach { emotion ->
+            emotion.view.setOnClickListener {
+                selectEmotion(emotion)
+            }
+        }
+    }
+
+    /**
+     * 선택한 감정(Emotion)만 활성 이미지로, 나머지는 비활성 이미지로 변경합니다.
+     */
+    private fun selectEmotion(selectedEmotion: TestEmotion) {
+        for (emotion in emotions) {
+            if (emotion == selectedEmotion) {
+                emotion.view.setImageResource(emotion.activeRes)
+            } else {
+                emotion.view.setImageResource(emotion.disabledRes)
+            }
+        }
     }
 
     override fun onDestroyView() {
