@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -94,6 +95,25 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         }
 
         setupEmotionClickListeners()
+
+        binding.weeklyTimeTakenTimeTv.setOnClickListener {
+            val timePickerFragment = TakenTimeDialogFragment().apply {
+                // TextView에 표시된 현재 시간을 파싱하여 초기값 전달 (없으면 0)
+                val currentText = binding.weeklyTimeTakenTimeTv.text.toString()
+                val initialHours = currentText.substringBefore("시간").trim().toIntOrNull() ?: 0
+                val initialMinutes = currentText.substringAfter("시간").substringBefore("분").trim().toIntOrNull() ?: 0
+                arguments = Bundle().apply {
+                    putInt("initialHours", initialHours)
+                    putInt("initialMinutes", initialMinutes)
+                }
+                listener = object : TakenTimeDialogFragment.OnTimeSelectedListener {
+                    override fun onTimeSelected(hours: Int, minutes: Int) {
+                        binding.weeklyTimeTakenTimeTv.text = String.format("%02d시간 %02d분", hours, minutes)
+                    }
+                }
+            }
+            timePickerFragment.show(parentFragmentManager, "takenTimePicker")
+        }
 
         return binding.root
     }
@@ -240,4 +260,5 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             }
         }
     }
+
 }
