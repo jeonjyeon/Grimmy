@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
         childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeMonthlyFragment()).commit()
 
         binding.homeWeeklySelectedBtnTv.setOnClickListener {
-            childFragmentManager.beginTransaction().replace(R.id.report_frame,ReportEmotionFragment()).commit()
+            childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeWeeklyFragment()).commit()
             // 배경 드로어블 변경
             binding.homeWeeklySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_right_selected_btn) // 선택된 버튼의 배경
             binding.homeWeeklySelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
@@ -38,7 +38,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.homeMonthlySelectedBtnTv.setOnClickListener {
-            childFragmentManager.beginTransaction().replace(R.id.report_frame,ReportPaintingFragment()).commit()
+            childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeMonthlyFragment()).commit()
             // 배경 드로어블 변경
             binding.homeMonthlySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_left_selected_btn) // 선택된 버튼의 배경
             binding.homeMonthlySelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
