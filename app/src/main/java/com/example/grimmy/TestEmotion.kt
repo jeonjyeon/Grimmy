@@ -5,5 +5,6 @@ import android.widget.ImageView
 data class TestEmotion(
     val view: ImageView,
     val activeRes: Int,
-    val disabledRes: Int
+    val disabledRes: Int,
+    val mood: String
 )

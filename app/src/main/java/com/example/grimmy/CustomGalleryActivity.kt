@@ -241,18 +241,19 @@ class CustomGalleryActivity : AppCompatActivity() {
                 }
 
                 holder.itemView.setOnClickListener {
-                    // 아직 선택되지 않은 경우
                     if (!selectedImages.contains(imageUri)) {
-                        if (selectedImages.size >= 3) {
-                            Toast.makeText(activity, "최대 3개만 선택할 수 있습니다.", Toast.LENGTH_SHORT).show()
-                            return@setOnClickListener
+                        // 만약 이미 다른 이미지가 선택되어 있다면 모두 해제 후 새로 추가
+                        if (selectedImages.isNotEmpty()) {
+                            selectedImages.clear()
                         }
                         selectedImages.add(imageUri)
                     } else {
+                        // 이미 선택된 이미지면 해제
                         selectedImages.remove(imageUri)
                     }
                     onSelectionChanged(selectedImages.size)
-                    notifyItemChanged(position)
+                    // 전체 항목 갱신하여 선택 상태가 변경된 것을 반영
+                    notifyDataSetChanged()
                 }
             } else {
                 // 카메라 아이콘 클릭 시 처리
