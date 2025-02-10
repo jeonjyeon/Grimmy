@@ -391,10 +391,10 @@
                 />
 
             <TextView
-                android:id="@+id/painting_week_subtitle_tv"
+                android:id="@+id/painting_week_subtitle_month_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="11월 3주차 (11.01 ~ 11.25)"
+                android:text="11월"
                 android:fontFamily="@font/pretendard_medium"
                 android:textColor="@color/font2"
                 android:textSize="18sp"
@@ -402,6 +402,27 @@
                 app:layout_constraintStart_toStartOf="@id/painting_score_title_tv"
                 android:layout_marginTop="10dp"
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 그림 성적 통계를 통해"
+                android:fontFamily="@font/pretendard_medium"
+                android:textColor="@color/font2"
+                android:textSize="18sp"
+                app:layout_constraintTop_toTopOf="@id/painting_week_subtitle_month_tv"
+                app:layout_constraintStart_toEndOf="@id/painting_week_subtitle_month_tv"
+                />
+            <TextView
+            android:id="@+id/painting_week_subtitle_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="성적이 떨어진 이유를 분석해 보세요!"
+            android:fontFamily="@font/pretendard_medium"
+            android:textColor="@color/font2"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/painting_week_subtitle_month_tv"
+            app:layout_constraintStart_toStartOf="@id/painting_week_subtitle_month_tv"
+            />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/painting_bar_chart2_fl"

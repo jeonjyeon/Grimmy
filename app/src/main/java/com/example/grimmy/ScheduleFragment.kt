@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,6 +24,10 @@ class ScheduleFragment : Fragment() {
     ): View? {
         // ViewBinding을 사용하여 binding 객체 초기화
         binding = FragmentScheduleBinding.inflate(inflater, container, false)
+
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.scheduleProfileUsernameTv.text = nickname ?: "사용자"
 
         binding.scheduleNotifyBtnIv.setOnClickListener{
             // AlarmFragment로 전환
@@ -65,5 +70,10 @@ class ScheduleFragment : Fragment() {
         }
 
         return binding.root
+    }
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
     }
 }

@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -59,6 +60,10 @@ class LoginActivity : AppCompatActivity() {
     private fun handleLoginSuccess(accessToken: String) {
         Log.i(TAG, "카카오 로그인 성공")
         Log.i(TAG, accessToken)
+
+        // ✅ 로그인 성공 후 OnboardingActivity로 이동
+        moveToOnboardingActivity()
+
         requestKakaoUserInfo()
     }
 
@@ -71,6 +76,14 @@ class LoginActivity : AppCompatActivity() {
                 val userId = user.id
                 val nickname = user.kakaoAccount?.profile?.nickname
                 val isEmailVerified = user.kakaoAccount?.isEmailVerified ?: false
+                val email = user.kakaoAccount?.email
+
+                Log.i(TAG, "✅ 사용자 정보 가져오기 성공")
+                Log.i(TAG, "User Id: $userId")
+                Log.i(TAG, "Nickname: $nickname")
+                Log.i(TAG, "Email: $email")
+                Log.i(TAG, "✅ 이메일 인증 여부: $isEmailVerified")
+
 
                 // 이메일 미인증 시 동의창 띄우기
                 if (!isEmailVerified) {
@@ -90,9 +103,17 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     // 이미 이메일 인증된 사용자의 처리
                     Log.i(TAG, "이미 이메일 인증된 사용자")
+
                     // 추가 작업 수행
                 }
             }
         }
+    }
+
+    private fun moveToOnboardingActivity() {
+        Log.i(TAG, "🔄 OnboardingActivity로 이동 중...")
+        val intent = Intent(this, OnboardingActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

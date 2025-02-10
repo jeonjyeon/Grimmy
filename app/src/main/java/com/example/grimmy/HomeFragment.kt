@@ -1,5 +1,7 @@
 package com.example.grimmy
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -19,21 +21,29 @@ class HomeFragment : Fragment() {
     ): View? {
 
         binding = FragmentHomeBinding.inflate(inflater,container,false)
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.homeProfileUsernameTv.text = nickname ?: "사용자"
 
         childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeMonthlyFragment()).commit()
 
-        binding.homeMonthlySelectedBtnIv.setOnClickListener {
-            childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeWeeklyFragment()).commit()
-            test_state = true
-            binding.homeWeeklySelectedBtnIv.visibility = View.VISIBLE
-            binding.homeMonthlySelectedBtnIv.visibility = View.GONE
+        binding.homeWeeklySelectedBtnTv.setOnClickListener {
+            childFragmentManager.beginTransaction().replace(R.id.report_frame,ReportEmotionFragment()).commit()
+            // 배경 드로어블 변경
+            binding.homeWeeklySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_right_selected_btn) // 선택된 버튼의 배경
+            binding.homeWeeklySelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
+            binding.homeMonthlySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_left_non_selected_btn) // 비선택된 버튼의 배경
+            binding.homeMonthlySelectedBtnTv.setTextColor(Color.parseColor("#80FFCDA9"))
+
         }
 
-        binding.homeWeeklySelectedBtnIv.setOnClickListener {
-            childFragmentManager.beginTransaction().replace(R.id.home_frame,HomeMonthlyFragment()).commit()
-            test_state = false
-            binding.homeWeeklySelectedBtnIv.visibility = View.GONE
-            binding.homeMonthlySelectedBtnIv.visibility = View.VISIBLE
+        binding.homeMonthlySelectedBtnTv.setOnClickListener {
+            childFragmentManager.beginTransaction().replace(R.id.report_frame,ReportPaintingFragment()).commit()
+            // 배경 드로어블 변경
+            binding.homeMonthlySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_left_selected_btn) // 선택된 버튼의 배경
+            binding.homeMonthlySelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
+            binding.homeWeeklySelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_right_non_selected_btn) // 비선택된 버튼의 배경
+            binding.homeWeeklySelectedBtnTv.setTextColor(Color.parseColor("#80FFCDA9"))
         }
 
         binding.homeNotifyBtnIv.setOnClickListener{
@@ -46,6 +56,11 @@ class HomeFragment : Fragment() {
         }
 
         return binding.root
+    }
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
     }
 
     // ScrollView의 id가 mainScrollView라고 가정합니다.

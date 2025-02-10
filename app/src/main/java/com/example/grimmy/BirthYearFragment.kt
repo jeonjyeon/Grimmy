@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -7,17 +8,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.NumberPicker
-import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import com.example.grimmy.Retrofit.Request.BirthRequest
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentBrithYearBinding
-import com.example.grimmy.viewmodel.UserViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class BirthYearFragment : Fragment() {
     private lateinit var binding: FragmentBrithYearBinding
-    private val userViewModel: UserViewModel by activityViewModels() // ViewModel 사용
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,16 +25,9 @@ class BirthYearFragment : Fragment() {
     ): View? {
         binding = FragmentBrithYearBinding.inflate(inflater, container, false)
 
-        // 사용자 정보를 관찰
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
-            // user 객체가 null이 아닐 때만 접근
-            user?.let {
-                binding.yearNicknameTv.text = it.nickname // 닉네임 표시
-//                binding.textViewBirthYear.text = it.birthYear // 출생년도 표시
-//                binding.textViewStudentStatus.text = it.studentStatus // 학생 상태 표시
-//                binding.textViewExamType.text = it.examType // 시험 타입 표시
-            }
-        }
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.yearNicknameTv.text = nickname ?: "사용자"
 
         // NumberPicker 설정
         setupNumberPicker()
@@ -54,18 +47,42 @@ class BirthYearFragment : Fragment() {
 
         // TextView 클릭 이벤트 처리
         binding.yearNextBtnTv.setOnClickListener {
-            // ViewModel에 출생 년도 저장
-            userViewModel.setBirthYear(binding.yearPickerNp.value.toString())
+            val selectedYear = binding.yearPickerNp.value
 
-            // 서버에 출생 년도 저장
-
-            // 잠시 대기 후 다음 페이지로 넘어가기
-            binding.yearNextBtnTv.postDelayed({
-                (activity as OnboardingActivity).goToNextPage()
-            }, 300) // 300ms 지연
+            // ✅ 출생 연도를 서버에 저장 (SharedPreferences에는 저장 안 함)
+            sendBirthYearToServer(selectedYear)
         }
         return binding.root
     }
+
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
+    }
+
+    // ✅ 출생 연도를 서버에 저장하는 함수
+    private fun sendBirthYearToServer(birthYear: Int) {
+        RetrofitClient.service.updateBirthYear(BirthRequest(birthYear))
+            .enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Log.i("BirthYearFragment", "✅ 출생 연도 업데이트 성공!")
+
+                        // ✅ 서버 저장 후 다음 프래그먼트로 이동
+                        moveToNextPage()
+                    } else {
+                        Log.e("BirthYearFragment", "❌ 출생 연도 업데이트 실패: ${response.code()}")
+                        Log.e("BirthYearFragment", "❌ 응답 내용: ${response.errorBody()?.string()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Log.e("BirthYearFragment", "❌ 네트워크 오류: ${t.message}")
+                }
+            })
+    }
+
 
     private fun setupNumberPicker() {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR) // 현재 연도
@@ -75,6 +92,14 @@ class BirthYearFragment : Fragment() {
         binding.yearPickerNp.value = currentYear //기본값: 현재 연도
 //        yearPicker.maxValue = currentYear // 최대값: 현재 연도
 //        yearPicker.value = studentBirthYear // 기본값: 고3 수험생 출생년도
+    }
+
+
+
+    private fun moveToNextPage() {
+        binding.yearNextBtnTv.postDelayed({
+            (activity as OnboardingActivity).goToNextPage()
+        }, 300)
     }
 
 }
