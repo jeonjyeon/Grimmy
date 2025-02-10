@@ -215,15 +215,15 @@ class HomeWeeklyTestFragment : Fragment() {
         // 감정 ImageView들이 binding에 포함되어 있다고 가정합니다.
         // 각 감정에 대해 활성 이미지와 비활성 이미지 리소스를 지정하세요.
         emotions = listOf(
-            TestEmotion(binding.testEmotionLoveIv, R.drawable.img_emotion_love, R.drawable.img_emotion_love_off),
-            TestEmotion(binding.testEmotionSadIv, R.drawable.img_emotion_sad, R.drawable.img_emotion_sad_off),
-            TestEmotion(binding.testEmotionLighteningIv, R.drawable.img_emotion_lightening, R.drawable.img_emotion_lightening_off),
-            TestEmotion(binding.testEmotionSleepyIv, R.drawable.img_emotion_sleepy, R.drawable.img_emotion_sleepy_off),
-            TestEmotion(binding.testEmotionHappyIv, R.drawable.img_emotion_happy, R.drawable.img_emotion_happy_off),
-            TestEmotion(binding.testEmotionAngryIv, R.drawable.img_emotion_angry, R.drawable.img_emotion_angry_off),
-            TestEmotion(binding.testEmotionTiredIv, R.drawable.img_emotion_tired, R.drawable.img_emotion_tired_off),
-            TestEmotion(binding.testEmotionXxIv, R.drawable.img_emotion_xx, R.drawable.img_emotion_xx_off),
-            TestEmotion(binding.testEmotionStressIv, R.drawable.img_emotion_stress, R.drawable.img_emotion_stress_off)
+            TestEmotion(binding.testEmotionLoveIv, R.drawable.img_emotion_love, R.drawable.img_emotion_love_off, "love"),
+            TestEmotion(binding.testEmotionSadIv, R.drawable.img_emotion_sad, R.drawable.img_emotion_sad_off, "sad"),
+            TestEmotion(binding.testEmotionLighteningIv, R.drawable.img_emotion_lightening, R.drawable.img_emotion_lightening_off, "lightening"),
+            TestEmotion(binding.testEmotionSleepyIv, R.drawable.img_emotion_sleepy, R.drawable.img_emotion_sleepy_off, "sleepy"),
+            TestEmotion(binding.testEmotionHappyIv, R.drawable.img_emotion_happy, R.drawable.img_emotion_happy_off, "happy"),
+            TestEmotion(binding.testEmotionAngryIv, R.drawable.img_emotion_angry, R.drawable.img_emotion_angry_off, "angry"),
+            TestEmotion(binding.testEmotionTiredIv, R.drawable.img_emotion_tired, R.drawable.img_emotion_tired_off, "tired"),
+            TestEmotion(binding.testEmotionXxIv, R.drawable.img_emotion_xx, R.drawable.img_emotion_xx_off, "xx"),
+            TestEmotion(binding.testEmotionStressIv, R.drawable.img_emotion_stress, R.drawable.img_emotion_stress_off, "stress")
         )
         emotions.forEach { emotion ->
             emotion.view.setOnClickListener {
