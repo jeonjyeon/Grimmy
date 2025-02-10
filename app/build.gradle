@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+// local.properties 파일에서 kakao_native_app_key 값을 읽어오기
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+def kakaoNativeAppKey = localProperties.getProperty("kakao_native_app_key", "")
+
+
 android {
     namespace 'com.example.grimmy'
     compileSdk 34
@@ -15,6 +24,11 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // manifestPlaceholders에 값을 등록
+        manifestPlaceholders = [NATIVE_APP_KEY: kakaoNativeAppKey]
+        buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${localProperties.getProperty('kakao_native_app_key')}\""
+
     }
 
     buildTypes {
@@ -33,6 +47,7 @@ android {
 
     buildFeatures{
         viewBinding true
+        buildConfig true
     }
 }
 
@@ -62,4 +77,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     // OkHttp Logging Interceptor (로그 확인 시 유용)
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
+
+    implementation 'com.kakao.sdk:v2-user:2.20.6' // 카카오 로그인 API 모듈
 }
