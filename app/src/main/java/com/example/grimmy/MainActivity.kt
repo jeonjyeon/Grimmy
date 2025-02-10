@@ -32,24 +32,34 @@ class MainActivity : AppCompatActivity(), OnPageUpListener {
     private fun setBottomNavView() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                com.example.grimmy.R.id.fragment_home -> {
-                    supportFragmentManager.beginTransaction().replace(com.example.grimmy.R.id.main_frame,HomeFragment()).commit()
+                R.id.fragment_home -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.main_frame,
+                        HomeFragment()
+                    ).commit()
                     true
                 }
-                com.example.grimmy.R.id.fragment_goal -> {
-                    supportFragmentManager.beginTransaction().replace(com.example.grimmy.R.id.main_frame,GoalFragment()).commit()
+                R.id.fragment_goal -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.main_frame,
+                        GoalFragment()
+                    ).commit()
                     true
                 }
-                com.example.grimmy.R.id.fragment_report -> {
-                    supportFragmentManager.beginTransaction().replace(com.example.grimmy.R.id.main_frame,ReportFragment()).commit()
+                R.id.fragment_report -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.main_frame,
+                        ReportFragment()
+                    ).commit()
                     true
                 }
-                com.example.grimmy.R.id.fragment_schedule -> {
-                    supportFragmentManager.beginTransaction().replace(com.example.grimmy.R.id.main_frame,ScheduleFragment()).commit()
+                R.id.fragment_schedule -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.main_frame,
+                        ScheduleFragment()
+                    ).commit()
                     true
                 }
-                com.example.grimmy.R.id.fragment_mypage -> {
-                    supportFragmentManager.beginTransaction().replace(com.example.grimmy.R.id.main_frame,MypageFragment()).commit()
+                R.id.fragment_mypage -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.main_frame,
+                        MypageFragment()
+                    ).commit()
                     true
                 }
 

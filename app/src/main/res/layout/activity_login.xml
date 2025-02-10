@@ -51,15 +51,14 @@
         android:id="@+id/login_kakao_login_btn_layout"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:background="@drawable/bg_activity_login_kakao"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/login_naver_login_btn_layout"
-        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="40dp"
         >
 
         <ImageView
@@ -72,36 +71,6 @@
             android:layout_height="wrap_content"
             android:text="카카오로 시작하기"
             android:textColor="@color/black"
-            android:fontFamily="@font/pretendard_semi_bold"
-            android:textSize="20sp"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/login_naver_login_btn_layout"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/bg_activity_login_naver"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/img_naver_logo" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="네이버로 시작하기"
-            android:textColor="@color/white"
             android:fontFamily="@font/pretendard_semi_bold"
             android:textSize="20sp"
             />
