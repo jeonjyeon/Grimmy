@@ -182,49 +182,54 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     private fun updateCalendarWeek() {
         binding.weeklyCalendarGl.removeAllViews()
 
-        // 오늘 날짜 (시간은 0시로 맞춰 비교 용이하게 처리)
+        // 오늘 날짜 객체 (비교를 위해 시/분/초/밀리초를 0으로 설정)
         val todayCal = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
+        // "yyyy-MM-dd" 형식 포맷터
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val todayStr = sdf.format(todayCal.time)
 
         // 이번 주의 시작 날짜를 복제 (현재 calendar는 달력 시작 날짜)
         val thisWeekStart = calendar.clone() as Calendar
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-
         for (i in 0 until 7) {
-            // 달력에서 표시할 날짜 복제
+            // 해당 날짜 객체 복제 및 문자열 생성
             val currentDayCal = calendar.clone() as Calendar
+            val currentDayStr = sdf.format(currentDayCal.time)
 
-            val dayView = layoutInflater.inflate(
-                if (currentDayCal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR) &&
-                    currentDayCal.get(Calendar.MONTH) == todayCal.get(Calendar.MONTH) &&
-                    currentDayCal.get(Calendar.DAY_OF_MONTH) == todayCal.get(Calendar.DAY_OF_MONTH)
-                ) R.layout.item_calendar_today else R.layout.item_calendar_day,
-                binding.weeklyCalendarGl, false
-            )
+            // 날짜 디자인 결정
+            val layoutRes = when {
+                // 오늘 날짜는 항상 item_calendar_today 디자인
+                currentDayStr == todayStr -> R.layout.item_calendar_today
+                // 오늘이 아니고, 선택된 날짜와 일치하면 item_calendar_selected 디자인
+                currentDayStr == currentSelectedDate -> R.layout.item_calendar_today
+                // 그 외는 기본 날짜 디자인
+                else -> R.layout.item_calendar_day
+            }
 
+            val dayView = layoutInflater.inflate(layoutRes, binding.weeklyCalendarGl, false)
             val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             textView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
 
-            // 미래 날짜이면 비활성화 처리
+            // 미래 날짜인 경우: 클릭 불가 및 투명도 낮춤
             if (currentDayCal.after(todayCal)) {
                 dayView.isClickable = false
                 dayView.alpha = 0.5f
             } else {
-                // 과거 또는 오늘이면 클릭 리스너 등록
+                // 과거 및 오늘 날짜인 경우 클릭 이벤트 등록
                 dayView.setOnClickListener {
-                    // 먼저 현재 선택 날짜의 데이터를 자동 저장
+                    // 현재 선택된 날짜에 대한 기록 자동 저장
                     DailyRecordSave()
-                    // 새로 선택한 날짜
-                    val newSelectedDate = sdf.format(currentDayCal.time)
-                    currentSelectedDate = newSelectedDate
-                    // 기록 조회 및 편집 화면 업데이트 (추후 API 호출 등 구현)
-                    // loadRecordForDate(newSelectedDate)
-                    // (필요하다면, 선택된 날짜 UI 표시 업데이트도 수행)
+                    // 새로 선택한 날짜 저장
+                    currentSelectedDate = currentDayStr
+                    // 해당 날짜의 기록을 불러오기 (추후 API 구현)
+                    // loadRecordForDate(currentDayStr)
+                    // 달력 UI를 갱신하여 선택된 날짜 항목이 item_calendar_selected 디자인으로 표시되도록 함
+                    updateCalendarWeek()
                 }
             }
 
