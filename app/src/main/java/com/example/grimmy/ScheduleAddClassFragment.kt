@@ -124,12 +124,48 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
     }
 
     override fun onTimeSet(hour: Int, minute: Int) {
+        // 선택한 시간(분 단위)
+        val chosenTimeInMinutes = hour * 60 + minute
+
         if (startTimePickerDialog.isVisible) {
+            // 시작 시간 텍스트 업데이트
             binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
+
+            // 현재 설정된 종료 시간 파싱
+            val currentEndTimeStr = binding.scheduleAddClassEndTimepickerBtnTv.text.toString()
+            val parts = currentEndTimeStr.split(":")
+            if (parts.size == 2) {
+                val endHour = parts[0].toIntOrNull() ?: hour
+                val endMinute = parts[1].toIntOrNull() ?: minute
+                val currentEndTimeInMinutes = endHour * 60 + endMinute
+
+                // 시작 시간이 종료 시간보다 크면 종료 시간을 시작 시간 + 1시간으로 설정 (24시간 형식 고려)
+                if (chosenTimeInMinutes > currentEndTimeInMinutes) {
+                    val newEndHour = (hour + 1) % 24
+                    binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", newEndHour, minute)
+                }
+            }
         } else if (endTimePickerDialog.isVisible) {
+            // 종료 시간 텍스트 업데이트
             binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
+
+            // 현재 설정된 시작 시간 파싱
+            val currentStartTimeStr = binding.scheduleAddClassStartTimepickerBtnTv.text.toString()
+            val parts = currentStartTimeStr.split(":")
+            if (parts.size == 2) {
+                val startHour = parts[0].toIntOrNull() ?: hour
+                val startMinute = parts[1].toIntOrNull() ?: minute
+                val currentStartTimeInMinutes = startHour * 60 + startMinute
+
+                // 종료 시간이 시작 시간보다 작으면 시작 시간을 종료 시간 - 1시간으로 설정 (24시간 형식 고려)
+                if (chosenTimeInMinutes < currentStartTimeInMinutes) {
+                    val newStartHour = (hour + 23) % 24  // (hour - 1) mod 24
+                    binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", newStartHour, minute)
+                }
+            }
         }
     }
+
 
     override fun onDaySet(day: String) {
         binding.scheduleAddClassDaypickerBtnTv.text = day
