@@ -292,6 +292,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val today = dateFormat.format(Date())
 
         val drawing = selectedImageUri.toString()
+        val drawingTime = binding.weeklyTimeTakenTimeTv.text.toString()
         val todayMood = selectedMood
 
         val createdAt = getCurrentDateZeroTime()
@@ -301,10 +302,12 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             userId = 1,
             dailyDayRecording = today,
             drawing = drawing,
+            drawingTime = drawingTime,
             feedback = binding.weeklyFeedbackEdittextEt.text.toString(),
             difficultIssue = binding.weeklyHardEdittextEt.text.toString(),
             goodIssue = binding.weeklyGoodEdittextEt.text.toString(),
             todayMood = todayMood,
+            moodDetail = binding.weeklyFeelEdittextEt.text.toString(),
             question = binding.weeklyQuestionEdittextEt.text.toString(),
             createdAt = createdAt,
             updateAt = updatedAt
@@ -315,6 +318,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         )
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                Log.d("HomeWeeklyFragment",request.toString())
                 if (response.isSuccessful) {
                     Log.d("HomeWeeklyFragment", "데일리 기록 저장 성공")
                     // 성공 처리 로직 추가
