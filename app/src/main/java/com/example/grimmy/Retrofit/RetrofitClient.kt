@@ -20,8 +20,8 @@ class RetrofitClient {
         //추가
         private val okHttpClient = OkHttpClient.Builder()
             //.addInterceptor(ContentTypeInterceptor())
-            .connectTimeout(20, TimeUnit.SECONDS)  // 연결 타임아웃 20초
-            .readTimeout(20, TimeUnit.SECONDS)
+            // .connectTimeout(20, TimeUnit.SECONDS)  // 연결 타임아웃 20초
+            // .readTimeout(20, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .build()
 

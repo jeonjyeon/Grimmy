@@ -1,10 +1,16 @@
 package com.example.grimmy
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 import com.example.grimmy.databinding.ActivityMainBinding
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 class MainActivity : AppCompatActivity(), OnPageUpListener {
 
@@ -20,6 +26,9 @@ class MainActivity : AppCompatActivity(), OnPageUpListener {
         if (savedInstanceState == null) {
             binding.bottomNav.selectedItemId = com.example.grimmy.R.id.fragment_home
         }
+
+        val keyHash = getKeyHash(this, packageName)
+        Log.d("KeyHash", keyHash!!)
     }
 
     override fun onPageUpClicked() {
@@ -27,6 +36,25 @@ class MainActivity : AppCompatActivity(), OnPageUpListener {
         // 예를 들어, fragment_home은 R.id.home_fragment_container에 배치되었다고 가정합니다.
         val homeFragment = supportFragmentManager.findFragmentById(R.id.main_frame) as? HomeFragment
         homeFragment?.scrollToTop()
+    }
+
+    fun getKeyHash(context: Context, packageName: String): String? {
+        val packageInfo = try {
+            context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+        } catch (e: PackageManager.NameNotFoundException) {
+            return null
+        }
+
+        for (signature in packageInfo.signatures) {
+            try {
+                val md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                return Base64.encodeToString(md.digest(), Base64.NO_WRAP)
+            } catch (e: NoSuchAlgorithmException) {
+                Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
+            }
+        }
+        return null
     }
 
     private fun setBottomNavView() {
