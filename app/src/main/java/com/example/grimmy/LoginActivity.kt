@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -60,10 +61,20 @@ class LoginActivity : AppCompatActivity() {
         Log.i(TAG, "카카오 로그인 성공")
         Log.i(TAG, accessToken)
 
+        // ✅ accessToken을 SharedPreferences에 저장
+        saveAccessToken(accessToken)
+
         // ✅ 로그인 성공 후 OnboardingActivity로 이동
         moveToOnboardingActivity()
 
         requestKakaoUserInfo()
+    }
+
+    // SharedPreferences에 accessToken을 저장하는 함수
+    private fun saveAccessToken(token: String) {
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        sharedPref.edit().putString("accessToken", token).apply()
+        Log.i(TAG, "accessToken 저장 완료: $token")
     }
 
     private fun requestKakaoUserInfo() {
