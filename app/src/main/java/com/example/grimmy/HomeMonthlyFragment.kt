@@ -49,6 +49,8 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
             pickerFragment.show(parentFragmentManager, "yearmonthPicker")
         }
 
+        loadMonthlyRecords(currentYear, currentMonth)
+
         return binding.root
     }
 
@@ -97,18 +99,20 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
             val dayTextView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             dayTextView.text = day.toString()
 
-            // 만약 월별 기록 데이터에 해당 날짜가 있다면, 해당 셀에 이미지 표시
-            val displayImage = monthlyRecordsMap[currentDateStr]
-            // 셀 레이아웃 내에 ImageView가 있다고 가정 (예: id item_calendar_record_iv)
+            // 기본 이미지를 설정 (default image)
             val recordImageView = dayView.findViewById<ImageView>(R.id.item_calendar_day_img_iv)
-            if (displayImage != null && displayImage.isNotEmpty()) {
-                // 서버에서 반환된 displayImage가 URI이므로 그대로 사용
+            recordImageView.setImageResource(R.drawable.img_default_profile_dark)
+
+            // 월별 기록 데이터가 있다면 해당 날짜의 displayImage 값을 사용하여 이미지 로드
+            val displayImage = monthlyRecordsMap[currentDateStr]
+            if (!displayImage.isNullOrEmpty()) {
                 Glide.with(requireContext())
-                    .load(displayImage)
+                    .load(displayImage) // displayImage가 URI 문자열이라고 가정
                     .into(recordImageView)
                 recordImageView.visibility = View.VISIBLE
             } else {
-                recordImageView.visibility = View.GONE
+                // 데이터가 없으면 기본 이미지가 유지되거나, 필요에 따라 visibility를 GONE으로 처리할 수 있음
+                recordImageView.visibility = View.VISIBLE
             }
 
             gridLayout.addView(dayView)
