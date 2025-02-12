@@ -6,14 +6,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.NumberPicker
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -116,50 +120,24 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
         setupEmotionClickListeners()
 
-        binding.weeklyTodayDrawingBoxCl.setOnClickListener {
-            // 이미지가 아직 로드되지 않았다면 갤러리로 이동
-            if (selectedImageUri == null) {
-                val intent = Intent(activity, CustomGalleryActivity::class.java)
-                startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
-            }
-        }
-
-        // 터치 이벤트: 이미지가 로드된 경우에만 코멘트 입력 기능 실행
-        binding.weeklyTodayDrawingBoxCl.setOnTouchListener { view, event ->
-            if (selectedImageUri != null) {
-                if (event.action == MotionEvent.ACTION_UP) {
-                    val clickX = event.x
-                    val clickY = event.y
-                    addSpeechBubbleAt(clickX, clickY)
-                    showCommentInputOverlay()
+        binding.weeklyTimeTakenTimeTv.setOnClickListener {
+            val timePickerFragment = TakenTimeDialogFragment().apply {
+                // TextView에 표시된 현재 시간을 파싱하여 초기값 전달 (없으면 0)
+                val currentText = binding.weeklyTimeTakenTimeTv.text.toString()
+                val initialHours = currentText.substringBefore("시간").trim().toIntOrNull() ?: 0
+                val initialMinutes = currentText.substringAfter("시간").substringBefore("분").trim().toIntOrNull() ?: 0
+                arguments = Bundle().apply {
+                    putInt("initialHours", initialHours)
+                    putInt("initialMinutes", initialMinutes)
                 }
-                // 이미지가 존재할 경우 터치 이벤트를 소비해서 onClick이 실행되지 않도록 함
-                true
-            } else {
-                // 이미지가 없으면 터치 이벤트를 소비하지 않고 onClick으로 전달
-                false
-            }
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    // 오버레이가 보이는 경우 제거하고 저장 수행
-                    removeCommentInputOverlay()
-
-                    // 추후 API 연동 시 여기에 실제 저장 로직이 들어갑니다.
-                    // 지금은 saveRecordForDate 메소드를 호출합니다.
-                    autoSaveRecordForDate(currentSelectedDate)
-
-                    // 사용자에게 저장 완료 메시지를 보여줄 수도 있습니다.
-                    Toast.makeText(requireContext(), "자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
-
-                    // 뒤로가기 이벤트가 정상적으로 전달되도록 콜백 비활성화 후 다시 뒤로가기 호출
-                    isEnabled = false
-                    requireActivity().onBackPressed()
+                listener = object : TakenTimeDialogFragment.OnTimeSelectedListener {
+                    override fun onTimeSelected(hours: Int, minutes: Int) {
+                        binding.weeklyTimeTakenTimeTv.text = String.format("%02d시간 %02d분", hours, minutes)
+                    }
                 }
             }
-        )
+            timePickerFragment.show(parentFragmentManager, "takenTimePicker")
+        }
 
         return binding.root
     }
@@ -193,46 +171,6 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         viewPager.visibility = View.VISIBLE
         dotsIndicator.visibility = View.VISIBLE
         placeholder.visibility = View.GONE
-    }
-
-    private fun addSpeechBubbleAt(x: Float, y: Float) {
-        val bubble = ImageView(requireContext()).apply {
-            setImageResource(R.drawable.ic_comment_bubble) // 말풍선 아이콘 리소스
-        }
-        // 부모 레이아웃이 FrameLayout이라고 가정
-        val params = ConstraintLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ).apply {
-            // 클릭 좌표에 맞춰 margin을 설정 (필요에 따라 조정)
-            leftMargin = x.toInt()
-            topMargin = y.toInt()
-        }
-        (binding.root as? ConstraintLayout)?.addView(bubble, params)
-    }
-
-    private var commentOverlay: View? = null
-
-    private fun showCommentInputOverlay() {
-        if (commentOverlay == null) {
-            commentOverlay = LayoutInflater.from(requireContext())
-                .inflate(R.layout.layout_comment_input, (binding.root as ViewGroup), false)
-            // 저장버튼 리스너를 별도로 지정하지 않고, 뒤로가기 시 자동 저장으로 처리합니다.
-            (binding.root as? ViewGroup)?.addView(commentOverlay)
-        }
-    }
-
-    private fun removeCommentInputOverlay() {
-        commentOverlay?.let { overlay ->
-            (binding.root as? ViewGroup)?.removeView(overlay)
-            commentOverlay = null
-        }
-    }
-
-    private fun autoSaveRecordForDate(recordDate: String) {
-        // 저장 API 연동은 추후 진행하고, 현재는 로그와 토스트로 확인만 합니다.
-        Log.d("HomeWeeklyFragment", "[$recordDate] 자동 저장 호출")
-        Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
     }
 
     // --- 달력 관련 메소드 ---
