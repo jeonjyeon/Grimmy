@@ -145,7 +145,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     override fun onPause() {
         super.onPause()
         // 화면 전환 전에 현재 선택된 날짜에 대해 자동 저장
-        saveRecordForDate(currentSelectedDate)
+        saveRecordForDate(parseDate(currentSelectedDate))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -158,6 +158,14 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                 setupDrawingViewPager(selectedImages)
             }
         }
+    }
+
+    private fun parseDate(dateString: String): Date {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // ✅ yyyy-MM-dd 형식 지정
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+        val formattedDate = sdf.format(sdf.parse(dateString) ?: Date()) // ✅ String으로 변환 후 다시 Date로 변환
+        return sdf.parse(formattedDate) ?: Date()
     }
 
     private fun setupDrawingViewPager(selectedImages: List<Uri>) {
@@ -217,7 +225,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             } else {
                 dayView.setOnClickListener {
                     // 자동 저장: 기존 선택된 날짜 기록 저장
-                    saveRecordForDate(currentSelectedDate)
+                    saveRecordForDate(parseDate(currentSelectedDate))
                     // 업데이트: 새 선택 날짜 설정
                     currentSelectedDate = currentDayStr
                     // 조회: 해당 날짜의 기록을 불러오기
@@ -309,7 +317,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     }
 
     // --- 자동 저장 및 기록 조회 함수 ---
-    private fun saveRecordForDate(recordDate: String) {
+    private fun saveRecordForDate(recordDate: Date) {
         val drawing = selectedImageUri?.toString() ?: ""
         val todayMood = selectedMood
 
@@ -322,14 +330,17 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             drawing = drawing,
             drawingTime = binding.weeklyTimeTakenTimeTv.text.toString(),
             feedback = binding.weeklyFeedbackEdittextEt.text.toString(),
-            difficultIssue = binding.weeklyHardEdittextEt.text.toString(),
+            dfficultIssue = binding.weeklyHardEdittextEt.text.toString(),
             goodIssue = binding.weeklyGoodEdittextEt.text.toString(),
             todayMood = todayMood,
             moodDetail = binding.weeklyFeelEdittextEt.text.toString(),
             question = binding.weeklyQuestionEdittextEt.text.toString(),
             createdAt = createdAt,
-            updateAt = updatedAt
+            updatedAt = updatedAt
         )
+
+        Log.d("apiConnect",request.toString())
+        Log.d("apiConnect",request.dailyDayRecording::class.java.toString())
 
         RetrofitClient.service.postDailyRecordSave(request).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {

@@ -1,5 +1,7 @@
 package com.example.grimmy.Retrofit
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -25,12 +27,14 @@ class RetrofitClient {
             .addInterceptor(loggingInterceptor)
             .build()
 
-
+        val gson: Gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd") // ✅ 자동 변환 설정
+            .create()
 
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(this.BASE_URL)
             .client(okHttpClient) // 추가
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
         val service: RetrofitService = retrofit.create(RetrofitService::class.java)
