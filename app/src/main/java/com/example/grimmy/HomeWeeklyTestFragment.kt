@@ -1,15 +1,28 @@
 package com.example.grimmy
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
+import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyTestBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 class HomeWeeklyTestFragment : Fragment() {
@@ -24,6 +37,13 @@ class HomeWeeklyTestFragment : Fragment() {
     private var pageUpListener: OnPageUpListener? = null
 
     private lateinit var emotions: List<TestEmotion>
+    private var selectedMood: String = ""
+    // 선택된 이미지 URI (CustomGalleryActivity에서 전달받은 값)
+    private var selectedImageUri: Uri? = null
+    private var savedCreatedAt: String? = null
+
+    // 현재 선택된 날짜를 "yyyy-MM-dd" 형식으로 저장 (초기값은 오늘)
+    private var currentSelectedDate: String = getCurrentDate("yyyy-MM-dd")
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -162,36 +182,59 @@ class HomeWeeklyTestFragment : Fragment() {
      */
     private fun updateCalendarWeek() {
         binding.testCalendarGl.removeAllViews()
+        // 오늘 날짜(비교용; 시간 0시로 설정)
+        val todayCal = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val todayStr = sdf.format(todayCal.time)
 
-        val today = Calendar.getInstance()
-        val currentYear = today.get(Calendar.YEAR)
-        val currentMonth = today.get(Calendar.MONTH)
-        val currentDate = today.get(Calendar.DAY_OF_MONTH)
-
-        // 이번 주의 시작 날짜를 복제
+        // 이번 주 시작 날짜 복제
         val thisWeekStart = calendar.clone() as Calendar
 
         for (i in 0 until 7) {
-            val isToday = calendar.get(Calendar.YEAR) == currentYear &&
-                    calendar.get(Calendar.MONTH) == currentMonth &&
-                    calendar.get(Calendar.DAY_OF_MONTH) == currentDate
+            val currentDayCal = calendar.clone() as Calendar
+            val currentDayStr = sdf.format(currentDayCal.time)
 
-            val dayView = if (isToday) {
-                layoutInflater.inflate(R.layout.item_calendar_today, binding.testCalendarGl, false)
-            } else {
-                layoutInflater.inflate(R.layout.item_calendar_day, binding.testCalendarGl, false)
+            // 디자인 결정: 오늘은 항상 item_calendar_today,
+            // 그 외에 (오늘이 아닌) 선택된 날짜는 item_calendar_selected,
+            // 기본 날짜는 item_calendar_day
+            val layoutRes = when {
+                currentDayStr == todayStr -> R.layout.item_calendar_today
+                currentDayStr == currentSelectedDate -> R.layout.item_calendar_today
+                else -> R.layout.item_calendar_day
             }
+            val dayView = layoutInflater.inflate(layoutRes, binding.testCalendarGl, false)
+            val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
+            textView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
 
-            // 날짜 항목 내부의 TextView (id: item_calendar_day_tv)에 날짜 숫자 설정
-            val dayTextView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
-            dayTextView.text = "${calendar.get(Calendar.DAY_OF_MONTH)}"
-
+            if (currentDayCal.after(todayCal)) {
+                dayView.isClickable = false
+                dayView.alpha = 0.5f
+            } else {
+                dayView.setOnClickListener {
+                    // 자동 저장: 현재 선택된 날짜의 기록 저장
+                    saveTestRecordForDate(currentSelectedDate)
+                    // 업데이트: 새로 선택한 날짜 저장
+                    currentSelectedDate = currentDayStr
+                    // 조회: 해당 날짜의 기록 불러오기
+                    loadRecordForDate(currentDayStr)
+                    // UI 갱신: 달력 UI 업데이트하여 선택된 날짜는 item_calendar_selected로 표시
+                    updateCalendarWeek()
+                }
+            }
             binding.testCalendarGl.addView(dayView)
-            // 다음 날짜로 이동
             calendar.add(Calendar.DATE, 1)
         }
-        // GridLayout 업데이트 후 calendar를 이번 주의 시작 날짜로 재설정
-        calendar.set(thisWeekStart.get(Calendar.YEAR), thisWeekStart.get(Calendar.MONTH), thisWeekStart.get(Calendar.DAY_OF_MONTH))
+        // 달력 업데이트 후 calendar를 이번 주 시작 날짜로 재설정
+        calendar.set(
+            thisWeekStart.get(Calendar.YEAR),
+            thisWeekStart.get(Calendar.MONTH),
+            thisWeekStart.get(Calendar.DAY_OF_MONTH)
+        )
     }
 
     /**
@@ -243,6 +286,90 @@ class HomeWeeklyTestFragment : Fragment() {
                 emotion.view.setImageResource(emotion.disabledRes)
             }
         }
+    }
+
+    private fun saveTestRecordForDate(recordDate: String) {
+        val drawing = selectedImageUri?.toString() ?: ""
+        val todayMood = selectedMood
+
+        val createdAt = savedCreatedAt ?: getCurrentDateTime().also { savedCreatedAt = it }
+        val updatedAt = getCurrentDateTime()
+
+        val scoreText = binding.testScoreTv.text.toString()  // 예: "00점"
+        val scoreInt = scoreText.substringBefore("점").trim().toIntOrNull() ?: 0
+
+        val request = TestRecordSaveRequest(
+            userId = 1,
+            testDayRecording = recordDate,
+            drawing = drawing,
+            drawingTime = binding.testTimeTakenTimeTv.text.toString(),
+            score = scoreInt,
+            feedback = binding.testFeedbackEdittextEt.text.toString(),
+            difficultIssue = binding.testHardEdittextEt.text.toString(),
+            goodIssue = binding.testGoodEdittextEt.text.toString(),
+            addTime = binding.testMoreTimeEdittextEt.text.toString(),
+            satisfication = binding.progressText.text.toString(),
+            todayMood = todayMood,
+            moodDetail = binding.testFeelEdittextEt.text.toString(),
+            question = binding.testQuestionEdittextEt.text.toString(),
+            createdAt = createdAt,
+            updateAt = updatedAt
+        )
+
+        RetrofitClient.service.postTestRecordSave(request).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 자동 저장 성공")
+                    Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 실패: ${response.code()} , ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 에러: ${t.message}")
+            }
+        })
+    }
+
+    private fun loadRecordForDate(recordDate: String) {
+        RetrofitClient.service.getTestRecordGet(userId = 1, date = recordDate).enqueue(object : Callback<TestRecordGetResponse> {
+            override fun onResponse(call: Call<TestRecordGetResponse>, response: Response<TestRecordGetResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { record ->
+                        binding.testFeedbackEdittextEt.setText(record.feedback ?: "")
+                        binding.testHardEdittextEt.setText(record.difficultIssue ?: "")
+                        binding.testGoodEdittextEt.setText(record.goodIssue ?: "")
+                        binding.progressText.setText(record.satisfication ?: "")
+                        binding.testQuestionEdittextEt.setText(record.question ?: "")
+                        binding.testScoreTv.text = "${record.score} 점"
+                        binding.testTimeTakenTimeTv.text = record.drawingTime ?: binding.testTimeTakenTimeTv.text
+                        selectedMood = record.todayMood ?: ""
+                        binding.testFeelEdittextEt.setText(record.moodDetail ?: "")
+                        Toast.makeText(requireContext(), "[$recordDate] 기록을 불러왔습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 조회 실패: ${response.code()} ${response.message()}")
+                    Toast.makeText(requireContext(), "[$recordDate] 기록 조회 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<TestRecordGetResponse>, t: Throwable) {
+                Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 조회 에러: ${t.message}")
+                Toast.makeText(requireContext(), "[$recordDate] 기록 조회 에러", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun getCurrentDateTime(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return dateFormat.format(Date())
+    }
+
+    private fun getCurrentDate(format: String): String {
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return sdf.format(Date())
     }
 
     override fun onDestroyView() {
