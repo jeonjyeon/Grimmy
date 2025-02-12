@@ -16,7 +16,9 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyBinding
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
@@ -40,12 +42,14 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     private var pageUpListener: OnPageUpListener? = null
 
-    private var currentSelectedDate: String = getCurrentDate("yyyy-MM-dd")
     private lateinit var emotions: List<TestEmotion>
     private var selectedMood: String = ""
-    // 선택된 이미지 URI를 저장 (CustomGalleryActivity에서 전달받은 값)
+    // 선택된 이미지 URI (CustomGalleryActivity에서 전달받은 값)
     private var selectedImageUri: Uri? = null
     private var savedCreatedAt: String? = null
+
+    // 현재 선택된 날짜를 "yyyy-MM-dd" 형식으로 저장 (초기값은 오늘)
+    private var currentSelectedDate: String = getCurrentDate("yyyy-MM-dd")
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,18 +65,18 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     ): View? {
         binding = FragmentHomeWeeklyBinding.inflate(inflater, container, false)
 
-        // Initial calendar setup for the current week
+        // 초기 달력 설정
         adjustToStartOfWeek()
         updateCalendarWeek()
+        updateDateTextView(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1)
+        // 화면이 처음 로드될 때 오늘 날짜(현재 선택된 날짜)에 대한 기록을 조회
+        loadRecordForDate(currentSelectedDate)
 
-        // Set the default value of the date text view to the current month
-        updateDateTextView(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1) // Calendar.MONTH는 0부터 시작
-
-        // Set up the listeners for previous and next week buttons
+        // 이전/다음 주 버튼 리스너
         binding.weeklyCalendarPreviousBtnIv.setOnClickListener { changeWeek(-1) }
         binding.weeklyCalendarNextBtnIv.setOnClickListener { changeWeek(1) }
 
-        // Set up the date picker dialog
+        // 날짜 선택 다이얼로그
         binding.weeklyDatepickerLl.setOnClickListener {
             val pickerFragment = DatePickerDialogFragment().apply {
                 listener = this@HomeWeeklyFragment
@@ -80,21 +84,18 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             pickerFragment.show(parentFragmentManager, "yearmonthPicker")
         }
 
-        // 기존: 전체 박스 클릭 시 CustomGalleryActivity 호출
+        // CustomGalleryActivity 호출
         binding.weeklyTodayDrawingBoxCl.setOnClickListener {
             val intent = Intent(activity, CustomGalleryActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
         }
-
-        // 추가: plus 버튼 클릭 시에도 CustomGalleryActivity 호출
         binding.weeklyTodayDrawingPlusBtnIv.setOnClickListener {
             val intent = Intent(activity, CustomGalleryActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
         }
 
-        // weekly_toggle_btn_iv 클릭 시 HomeWeeklyTestFragment로 화면 전환
+        // 토글 버튼
         binding.weeklyToggleBtnIv.setOnClickListener {
-            // 전환할 Fragment의 컨테이너 id를 R.id.fragment_container로 가정 (실제 id로 변경 필요)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.home_frame, HomeWeeklyTestFragment())
                 .addToBackStack(null)
@@ -103,7 +104,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
         binding.weeklyPageUpBtnIv.setOnClickListener {
             pageUpListener?.onPageUpClicked()
-            // DailyRecordSave() // 서버 연동 확인을 위해 임시 버튼으로 사용
+            // 필요 시 임시 저장 버튼으로도 호출 가능
         }
 
         setupEmotionClickListeners()
@@ -132,8 +133,8 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     override fun onPause() {
         super.onPause()
-        // 화면 전환 전에 자동 저장
-        DailyRecordSave()
+        // 화면 전환 전에 현재 선택된 날짜에 대해 자동 저장
+        saveRecordForDate(currentSelectedDate)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -141,34 +142,27 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         if (requestCode == REQUEST_CODE_CUSTOM_GALLERY && resultCode == Activity.RESULT_OK) {
             val selectedImages = data?.getParcelableArrayListExtra<Uri>("selectedImages")
             if (!selectedImages.isNullOrEmpty()) {
-                // 여기서 하나의 이미지만 사용하도록 첫 번째 URI를 저장
+                // 하나의 이미지만 사용하도록 첫 번째 URI 저장
                 selectedImageUri = selectedImages.first()
-                // 업데이트: ViewPager2와 인디케이터 설정 (갤러리 미리보기 등)
                 setupDrawingViewPager(selectedImages)
             }
         }
     }
 
     private fun setupDrawingViewPager(selectedImages: List<Uri>) {
-        // weekly_today_drawing_box_cl 내부의 ViewPager2, 인디케이터, 그리고 placeholder 가져오기
         val viewPager = binding.weeklyTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
         val dotsIndicator = binding.weeklyTodayDrawingBoxCl.findViewById<DotsIndicator>(R.id.weekly_dot_indicator_di)
         val placeholder = binding.weeklyTodayDrawingBoxCl.findViewById<View>(R.id.weekly_placeholder_ll)
 
-        // ViewPager2 어댑터 설정
         val adapter = DrawingPagerAdapter(selectedImages)
         viewPager.adapter = adapter
-
-        // 인디케이터와 ViewPager2 연결
         dotsIndicator.setViewPager2(viewPager)
-
-        // 이미지가 선택되었으므로 placeholder 감추고 ViewPager2와 인디케이터 보이기
         viewPager.visibility = View.VISIBLE
         dotsIndicator.visibility = View.VISIBLE
         placeholder.visibility = View.GONE
     }
 
-    // --- 기존 캘린더 관련 메소드들 ---
+    // --- 달력 관련 메소드 ---
     private fun adjustToStartOfWeek() {
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
             calendar.add(Calendar.DATE, -1)
@@ -177,63 +171,59 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     private fun updateCalendarWeek() {
         binding.weeklyCalendarGl.removeAllViews()
-
-        // 오늘 날짜 객체 (비교를 위해 시/분/초/밀리초를 0으로 설정)
+        // 오늘 날짜(비교용; 시간 0시로 맞춤)
         val todayCal = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        // "yyyy-MM-dd" 형식 포맷터
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val todayStr = sdf.format(todayCal.time)
 
-        // 이번 주의 시작 날짜를 복제 (현재 calendar는 달력 시작 날짜)
+        // 이번 주 시작 날짜 복제
         val thisWeekStart = calendar.clone() as Calendar
 
         for (i in 0 until 7) {
-            // 해당 날짜 객체 복제 및 문자열 생성
             val currentDayCal = calendar.clone() as Calendar
             val currentDayStr = sdf.format(currentDayCal.time)
 
-            // 날짜 디자인 결정
+            // 오늘 날짜는 항상 item_calendar_today 디자인 유지
+            // 만약 현재 선택된 날짜가 오늘과 같다면 item_calendar_today가 선택 디자인과 동일하다고 볼 수 있음
+            // 오늘이 아니면서 사용자가 선택한 날짜면 별도의 선택 디자인(item_calendar_selected)
             val layoutRes = when {
-                // 오늘 날짜는 항상 item_calendar_today 디자인
                 currentDayStr == todayStr -> R.layout.item_calendar_today
-                // 오늘이 아니고, 선택된 날짜와 일치하면 item_calendar_selected 디자인
                 currentDayStr == currentSelectedDate -> R.layout.item_calendar_today
-                // 그 외는 기본 날짜 디자인
                 else -> R.layout.item_calendar_day
             }
-
             val dayView = layoutInflater.inflate(layoutRes, binding.weeklyCalendarGl, false)
             val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             textView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
 
-            // 미래 날짜인 경우: 클릭 불가 및 투명도 낮춤
             if (currentDayCal.after(todayCal)) {
                 dayView.isClickable = false
                 dayView.alpha = 0.5f
             } else {
-                // 과거 및 오늘 날짜인 경우 클릭 이벤트 등록
                 dayView.setOnClickListener {
-                    // 현재 선택된 날짜에 대한 기록 자동 저장
-                    DailyRecordSave()
-                    // 새로 선택한 날짜 저장
+                    // 자동 저장: 기존 선택된 날짜 기록 저장
+                    saveRecordForDate(currentSelectedDate)
+                    // 업데이트: 새 선택 날짜 설정
                     currentSelectedDate = currentDayStr
-                    // 해당 날짜의 기록을 불러오기 (추후 API 구현)
-                    // loadRecordForDate(currentDayStr)
-                    // 달력 UI를 갱신하여 선택된 날짜 항목이 item_calendar_selected 디자인으로 표시되도록 함
+                    // 조회: 해당 날짜의 기록을 불러오기
+                    loadRecordForDate(currentDayStr)
+                    // UI 갱신: 달력의 각 항목이 올바른 디자인으로 표시되도록 갱신
                     updateCalendarWeek()
                 }
             }
-
             binding.weeklyCalendarGl.addView(dayView)
             calendar.add(Calendar.DATE, 1)
         }
-        // 달력 업데이트 후 calendar를 이번 주의 시작 날짜로 재설정
-        calendar.set(thisWeekStart.get(Calendar.YEAR), thisWeekStart.get(Calendar.MONTH), thisWeekStart.get(Calendar.DAY_OF_MONTH))
+        // 달력 업데이트 후 calendar를 이번 주 시작 날짜로 재설정
+        calendar.set(
+            thisWeekStart.get(Calendar.YEAR),
+            thisWeekStart.get(Calendar.MONTH),
+            thisWeekStart.get(Calendar.DAY_OF_MONTH)
+        )
     }
 
     private fun changeWeek(direction: Int) {
@@ -243,12 +233,8 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     }
 
     private fun updateDateTextView(year: Int, month: Int) {
+        // 예: "YYYY년 M월" 형식으로 달력 상단에 표시
         binding.weeklyDatepickerBtnTv.text = String.format("%d년 %d월", year, month)
-    }
-
-    private fun getCurrentDate(format: String): String {
-        val sdf = SimpleDateFormat(format, Locale.getDefault())
-        return sdf.format(Date())
     }
 
     override fun onDateSelected(year: Int, month: Int) {
@@ -260,29 +246,25 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         updateDateTextView(year, month)
     }
 
-    // ViewPager2 어댑터: 선택된 그림들을 보여줌
+    // --- ViewPager2 어댑터 ---
     class DrawingPagerAdapter(private val images: List<Uri>) : RecyclerView.Adapter<DrawingPagerAdapter.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_drawing_page, parent, false)
             return ViewHolder(view)
         }
-
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             Glide.with(holder.itemView.context)
                 .load(images[position])
                 .into(holder.imageView)
         }
-
         override fun getItemCount(): Int = images.size
-
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val imageView: ImageView = itemView.findViewById(R.id.drawing_page_iv)
         }
     }
 
+    // --- 감정 관련 ---
     private fun setupEmotionClickListeners() {
-        // 감정 ImageView들이 binding에 포함되어 있다고 가정합니다.
-        // 각 감정에 대해 활성 이미지와 비활성 이미지 리소스를 지정하세요.
         emotions = listOf(
             TestEmotion(binding.emotionLoveIv, R.drawable.img_emotion_love, R.drawable.img_emotion_love_off, "love"),
             TestEmotion(binding.emotionSadIv, R.drawable.img_emotion_sad, R.drawable.img_emotion_sad_off, "sad"),
@@ -302,12 +284,10 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     }
 
     /**
-     * 선택한 감정(Emotion)만 활성 이미지로, 나머지는 비활성 이미지로 변경합니다.
+     * 선택한 감정만 활성 이미지로, 나머지는 비활성 이미지로 변경하고 선택된 감정의 mood를 저장합니다.
      */
     private fun selectEmotion(selectedEmotion: TestEmotion) {
-        // 선택한 감정의 mood 값을 저장
         selectedMood = selectedEmotion.mood
-
         for (emotion in emotions) {
             if (emotion == selectedEmotion) {
                 emotion.view.setImageResource(emotion.activeRes)
@@ -317,32 +297,19 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         }
     }
 
-    private fun getCurrentDateTime(): String {
-        // "yyyy-MM-dd'T'HH:mm:ss" 형식으로 현재 날짜와 시간을 반환하는 포맷터 생성
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-        // 타임존을 한국 표준시(Asia/Seoul)로 설정
-        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
-        return dateFormat.format(Date())
-    }
-
-    private fun DailyRecordSave() {
-
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = dateFormat.format(Date())
-
-        val drawing = selectedImageUri.toString()
-        val drawingTime = binding.weeklyTimeTakenTimeTv.text.toString()
+    // --- 자동 저장 및 기록 조회 함수 ---
+    private fun saveRecordForDate(recordDate: String) {
+        val drawing = selectedImageUri?.toString() ?: ""
         val todayMood = selectedMood
 
         val createdAt = savedCreatedAt ?: getCurrentDateTime().also { savedCreatedAt = it }
-        // updatedAt은 매번 저장 시 현재 날짜로 갱신
         val updatedAt = getCurrentDateTime()
 
         val request = DailyRecordSaveRequest(
             userId = 1,
-            dailyDayRecording = currentSelectedDate,
+            dailyDayRecording = recordDate,
             drawing = drawing,
-            drawingTime = drawingTime,
+            drawingTime = binding.weeklyTimeTakenTimeTv.text.toString(),
             feedback = binding.weeklyFeedbackEdittextEt.text.toString(),
             difficultIssue = binding.weeklyHardEdittextEt.text.toString(),
             goodIssue = binding.weeklyGoodEdittextEt.text.toString(),
@@ -353,25 +320,60 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             updateAt = updatedAt
         )
 
-        val call= RetrofitClient.service.postDailyRecordSave(
-            request
-        )
-        call.enqueue(object : Callback<Void> {
+        RetrofitClient.service.postDailyRecordSave(request).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                Log.d("HomeWeeklyFragment",request.toString())
                 if (response.isSuccessful) {
-                    Log.d("HomeWeeklyFragment", "데일리 기록 저장 성공")
-                    // 성공 처리 로직 추가
-                    Toast.makeText(requireContext(), "저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    Log.d("HomeWeeklyFragment", "[$recordDate] 기록 자동 저장 성공")
+                    Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    Log.d("HomeWeeklyFragment", "데일리 기록 저장 실패: ${response.code()} , 에러메시지: ${response.message()}")
+                    Log.d("HomeWeeklyFragment", "[$recordDate] 기록 저장 실패: ${response.code()} , ${response.message()}")
                 }
             }
-
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("HomeWeeklyFragment", "데일리 기록 저장 에러: ${t.message}")
+                Log.d("HomeWeeklyFragment", "[$recordDate] 기록 저장 에러: ${t.message}")
             }
         })
     }
 
+    private fun loadRecordForDate(recordDate: String) {
+        RetrofitClient.service.getDailyRecordGet(userId = 1, date = recordDate).enqueue(object : Callback<DailyRecordGetResponse> {
+            override fun onResponse(call: Call<DailyRecordGetResponse>, response: Response<DailyRecordGetResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { record ->
+                        // EditText 등에 기록된 내용을 채웁니다.
+                        binding.weeklyFeedbackEdittextEt.setText(record.feedback ?: "")
+                        binding.weeklyHardEdittextEt.setText(record.difficultIssue ?: "")
+                        binding.weeklyGoodEdittextEt.setText(record.goodIssue ?: "")
+                        binding.weeklyQuestionEdittextEt.setText(record.question ?: "")
+                        // 예시로, drawingTime이나 moodDetail 등도 필요하면 채워 넣습니다.
+                        binding.weeklyTimeTakenTimeTv.text = record.drawingTime ?: binding.weeklyTimeTakenTimeTv.text
+                        // 만약 mood 정보가 있으면 selectedMood도 업데이트
+                        selectedMood = record.todayMood ?: ""
+                        binding.weeklyFeelEdittextEt.setText(record.moodDetail ?: "")
+                        Toast.makeText(requireContext(), "[$recordDate] 기록을 불러왔습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.d("HomeWeeklyFragment", "[$recordDate] 기록 조회 실패: ${response.code()} ${response.message()}")
+                    Toast.makeText(requireContext(), "[$recordDate] 기록 조회 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<DailyRecordGetResponse>, t: Throwable) {
+                Log.d("HomeWeeklyFragment", "[$recordDate] 기록 조회 에러: ${t.message}")
+                Toast.makeText(requireContext(), "[$recordDate] 기록 조회 에러", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun getCurrentDateTime(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return dateFormat.format(Date())
+    }
+
+    private fun getCurrentDate(format: String): String {
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return sdf.format(Date())
+    }
 }
