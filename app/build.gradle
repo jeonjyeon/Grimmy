@@ -79,4 +79,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
 
     implementation 'com.kakao.sdk:v2-user:2.20.6' // 카카오 로그인 API 모듈
+    implementation "androidx.core:core-splashscreen:1.0.0" // Android 12 하위 버전 대비하여 라이브러리 추가
 }
