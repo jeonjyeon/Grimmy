@@ -5,6 +5,7 @@ import retrofit2.Call
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
+import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -33,4 +34,11 @@ interface RetrofitService {
         @Query(value = "userId") userId: Int,
         @Query(value = "date") date: String
     ):Call<TestRecordGetResponse>
+
+    @GET("/record/monthly")
+    fun getMonthlyRecord(
+        @Query(value = "userId") userId: Int,
+        @Query(value = "year") year: Int,
+        @Query(value = "month") month: Int
+    ):Call<List<MonthlyRecordGetResponse>>
 }
