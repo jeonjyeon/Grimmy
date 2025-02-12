@@ -49,13 +49,14 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
             pickerFragment.show(parentFragmentManager, "yearmonthPicker")
         }
 
-        loadMonthlyRecords(currentYear, currentMonth)
+        loadMonthlyRecords(currentYear, currentMonth + 1)
 
         return binding.root
     }
 
     override fun onDateSelected(year: Int, month: Int) {
         updateCalendar(year, month)
+        loadMonthlyRecords(year, month)
     }
 
     private fun updateCalendar(year: Int, month: Int) {
