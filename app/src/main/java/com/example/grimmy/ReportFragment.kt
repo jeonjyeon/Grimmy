@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -18,6 +19,10 @@ class ReportFragment : Fragment() {
     ): View? {
         binding = FragmentReportBinding.inflate(inflater,container,false)
 
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.reportProfileUsernameTv.text = nickname ?: "사용자"
+
         childFragmentManager.beginTransaction().replace(R.id.report_frame,ReportPaintingFragment()).commit()
 
         binding.reportEmotionSelectedBtnTv.setOnClickListener {
@@ -26,7 +31,7 @@ class ReportFragment : Fragment() {
             binding.reportEmotionSelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_right_selected_btn) // 선택된 버튼의 배경
             binding.reportEmotionSelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
             binding.reportPaintingSelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_left_non_selected_btn) // 비선택된 버튼의 배경
-            binding.reportPaintingSelectedBtnTv.setTextColor(Color.parseColor("#FFCDA9"))
+            binding.reportPaintingSelectedBtnTv.setTextColor(Color.parseColor("#80FFCDA9"))
 
         }
 
@@ -36,7 +41,7 @@ class ReportFragment : Fragment() {
             binding.reportPaintingSelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_left_selected_btn) // 선택된 버튼의 배경
             binding.reportPaintingSelectedBtnTv.setTextColor(resources.getColor(R.color.gray9, null))
             binding.reportEmotionSelectedBtnTv.setBackgroundResource(R.drawable.bg_tab_right_non_selected_btn) // 비선택된 버튼의 배경
-            binding.reportEmotionSelectedBtnTv.setTextColor(Color.parseColor("#FFCDA9"))
+            binding.reportEmotionSelectedBtnTv.setTextColor(Color.parseColor("#80FFCDA9"))
         }
 
         binding.reportNotifyBtnIv.setOnClickListener{
@@ -49,5 +54,9 @@ class ReportFragment : Fragment() {
         }
         return binding.root
     }
-
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
+    }
 }

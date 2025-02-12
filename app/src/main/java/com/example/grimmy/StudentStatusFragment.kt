@@ -1,7 +1,9 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -9,12 +11,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.example.grimmy.Retrofit.Request.StatusRequest
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentStudentStatusBinding
-import com.example.grimmy.viewmodel.UserViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class StudentStatusFragment : Fragment() {
     private lateinit var binding: FragmentStudentStatusBinding
-    private val userViewModel: UserViewModel by activityViewModels() // ViewModel 사용
 
     private lateinit var statusOptions: List<TextView>
     private var selectedOption: TextView? = null
@@ -26,15 +31,10 @@ class StudentStatusFragment : Fragment() {
         binding = FragmentStudentStatusBinding.inflate(inflater, container, false)
         // 사용자 정보를 관찰
 
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
-            // user 객체가 null이 아닐 때만 접근
-            user?.let {
-                binding.statusNicknameTv.text = it.nickname // 닉네임 표시
-//                binding.textViewBirthYear.text = it.birthYear // 출생년도 표시
-//                binding.textViewStudentStatus.text = it.studentStatus // 학생 상태 표시
-//                binding.textViewExamType.text = it.examType // 시험 타입 표시
-            }
-        }
+        // ✅ SharedPreferences에서 닉네임 가져오기
+        val nickname = getNickname()
+        binding.statusNicknameTv.text = nickname ?: "사용자" // 닉네임이 없으면 기본값 표시
+
 
         // TextView 목록 초기화
         statusOptions = listOf(
@@ -68,16 +68,54 @@ class StudentStatusFragment : Fragment() {
             // 선택된 버튼의 텍스트를 가져와서 학생 상태로 설정
             selectedOption?.let { selected ->
                 val studentStatus = selected.text.toString() // 선택된 TextView의 텍스트를 가져옴
-                userViewModel.setStudentStatus(studentStatus) // ViewModel에 학생 상태 저장
+                sendStatusToServer(studentStatus) // ✅ 서버로 전송
             }
-            // 잠시 대기 후 다음 페이지로 넘어가기
-            binding.statusNextBtnTv.postDelayed({
-                (activity as OnboardingActivity).goToNextPage()
-            }, 350) // 300ms 지연
         }
 
         return binding.root
     }
+
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
+    }
+
+    // ✅ 서버에 신분(status) 저장 요청
+    private fun sendStatusToServer(status: String) {
+        val statusEnum = getStatusEnum(status)
+        if (statusEnum != null) {
+            RetrofitClient.service.updateStatus(StatusRequest(statusEnum.name)) // ✅ ENUM.name 전송
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            Log.i("StudentStatusFragment", "✅ 신분 업데이트 성공! (${statusEnum.name})")
+                            moveToNextPage()
+                        } else {
+                            Log.e("StudentStatusFragment", "❌ 신분 업데이트 실패: ${response.code()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("StudentStatusFragment", "❌ 네트워크 오류: ${t.message}")
+                    }
+                })
+        } else {
+            Log.e("StudentStatusFragment", "❌ 잘못된 신분 선택: $status")
+        }
+    }
+
+    // ✅ 선택된 신분을 ENUM 형식의 문자열로 변환하는 함수
+    private fun getStatusEnum(statusText: String): EnumStatus? {
+        return EnumStatus.entries.find { it.statusName == statusText }
+    }
+
+    private fun moveToNextPage() {
+        binding.statusNextBtnTv.postDelayed({
+            (activity as OnboardingActivity).goToNextPage()
+        }, 350)
+    }
+
 
     private fun toggleSelection(selected: TextView) {
         if (selectedOption == selected) {

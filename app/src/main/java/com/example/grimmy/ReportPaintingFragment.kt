@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
@@ -9,16 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.viewModels
 import com.example.grimmy.databinding.FragmentReportPaintingBinding
 import com.example.grimmy.viewmodel.PaintingViewModel
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.ValueFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -32,6 +29,10 @@ class ReportPaintingFragment : Fragment(), DatePickerDialogFragment.OnDateSelect
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentReportPaintingBinding.inflate(inflater, container, false)
+
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.paintingProfileUsernameTv.text = nickname ?: "사용자"
 
         // Initial calendar setup for the current week
         adjustToStartOfWeek()
@@ -64,6 +65,12 @@ class ReportPaintingFragment : Fragment(), DatePickerDialogFragment.OnDateSelect
         viewModel.monthlyPerformance.observe(viewLifecycleOwner) { updateMonthlyChart(it) }
         return binding.root
     }
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
+    }
+
 //    /** 📌 LiveData 옵저버 설정 */
 //    private fun observeViewModel() {
 //        viewModel.weeklyScores.observe(viewLifecycleOwner) { updateExamChart(it) }

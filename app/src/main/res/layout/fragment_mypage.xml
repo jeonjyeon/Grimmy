@@ -62,37 +62,31 @@
                 android:layout_marginStart="20dp"
                 />
 
-            <LinearLayout
-                android:id="@+id/mypage_profile_ll"
+            <TextView
+                android:id="@+id/mypage_profile_name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:text="김민우"
+                android:fontFamily="@font/pretendard_bold"
+                android:textColor="@color/gray8"
+                android:textSize="28sp"
                 app:layout_constraintTop_toTopOf="@id/mypage_profile_img_iv"
-                app:layout_constraintBottom_toBottomOf="@id/mypage_profile_img_iv"
                 app:layout_constraintStart_toEndOf="@id/mypage_profile_img_iv"
-                android:layout_marginStart="25dp"
-                >
-                <TextView
-                    android:id="@+id/mypage_profile_name_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="김민우"
-                    android:fontFamily="@font/pretendard_bold"
-                    android:textColor="@color/gray8"
-                    android:textSize="28sp"
-                    android:paddingVertical="5dp"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="기초디자인"
-                    android:fontFamily="@font/pretendard_regular"
-                    android:textSize="16sp"
-                    android:textColor="@color/font4"
-                    android:paddingVertical="5dp"
-                    />
-            </LinearLayout>
-
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                />
+            <TextView
+                android:id="@+id/mypage_exam_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="기초디자인"
+                android:fontFamily="@font/pretendard_regular"
+                android:textSize="16sp"
+                android:textColor="@color/font4"
+                app:layout_constraintTop_toBottomOf="@id/mypage_profile_name_tv"
+                app:layout_constraintStart_toStartOf="@id/mypage_profile_name_tv"
+                android:paddingVertical="5dp"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -100,8 +94,8 @@
                 android:fontFamily="@font/pretendard_semi_bold"
                 android:textColor="@color/gray8"
                 android:textSize="19sp"
-                app:layout_constraintTop_toTopOf="@id/mypage_profile_ll"
-                app:layout_constraintStart_toEndOf="@id/mypage_profile_ll"
+                app:layout_constraintBottom_toBottomOf="@id/mypage_profile_name_tv"
+                app:layout_constraintStart_toEndOf="@id/mypage_profile_name_tv"
                 android:layout_marginTop="17dp"
                 android:layout_marginStart="5dp"
                 />
@@ -109,11 +103,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_circle_box_color"
+                android:background="@drawable/bg_rectangle"
                 android:orientation="horizontal"
                 android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/mypage_profile_ll"
+                app:layout_constraintBottom_toBottomOf="@id/mypage_exam_type_tv"
                 android:paddingHorizontal="15dp"
                 android:paddingVertical="5dp"
                 android:layout_marginEnd="20dp"
