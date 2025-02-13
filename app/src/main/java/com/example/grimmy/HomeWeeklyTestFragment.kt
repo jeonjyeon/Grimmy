@@ -1,6 +1,8 @@
 package com.example.grimmy
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +13,8 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
+import com.example.grimmy.HomeWeeklyFragment.Companion.REQUEST_CODE_CUSTOM_GALLERY
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.RetrofitClient
@@ -64,6 +68,14 @@ class HomeWeeklyTestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // === [그림 및 코멘트 기능 추가] ===
+        // testTodayDrawingBoxCl: 이미지(및 코멘트 오버레이)를 보여줄 컨테이너 (레이아웃에 정의되어 있어야 함)
+        binding.testTodayDrawingBoxCl.setOnClickListener {
+            // CustomGalleryActivity를 호출하여 이미지를 선택 (선택된 이미지들은 onActivityResult에서 처리)
+            val intent = Intent(activity, CustomGalleryActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
+        }
 
         // === SeekBar thumb 아래에 현재 progress 값을 텍스트로 표시 ===
 
@@ -147,6 +159,28 @@ class HomeWeeklyTestFragment : Fragment() {
             scorePicker.show(parentFragmentManager, "scorePicker")
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_CUSTOM_GALLERY && resultCode == Activity.RESULT_OK) {
+            val selectedImages = data?.getParcelableArrayListExtra<Uri>("selectedImages")
+            if (!selectedImages.isNullOrEmpty()) {
+                // 선택된 이미지 중 첫 번째 이미지를 저장 (필요에 따라 여러 이미지를 처리할 수도 있음)
+                selectedImageUri = selectedImages.first()
+                setupDrawingViewPager(selectedImages)
+            }
+        }
+    }
+
+
+    private fun setupDrawingViewPager(selectedImages: List<Uri>) {
+        // testTodayDrawingBoxCl 내부에 있는 ViewPager2 (레이아웃에 정의되어 있어야 함)
+        val viewPager = binding.testTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
+        // 만약 DotsIndicator 등을 사용한다면 해당 뷰도 찾아서 설정할 수 있습니다.
+        val adapter = DrawingPagerAdapter(selectedImages)
+        viewPager.adapter = adapter
+        viewPager.visibility = View.VISIBLE
     }
 
     /**
