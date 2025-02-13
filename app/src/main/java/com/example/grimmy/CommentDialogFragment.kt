@@ -4,8 +4,10 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
@@ -24,8 +26,15 @@ class CommentDialogFragment : DialogFragment() {
         val builder = AlertDialog.Builder(requireContext())
         dialogView = LayoutInflater.from(context).inflate(R.layout.layout_comment_input, null)
         builder.setView(dialogView)
-        // 버튼은 커스텀 레이아웃에 있으므로 AlertDialog의 기본 버튼은 사용하지 않음
-        return builder.create()
+        val dialog = builder.create()
+        // 다이얼로그가 화면 하단에 붙도록 gravity와 레이아웃 파라미터를 설정합니다.
+        dialog.window?.apply {
+            setGravity(Gravity.BOTTOM)
+            // 필요에 따라 다이얼로그의 너비를 MATCH_PARENT로 설정하여 화면 전체 너비를 사용할 수 있음
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            setBackgroundDrawableResource(R.drawable.bg_rectangle)
+        }
+        return dialog
     }
 
     override fun onStart() {
