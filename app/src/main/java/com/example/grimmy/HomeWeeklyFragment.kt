@@ -173,8 +173,11 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val dotsIndicator = binding.weeklyTodayDrawingBoxCl.findViewById<DotsIndicator>(R.id.weekly_dot_indicator_di)
         val placeholder = binding.weeklyTodayDrawingBoxCl.findViewById<View>(R.id.weekly_placeholder_ll)
 
+        // DrawingPagerAdapter를 생성하고 viewPager의 어댑터로 지정
         val adapter = DrawingPagerAdapter(selectedImages)
         viewPager.adapter = adapter
+
+        // 필요에 따라 dot indicator 등의 설정
         dotsIndicator.setViewPager2(viewPager)
         viewPager.visibility = View.VISIBLE
         dotsIndicator.visibility = View.VISIBLE
@@ -264,7 +267,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         updateCalendarWeek()
         updateDateTextView(year, month)
     }
-
+/*
     // --- ViewPager2 어댑터 ---
     class DrawingPagerAdapter(private val images: List<Uri>) : RecyclerView.Adapter<DrawingPagerAdapter.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -281,7 +284,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             val imageView: ImageView = itemView.findViewById(R.id.drawing_page_iv)
         }
     }
-
+*/
     // --- 감정 관련 ---
     private fun setupEmotionClickListeners() {
         emotions = listOf(
