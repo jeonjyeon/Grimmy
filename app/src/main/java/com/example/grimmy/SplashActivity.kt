@@ -21,17 +21,17 @@ class SplashActivity : AppCompatActivity() {
 
         // 2초 후에 SharedPreferences에 저장된 accessToken을 확인하여 다음 화면으로 전환
         Handler(Looper.getMainLooper()).postDelayed({
-            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-            val accessToken = sharedPref.getString("accessToken", null)
-            Log.d("TokenCheck", "Stored accessToken: $accessToken")
+//            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+//            val accessToken = sharedPref.getString("accessToken", null)
+//            Log.d("TokenCheck", "Stored accessToken: $accessToken")
 
-            // accessToken이 있으면 이미 가입된 사용자 -> MainActivity로, 없으면 LoginActivity로 이동
-            val nextIntent = if (accessToken != null) {
-                Intent(this, MainActivity::class.java)
-            } else {
-                Intent(this, LoginActivity::class.java)
-            }
-            startActivity(nextIntent)
+//            // accessToken이 있으면 이미 가입된 사용자 -> MainActivity로, 없으면 LoginActivity로 이동
+//            val nextIntent = if (accessToken != null) {
+//                Intent(this, MainActivity::class.java)
+//            } else {
+//                Intent(this, LoginActivity::class.java)
+//            }
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()  // SplashActivity 종료
         }, 2000)
 

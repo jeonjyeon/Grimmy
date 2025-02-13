@@ -28,6 +28,7 @@ android {
         // manifestPlaceholders에 값을 등록
         manifestPlaceholders = [NATIVE_APP_KEY: kakaoNativeAppKey]
         buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${localProperties.getProperty('kakao_native_app_key')}\""
+        buildConfigField "String", "KAKAO_REST_API_KEY", "\"${localProperties.getProperty('kakao_rest_api_key')}\""
 
     }
 
