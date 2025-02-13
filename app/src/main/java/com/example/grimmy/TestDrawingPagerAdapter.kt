@@ -9,24 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
-import com.example.grimmy.Retrofit.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class DrawingPagerAdapter(
-    private val images: List<Uri>,
-    private val dailyId: Int
-) : RecyclerView.Adapter<DrawingPagerAdapter.ViewHolder>() {
+class TestDrawingPagerAdapter(
+    private val images: List<Uri>
+) : RecyclerView.Adapter<TestDrawingPagerAdapter.ViewHolder>() {
 
     // 각 페이지별로 코멘트를 저장할 자료구조 (좌표, 제목, 내용)
     data class Comment(val x: Float, val y: Float, val title: String, val content: String)
-    private val comments: MutableList<Comment> = mutableListOf()
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val container: FrameLayout = itemView.findViewById(R.id.comment_container_fl)
@@ -47,10 +38,8 @@ class DrawingPagerAdapter(
             .load(images[position])
             .into(holder.imageView)
 
-        // 기존 오버레이 제거 (뷰 재활용 대응)
-        while (holder.container.childCount > 1) {
-            holder.container.removeViewAt(1)
-        }
+        // 기존에 추가한 코멘트 뷰들을 모두 제거한 후 다시 추가 (뷰 재활용 대응)
+        holder.container.removeViews(1, holder.container.childCount - 1)
 
         // 저장된 코멘트들을 화면에 오버레이로 추가
         for (comment in holder.comments) {
@@ -95,33 +84,14 @@ class DrawingPagerAdapter(
         val dialog = CommentDialogFragment()
         dialog.listener = object : CommentDialogFragment.OnCommentSavedListener {
             override fun onCommentSaved(title: String, content: String) {
+                // 입력받은 코멘트를 저장
                 val comment = Comment(x, y, title, content)
-                // API 호출로 서버에 저장
-                val request = DailyCommentSaveRequest(
-                    id = 0, // 서버에서 id를 할당한다면 0 또는 빈 값으로 전송
-                    title = title,
-                    content = content,
-                    x = x,
-                    y = y
-                )
-                RetrofitClient.service.postDailyCommentSave(dailyId = 1, request)
-                    .enqueue(object : Callback<Void> {
-                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                            if (response.isSuccessful) {
-                                Toast.makeText(holder.itemView.context, "코멘트 저장 성공", Toast.LENGTH_SHORT).show()
-                                comments.add(comment)
-                                notifyDataSetChanged() // 전체 페이지 업데이트
-                            } else {
-                                Toast.makeText(holder.itemView.context, "코멘트 저장 실패", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        override fun onFailure(call: Call<Void>, t: Throwable) {
-                            Toast.makeText(holder.itemView.context, "저장 오류: ${t.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    })
+                holder.comments.add(comment)
+                // 오버레이로 추가
+                addCommentOverlay(holder.container, comment)
             }
         }
-        val activity = holder.itemView.context as? FragmentActivity
+        val activity = holder.itemView.context as? androidx.fragment.app.FragmentActivity
         dialog.show(activity?.supportFragmentManager!!, "CommentDialog")
     }
 
@@ -142,11 +112,5 @@ class DrawingPagerAdapter(
         layoutParams.leftMargin = comment.x.toInt()
         layoutParams.topMargin = comment.y.toInt()
         container.addView(commentView, layoutParams)
-    }
-
-    fun updateComments(newComments: List<Comment>) {
-        comments.clear()
-        comments.addAll(newComments)
-        notifyDataSetChanged()
     }
 }

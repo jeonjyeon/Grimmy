@@ -32,7 +32,7 @@ interface RetrofitService {
     ):Call<Void>
 
     // 데일리 코멘트 작성
-    @POST("/record/test/comment/{dailyId}/save")
+    @POST("/record/daily/comment/{dailyId}/save")
     fun postDailyCommentSave(
         @Path("dailyId") dailyId: Int,
         @Body request: DailyCommentSaveRequest

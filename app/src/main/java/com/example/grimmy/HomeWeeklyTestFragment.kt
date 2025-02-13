@@ -178,7 +178,7 @@ class HomeWeeklyTestFragment : Fragment() {
         // testTodayDrawingBoxCl 내부에 있는 ViewPager2 (레이아웃에 정의되어 있어야 함)
         val viewPager = binding.testTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
         // 만약 DotsIndicator 등을 사용한다면 해당 뷰도 찾아서 설정할 수 있습니다.
-        val adapter = DrawingPagerAdapter(selectedImages)
+        val adapter = TestDrawingPagerAdapter(selectedImages)
         viewPager.adapter = adapter
         viewPager.visibility = View.VISIBLE
     }

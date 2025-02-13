@@ -28,6 +28,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyBinding
@@ -173,15 +174,41 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val dotsIndicator = binding.weeklyTodayDrawingBoxCl.findViewById<DotsIndicator>(R.id.weekly_dot_indicator_di)
         val placeholder = binding.weeklyTodayDrawingBoxCl.findViewById<View>(R.id.weekly_placeholder_ll)
 
-        // DrawingPagerAdapter를 생성하고 viewPager의 어댑터로 지정
-        val adapter = DrawingPagerAdapter(selectedImages)
+        // 예시로 dailyId는 1로 사용 (실제 사용시 해당 날짜의 daily record id로 대체)
+        val dailyId = 1
+        val adapter = DrawingPagerAdapter(selectedImages, dailyId)
         viewPager.adapter = adapter
 
-        // 필요에 따라 dot indicator 등의 설정
         dotsIndicator.setViewPager2(viewPager)
         viewPager.visibility = View.VISIBLE
         dotsIndicator.visibility = View.VISIBLE
         placeholder.visibility = View.GONE
+
+        loadDailyComments(dailyId, adapter)
+    }
+
+    private fun loadDailyComments(dailyId: Int, adapter: DrawingPagerAdapter) {
+        RetrofitClient.service.getDailyComment(dailyId).enqueue(object : Callback<List<DailyCommentGetResponse>> {
+            override fun onResponse(call: Call<List<DailyCommentGetResponse>>, response: Response<List<DailyCommentGetResponse>>) {
+                if (response.isSuccessful) {
+                    val commentResponses = response.body() ?: emptyList()
+                    val commentList = commentResponses.map { resp ->
+                        DrawingPagerAdapter.Comment(
+                            x = resp.x,
+                            y = resp.y,
+                            title = resp.title,
+                            content = resp.content
+                        )
+                    }
+                    adapter.updateComments(commentList)
+                } else {
+                    Toast.makeText(requireContext(), "코멘트 조회 실패: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            override fun onFailure(call: Call<List<DailyCommentGetResponse>>, t: Throwable) {
+                Toast.makeText(requireContext(), "코멘트 조회 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     // --- 달력 관련 메소드 ---
