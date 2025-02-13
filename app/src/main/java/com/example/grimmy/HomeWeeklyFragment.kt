@@ -201,12 +201,13 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                         )
                     }
                     adapter.updateComments(commentList)
+                    Log.d("HomeWeeklyFragment", "코멘트 조회 성공: ${commentList.size}개")
                 } else {
-                    Toast.makeText(requireContext(), "코멘트 조회 실패: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Log.d("HomeWeeklyFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
                 }
             }
             override fun onFailure(call: Call<List<DailyCommentGetResponse>>, t: Throwable) {
-                Toast.makeText(requireContext(), "코멘트 조회 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.d("HomeWeeklyFragment", "코멘트 조회 오류: ${t.message}")
             }
         })
     }

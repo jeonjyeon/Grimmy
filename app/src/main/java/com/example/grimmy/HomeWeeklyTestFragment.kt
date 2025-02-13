@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.viewpager2.widget.ViewPager2
 import com.example.grimmy.HomeWeeklyFragment.Companion.REQUEST_CODE_CUSTOM_GALLERY
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyTestBinding
@@ -175,12 +176,43 @@ class HomeWeeklyTestFragment : Fragment() {
 
 
     private fun setupDrawingViewPager(selectedImages: List<Uri>) {
-        // testTodayDrawingBoxCl 내부에 있는 ViewPager2 (레이아웃에 정의되어 있어야 함)
         val viewPager = binding.testTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
-        // 만약 DotsIndicator 등을 사용한다면 해당 뷰도 찾아서 설정할 수 있습니다.
-        val adapter = TestDrawingPagerAdapter(selectedImages)
+        // 예시로 dailyId는 1 (실제 사용시 해당 테스트 record id 사용)
+        val dailyId = 1
+        val adapter = TestDrawingPagerAdapter(selectedImages, dailyId)
         viewPager.adapter = adapter
         viewPager.visibility = View.VISIBLE
+
+        // 서버에서 테스트용 코멘트 조회 (GET API)
+        loadTestComments(dailyId, adapter)
+    }
+
+    private fun loadTestComments(dailyId: Int, adapter: TestDrawingPagerAdapter) {
+        RetrofitClient.service.getTestComment(dailyId).enqueue(object : Callback<List<TestCommentGetResponse>> {
+            override fun onResponse(
+                call: Call<List<TestCommentGetResponse>>,
+                response: Response<List<TestCommentGetResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    val commentResponses = response.body() ?: emptyList()
+                    val commentList = commentResponses.map { resp ->
+                        TestDrawingPagerAdapter.Comment(
+                            x = resp.x,
+                            y = resp.y,
+                            title = resp.title,
+                            content = resp.content
+                        )
+                    }
+                    adapter.updateComments(commentList)
+                    Log.d("HomeWeeklyTestFragment", "코멘트 조회 성공: ${commentList.size}개")
+                } else {
+                    Log.d("HomeWeeklyTestFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<List<TestCommentGetResponse>>, t: Throwable) {
+                Log.d("HomeWeeklyTestFragment", "코멘트 조회 오류: ${t.message}")
+            }
+        })
     }
 
     /**

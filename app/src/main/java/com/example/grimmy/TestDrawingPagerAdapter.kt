@@ -9,15 +9,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.grimmy.Retrofit.Request.TestCommentSaveRequest
+import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
+import com.example.grimmy.Retrofit.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TestDrawingPagerAdapter(
-    private val images: List<Uri>
+    private val images: List<Uri>,
+    private val dailyId: Int
 ) : RecyclerView.Adapter<TestDrawingPagerAdapter.ViewHolder>() {
 
     // 각 페이지별로 코멘트를 저장할 자료구조 (좌표, 제목, 내용)
     data class Comment(val x: Float, val y: Float, val title: String, val content: String)
+    private val comments = mutableListOf<Comment>()
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val container: FrameLayout = itemView.findViewById(R.id.comment_container_fl)
@@ -38,8 +48,10 @@ class TestDrawingPagerAdapter(
             .load(images[position])
             .into(holder.imageView)
 
-        // 기존에 추가한 코멘트 뷰들을 모두 제거한 후 다시 추가 (뷰 재활용 대응)
-        holder.container.removeViews(1, holder.container.childCount - 1)
+        // 기존 오버레이 제거 (재활용 이슈 방지)
+        while (holder.container.childCount > 1) {
+            holder.container.removeViewAt(1)
+        }
 
         // 저장된 코멘트들을 화면에 오버레이로 추가
         for (comment in holder.comments) {
@@ -84,14 +96,31 @@ class TestDrawingPagerAdapter(
         val dialog = CommentDialogFragment()
         dialog.listener = object : CommentDialogFragment.OnCommentSavedListener {
             override fun onCommentSaved(title: String, content: String) {
-                // 입력받은 코멘트를 저장
                 val comment = Comment(x, y, title, content)
-                holder.comments.add(comment)
-                // 오버레이로 추가
-                addCommentOverlay(holder.container, comment)
+                val request = TestCommentSaveRequest(
+                    title = title,
+                    content = content,
+                    x = x,
+                    y = y
+                )
+                RetrofitClient.service.postTestCommentSave(dailyId, request)
+                    .enqueue(object : Callback<TestCommentSaveResponse> {
+                        override fun onResponse(call: Call<TestCommentSaveResponse>, response: Response<TestCommentSaveResponse>) {
+                            if (response.isSuccessful) {
+                                Log.d("TestDrawingPagerAdapter", "코멘트 저장 성공")
+                                comments.add(comment)
+                                notifyDataSetChanged()
+                            } else {
+                                Log.d("TestDrawingPagerAdapter", "코멘트 저장 실패: ${response.code()} ${response.message()}")
+                            }
+                        }
+                        override fun onFailure(call: Call<TestCommentSaveResponse>, t: Throwable) {
+                            Log.d("TestDrawingPagerAdapter", "저장 오류: ${t.message}")
+                        }
+                    })
             }
         }
-        val activity = holder.itemView.context as? androidx.fragment.app.FragmentActivity
+        val activity = holder.itemView.context as? FragmentActivity
         dialog.show(activity?.supportFragmentManager!!, "CommentDialog")
     }
 
@@ -99,18 +128,17 @@ class TestDrawingPagerAdapter(
      * 주어진 코멘트 데이터를 기반으로 오버레이 뷰(TextView 등)를 생성하여 container에 추가합니다.
      */
     private fun addCommentOverlay(container: FrameLayout, comment: Comment) {
-        // item_comment.xml 레이아웃을 인플레이트하여 코멘트 뷰 생성
         val commentView = LayoutInflater.from(container.context)
-            .inflate(R.layout.item_comment, container, false)
+            .inflate(R.layout.item_comment, container, false) as ImageView
+        val lp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        lp.leftMargin = comment.x.toInt()
+        lp.topMargin = comment.y.toInt()
+        container.addView(commentView, lp)
+    }
 
-        // container 내부에 절대 위치 지정: 터치한 좌표에 맞춰 오버레이합니다.
-        val layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        )
-        // 터치 좌표를 기준으로 오프셋을 조정(예: 코멘트 뷰의 크기를 고려)
-        layoutParams.leftMargin = comment.x.toInt()
-        layoutParams.topMargin = comment.y.toInt()
-        container.addView(commentView, layoutParams)
+    fun updateComments(newComments: List<Comment>) {
+        comments.clear()
+        comments.addAll(newComments)
+        notifyDataSetChanged()
     }
 }

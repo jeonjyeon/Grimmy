@@ -108,15 +108,15 @@ class DrawingPagerAdapter(
                     .enqueue(object : Callback<Void> {
                         override fun onResponse(call: Call<Void>, response: Response<Void>) {
                             if (response.isSuccessful) {
-                                Toast.makeText(holder.itemView.context, "코멘트 저장 성공", Toast.LENGTH_SHORT).show()
+                                Log.d("DrawingPagerAdapter", "코멘트 저장 성공")
                                 comments.add(comment)
                                 notifyDataSetChanged() // 전체 페이지 업데이트
                             } else {
-                                Toast.makeText(holder.itemView.context, "코멘트 저장 실패", Toast.LENGTH_SHORT).show()
+                                Log.d("DrawingPagerAdapter", "코멘트 저장 실패: ${response.code()} ${response.message()}")
                             }
                         }
                         override fun onFailure(call: Call<Void>, t: Throwable) {
-                            Toast.makeText(holder.itemView.context, "저장 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                            Log.d("DrawingPagerAdapter", "저장 오류: ${t.message}")
                         }
                     })
             }
@@ -129,19 +129,12 @@ class DrawingPagerAdapter(
      * 주어진 코멘트 데이터를 기반으로 오버레이 뷰(TextView 등)를 생성하여 container에 추가합니다.
      */
     private fun addCommentOverlay(container: FrameLayout, comment: Comment) {
-        // item_comment.xml 레이아웃을 인플레이트하여 코멘트 뷰 생성
         val commentView = LayoutInflater.from(container.context)
-            .inflate(R.layout.item_comment, container, false)
-
-        // container 내부에 절대 위치 지정: 터치한 좌표에 맞춰 오버레이합니다.
-        val layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        )
-        // 터치 좌표를 기준으로 오프셋을 조정(예: 코멘트 뷰의 크기를 고려)
-        layoutParams.leftMargin = comment.x.toInt()
-        layoutParams.topMargin = comment.y.toInt()
-        container.addView(commentView, layoutParams)
+            .inflate(R.layout.item_comment, container, false) as ImageView
+        val lp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        lp.leftMargin = comment.x.toInt()
+        lp.topMargin = comment.y.toInt()
+        container.addView(commentView, lp)
     }
 
     fun updateComments(newComments: List<Comment>) {
