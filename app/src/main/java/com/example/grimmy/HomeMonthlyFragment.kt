@@ -133,6 +133,8 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
                     call: Call<List<MonthlyRecordGetResponse>>,
                     response: Response<List<MonthlyRecordGetResponse>>
                 ) {
+                    if (!isAdded) return // ✅ 프래그먼트가 활성 상태인지 확인
+
                     if (response.isSuccessful) {
                         val records = response.body() ?: emptyList()
                         val map = mutableMapOf<String, String>()
@@ -149,6 +151,8 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
                 }
 
                 override fun onFailure(call: Call<List<MonthlyRecordGetResponse>>, t: Throwable) {
+                    if (!isAdded) return // ✅ 프래그먼트가 활성 상태인지 확인
+
                     Toast.makeText(requireContext(), "월별 기록 조회 에러", Toast.LENGTH_SHORT).show()
                 }
             })
