@@ -149,7 +149,9 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
                 }
 
                 override fun onFailure(call: Call<List<MonthlyRecordGetResponse>>, t: Throwable) {
-                    Toast.makeText(requireContext(), "월별 기록 조회 에러", Toast.LENGTH_SHORT).show()
+                    Log.d("HomeMonthlyFragment", "record fetch error: ${t.message}")
+                    if (!isAdded) return  // 부착되어 있지 않으면 아무 작업도 하지 않음
+                    Toast.makeText(requireContext(), "[record date] 기록 조회 에러", Toast.LENGTH_SHORT).show()
                 }
             })
     }

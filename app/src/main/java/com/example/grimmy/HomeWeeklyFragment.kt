@@ -6,18 +6,19 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyBinding
@@ -134,7 +135,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     override fun onPause() {
         super.onPause()
         // 화면 전환 전에 현재 선택된 날짜에 대해 자동 저장
-        saveRecordForDate(currentSelectedDate)
+        saveRecordForDate(parseDate(currentSelectedDate))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -149,17 +150,55 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         }
     }
 
+    private fun parseDate(dateString: String): Date {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // ✅ yyyy-MM-dd 형식 지정
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+        val formattedDate = sdf.format(sdf.parse(dateString) ?: Date()) // ✅ String으로 변환 후 다시 Date로 변환
+        return sdf.parse(formattedDate) ?: Date()
+    }
+
     private fun setupDrawingViewPager(selectedImages: List<Uri>) {
         val viewPager = binding.weeklyTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
         val dotsIndicator = binding.weeklyTodayDrawingBoxCl.findViewById<DotsIndicator>(R.id.weekly_dot_indicator_di)
         val placeholder = binding.weeklyTodayDrawingBoxCl.findViewById<View>(R.id.weekly_placeholder_ll)
 
-        val adapter = DrawingPagerAdapter(selectedImages)
+        // 예시로 dailyId는 1로 사용 (실제 사용시 해당 날짜의 daily record id로 대체)
+        val dailyId = 1
+        val adapter = DrawingPagerAdapter(selectedImages, dailyId)
         viewPager.adapter = adapter
+
         dotsIndicator.setViewPager2(viewPager)
         viewPager.visibility = View.VISIBLE
         dotsIndicator.visibility = View.VISIBLE
         placeholder.visibility = View.GONE
+
+        loadDailyComments(dailyId, adapter)
+    }
+
+    private fun loadDailyComments(dailyId: Int, adapter: DrawingPagerAdapter) {
+        RetrofitClient.service.getDailyComment(dailyId).enqueue(object : Callback<List<DailyCommentGetResponse>> {
+            override fun onResponse(call: Call<List<DailyCommentGetResponse>>, response: Response<List<DailyCommentGetResponse>>) {
+                if (response.isSuccessful) {
+                    val commentResponses = response.body() ?: emptyList()
+                    val commentList = commentResponses.map { resp ->
+                        DrawingPagerAdapter.Comment(
+                            x = resp.x,
+                            y = resp.y,
+                            title = resp.title,
+                            content = resp.content
+                        )
+                    }
+                    adapter.updateComments(commentList)
+                    Log.d("HomeWeeklyFragment", "코멘트 조회 성공: ${commentList.size}개")
+                } else {
+                    Log.d("HomeWeeklyFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<List<DailyCommentGetResponse>>, t: Throwable) {
+                Log.d("HomeWeeklyFragment", "코멘트 조회 오류: ${t.message}")
+            }
+        })
     }
 
     // --- 달력 관련 메소드 ---
@@ -206,7 +245,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             } else {
                 dayView.setOnClickListener {
                     // 자동 저장: 기존 선택된 날짜 기록 저장
-                    saveRecordForDate(currentSelectedDate)
+                    saveRecordForDate(parseDate(currentSelectedDate))
                     // 업데이트: 새 선택 날짜 설정
                     currentSelectedDate = currentDayStr
                     // 조회: 해당 날짜의 기록을 불러오기
@@ -245,7 +284,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         updateCalendarWeek()
         updateDateTextView(year, month)
     }
-
+/*
     // --- ViewPager2 어댑터 ---
     class DrawingPagerAdapter(private val images: List<Uri>) : RecyclerView.Adapter<DrawingPagerAdapter.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -262,7 +301,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             val imageView: ImageView = itemView.findViewById(R.id.drawing_page_iv)
         }
     }
-
+*/
     // --- 감정 관련 ---
     private fun setupEmotionClickListeners() {
         emotions = listOf(
@@ -298,7 +337,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     }
 
     // --- 자동 저장 및 기록 조회 함수 ---
-    private fun saveRecordForDate(recordDate: String) {
+    private fun saveRecordForDate(recordDate: Date) {
         val drawing = selectedImageUri?.toString() ?: ""
         val todayMood = selectedMood
 
@@ -311,14 +350,17 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             drawing = drawing,
             drawingTime = binding.weeklyTimeTakenTimeTv.text.toString(),
             feedback = binding.weeklyFeedbackEdittextEt.text.toString(),
-            difficultIssue = binding.weeklyHardEdittextEt.text.toString(),
+            dfficultIssue = binding.weeklyHardEdittextEt.text.toString(),
             goodIssue = binding.weeklyGoodEdittextEt.text.toString(),
             todayMood = todayMood,
             moodDetail = binding.weeklyFeelEdittextEt.text.toString(),
             question = binding.weeklyQuestionEdittextEt.text.toString(),
             createdAt = createdAt,
-            updateAt = updatedAt
+            updatedAt = updatedAt
         )
+
+        Log.d("apiConnect",request.toString())
+        Log.d("apiConnect",request.dailyDayRecording::class.java.toString())
 
         RetrofitClient.service.postDailyRecordSave(request).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {

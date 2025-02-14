@@ -4,6 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="Grimmy">
         <option name="selectionMode" value="DROPDOWN" />
+
       </SelectionState>
     </selectionStates>
   </component>
