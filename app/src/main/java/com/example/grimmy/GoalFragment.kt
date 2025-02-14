@@ -34,6 +34,15 @@ class GoalFragment : Fragment() {
         setupPieChart(binding.goalMonthGraphPc, 70f, R.color.main_color, 85f) // 이번 달 목표 70%
         setupPieChart(binding.goalWeekGraphPc, 60f, R.color.graph_color, 80f) // 이번 주 목표 60%
 
+        binding.goalNotifyIconIv.setOnClickListener{
+            // AlarmFragment로 전환
+            val alarmFragment = AlarmFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.goal_notify_frame, alarmFragment) // fragment_container는 프래그먼트를 표시할 컨테이너의 ID입니다.
+                .addToBackStack(null) // 뒤로 가기 스택에 추가
+                .commit()
+        }
+
         return binding.root
     }
 
