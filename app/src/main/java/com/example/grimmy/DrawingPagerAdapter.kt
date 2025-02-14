@@ -1,6 +1,7 @@
 package com.example.grimmy
 
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -131,9 +132,26 @@ class DrawingPagerAdapter(
     private fun addCommentOverlay(container: FrameLayout, comment: Comment) {
         val commentView = LayoutInflater.from(container.context)
             .inflate(R.layout.item_comment, container, false) as ImageView
-        val lp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        val lp = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
         lp.leftMargin = comment.x.toInt()
         lp.topMargin = comment.y.toInt()
+
+        // 조회된 코멘트를 클릭하면 CommentDialogFragment를 read-only 모드로 띄웁니다.
+        commentView.setOnClickListener {
+            val dialog = CommentDialogFragment()
+            val args = Bundle().apply {
+                putString("initialTitle", comment.title)
+                putString("initialContent", comment.content)
+                putBoolean("isReadOnly", true)
+            }
+            dialog.arguments = args
+            val activity = container.context as? FragmentActivity
+            dialog.show(activity?.supportFragmentManager!!, "CommentDialog")
+        }
+
         container.addView(commentView, lp)
     }
 

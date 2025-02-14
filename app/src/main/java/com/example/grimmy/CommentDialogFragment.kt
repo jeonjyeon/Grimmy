@@ -39,17 +39,38 @@ class CommentDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        val alertDialog = dialog as? AlertDialog
-        // 저장 버튼이 ImageView라면 ImageView로 찾습니다.
-        val saveButton = alertDialog?.findViewById<ImageView>(R.id.comment_save_btn_iv)
-        saveButton?.setOnClickListener {
-            val title = alertDialog.findViewById<EditText>(R.id.comment_title_et)?.text.toString()
-            val content = alertDialog.findViewById<EditText>(R.id.comment_content_et)?.text.toString()
-            // 제목과 내용 모두 입력되어 있을 때만 저장
-            if (title.isNotEmpty() && content.isNotEmpty()) {
-                listener?.onCommentSaved(title, content)
+        val alertDialog = dialog as? AlertDialog ?: return
+
+        // 레이아웃에서 EditText와 저장 버튼(ImageView) 참조
+        val titleEditText = alertDialog.findViewById<EditText>(R.id.comment_title_et)
+        val contentEditText = alertDialog.findViewById<EditText>(R.id.comment_content_et)
+        val saveButton = alertDialog.findViewById<ImageView>(R.id.comment_save_btn_iv)
+
+        // read-only 모드를 위한 플래그와 초기 값 전달
+        val isReadOnly = arguments?.getBoolean("isReadOnly") ?: false
+        if (isReadOnly) {
+            // 읽기 전용 모드: 번들에 담긴 초기 제목/내용을 설정하고 EditText를 비활성화
+            val initialTitle = arguments?.getString("initialTitle") ?: ""
+            val initialContent = arguments?.getString("initialContent") ?: ""
+            titleEditText?.setText(initialTitle)
+            contentEditText?.setText(initialContent)
+            titleEditText?.isEnabled = false
+            contentEditText?.isEnabled = false
+
+            // 저장 버튼 클릭 시 단순히 다이얼로그를 종료 (편집 불가)
+            saveButton?.setOnClickListener {
+                dismiss()
             }
-            dismiss()  // 저장 후 다이얼로그 종료
+        } else {
+            // 일반 모드: 사용자가 제목/내용을 수정할 수 있도록 하고 저장 버튼 클릭 시 listener 호출
+            saveButton?.setOnClickListener {
+                val newTitle = titleEditText?.text.toString()
+                val newContent = contentEditText?.text.toString()
+                if (newTitle.isNotEmpty() && newContent.isNotEmpty()) {
+                    listener?.onCommentSaved(newTitle, newContent)
+                }
+                dismiss()
+            }
         }
     }
 }
