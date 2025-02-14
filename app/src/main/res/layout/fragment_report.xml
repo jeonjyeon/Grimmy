@@ -84,7 +84,7 @@
                     android:background="@drawable/bg_tab_right_non_selected_btn"
                     android:text="감정"
                     android:fontFamily="@font/pretendard_semi_bold"
-                    android:textColor="#FFCDA9"
+                    android:textColor="#80FFCDA9"
                     android:textSize="18sp"
                     android:gravity="center"
                     app:layout_constraintTop_toTopOf="parent"

@@ -5,27 +5,32 @@
     <item
         android:id="@+id/fragment_schedule"
         android:title="스케줄"
+        android:fontFamily="@font/pretendard_regular"
         android:icon="@drawable/ic_schedule"
         app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_goal"
         android:title="목표"
+        android:fontFamily="@font/pretendard_regular"
         android:icon="@drawable/ic_goal"
         app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_home"
         android:title="홈"
+        android:fontFamily="@font/pretendard_regular"
         android:icon="@drawable/ic_home"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
     <item
         android:id="@+id/fragment_report"
         android:title="기록"
+        android:fontFamily="@font/pretendard_regular"
         android:icon="@drawable/ic_report"
         app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_mypage"
         android:title="MY"
+        android:fontFamily="@font/pretendard_regular"
         android:icon="@drawable/ic_mypage"
         app:showAsAction="always"/>
 </menu>

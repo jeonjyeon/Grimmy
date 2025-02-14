@@ -1,21 +1,25 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
+import com.example.grimmy.Retrofit.Request.CategoryRequest
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentExamTypeBinding
-import com.example.grimmy.viewmodel.UserViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ExamTypeFragment : Fragment() {
     private lateinit var binding: FragmentExamTypeBinding
-    private val userViewModel: UserViewModel by activityViewModels() // ViewModel 사용
 
     private val typeOptions = mutableSetOf<String>() // 선택된 유형을 저장할 Set
 
@@ -25,13 +29,9 @@ class ExamTypeFragment : Fragment() {
     ): View? {
         binding = FragmentExamTypeBinding.inflate(inflater, container, false)
 
-        // 사용자 정보를 관찰
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
-            // user 객체가 null이 아닐 때만 접근
-            user?.let {
-                binding.typeNicknameTv.text = it.nickname // 닉네임 표시
-            }
-        }
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.typeNicknameTv.text = nickname ?: "사용자"
 
         // 각 버튼에 클릭 리스너 설정
         setButtonClickListeners()
@@ -41,7 +41,7 @@ class ExamTypeFragment : Fragment() {
 
         // "다음" 버튼 클릭 이벤트 처리
         binding.typeNextBtnTv.setOnClickListener {
-            userViewModel.setExamType(typeOptions.toList()) // 선택된 유형을 ViewModel에 저장
+            sendExamTypeToServer(typeOptions.toList()) // ✅ 서버에 전송
 
             if (typeOptions.isNotEmpty()) { // 최소 1개 이상 선택해야 이동
                 if (binding.typeNextBtnTv.text == "시작하기") {
@@ -54,6 +54,43 @@ class ExamTypeFragment : Fragment() {
         }
         return binding.root
     }
+    // ✅ 닉네임을 SharedPreferences에서 가져오는 함수
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
+
+
+    }
+
+    // ✅ 선택된 시험 유형을 ENUM 변환 후 서버에 전송하는 함수
+    private fun sendExamTypeToServer(selectedTypes: List<String>) {
+        val examTypeEnums = selectedTypes.mapNotNull { getExamTypeEnum(it) } // 선택된 한글 값을 ENUM으로 변환
+
+        if (examTypeEnums.isNotEmpty()) {
+            RetrofitClient.service.updateCategory(CategoryRequest(examTypeEnums.map { it.name })) // ✅ ENUM.name 리스트 전송
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            Log.i("ExamTypeFragment", "✅ 시험 유형 업데이트 성공! $examTypeEnums")
+                        } else {
+                            Log.e("ExamTypeFragment", "❌ 시험 유형 업데이트 실패: ${response.code()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("ExamTypeFragment", "❌ 네트워크 오류: ${t.message}")
+                    }
+                })
+        } else {
+            Log.e("ExamTypeFragment", "❌ 잘못된 시험 유형 선택: $selectedTypes")
+        }
+    }
+
+    // ✅ UI에서 선택한 값 → ENUM 변환
+    private fun getExamTypeEnum(typeText: String): EnumExamType? {
+        return EnumExamType.entries.find { it.examType == typeText }
+    }
+
 
     private fun setButtonClickListeners() {
         val buttons  = listOf(

@@ -22,6 +22,7 @@ android:layout_height="wrap_content">
         android:background="@drawable/bg_image_order"
         android:gravity="center"
         android:layout_gravity="top|end"
+        android:fontFamily="@font/pretendard_regular"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:visibility="gone" />

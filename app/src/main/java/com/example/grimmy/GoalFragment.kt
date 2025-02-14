@@ -26,11 +26,21 @@ class GoalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentGoalBinding.inflate(inflater, container, false)
 
+        // ✅ SharedPreferences에서 닉네임 불러오기
+        val nickname = getNickname()
+        binding.goalProfileUsernameTv.text = nickname ?: "사용자"
+
         // 각 차트의 progressColor를 개별적으로 설정
         setupPieChart(binding.goalMonthGraphPc, 70f, R.color.main_color, 85f) // 이번 달 목표 70%
         setupPieChart(binding.goalWeekGraphPc, 60f, R.color.graph_color, 80f) // 이번 주 목표 60%
 
         return binding.root
+    }
+
+    // ✅ 저장된 닉네임 가져오기
+    private fun getNickname(): String? {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("nickname", null)
     }
 
     private fun setupPieChart(pieChart: PieChart, percentage: Float, colorResId: Int, holeRadius: Float) {

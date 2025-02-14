@@ -2,9 +2,8 @@ package com.example.grimmy.Retrofit
 
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
-import retrofit2.Call
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
-import com.example.grimmy.Retrofit.Request.TestCommentSaveRequest
+
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
@@ -12,14 +11,15 @@ import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.PATCH
 
 interface RetrofitService {
-    // 데일리 기록 작성
     @POST("/record/daily/save")
     fun postDailyRecordSave(
         @Body request : DailyRecordSaveRequest
