@@ -61,6 +61,9 @@ class GoalFragment : Fragment() {
         updateMonthDonutChart()
         updateWeekDonutChart()
 
+        // Material 섹션의 plus 버튼 설정 (material 체크박스 추가)
+        setupMaterialAddition()
+
         return binding.root
     }
 
@@ -190,6 +193,72 @@ class GoalFragment : Fragment() {
             }
         }
         container.addView(editTextBoxView)
+    }
+
+    private fun setupMaterialAddition() {
+        // material 섹션의 plus 버튼과 컨테이너는 fragment_goal.xml에 정의되어 있다고 가정
+        val addMaterialBtn = binding.root.findViewById<ImageView>(R.id.goal_material_add_edittext_iv)
+        val materialContainer = binding.root.findViewById<ViewGroup>(R.id.goal_material_edittext_container)
+        addMaterialBtn.setOnClickListener {
+            addMaterialEditTextBox(materialContainer)
+            // 필요시 material 도넛 차트 업데이트 호출
+        }
+
+        addMaterialEditTextBox(materialContainer)
+    }
+
+    private fun addMaterialEditTextBox(container: ViewGroup) {
+        val materialView = layoutInflater.inflate(R.layout.item_material_checkbox, container, false)
+        val checkboxIv = materialView.findViewById<ImageView>(R.id.goal_material_checkbox_iv)
+        val editTextEt = materialView.findViewById<EditText>(R.id.goal_material_edittext_et)
+        checkboxIv.tag = false
+
+        checkboxIv.setOnClickListener {
+            if (editTextEt.text.toString().isNotEmpty()) {
+                val isChecked = checkboxIv.tag as Boolean
+                if (!isChecked) {
+                    checkboxIv.setImageResource(R.drawable.img_checkbox_on)
+                    editTextEt.paintFlags = editTextEt.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.bg_black2))
+                    checkboxIv.tag = true
+                } else {
+                    checkboxIv.setImageResource(R.drawable.img_checkbox_off)
+                    editTextEt.paintFlags = editTextEt.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.font4))
+                    checkboxIv.tag = false
+                }
+                // 재정렬: material 컨테이너 내의 항목들을 체크 상태에 따라 정렬
+                reorderMaterialContainer(container)
+            }
+        }
+        container.addView(materialView)
+    }
+
+    /**
+     * material 컨테이너 내 항목들을 재정렬하는 함수.
+     * EditText에 텍스트가 있는 항목 중 체크되지 않은 항목은 위로, 체크된 항목은 아래로 배치합니다.
+     */
+    private fun reorderMaterialContainer(container: ViewGroup) {
+        val uncheckedViews = mutableListOf<View>()
+        val checkedViews = mutableListOf<View>()
+        for (i in 0 until container.childCount) {
+            val child = container.getChildAt(i)
+            val checkbox: ImageView? = child.findViewById(R.id.goal_material_checkbox_iv)
+            val editText: EditText? = child.findViewById(R.id.goal_material_edittext_et)
+            if (editText != null && editText.text.toString().isNotEmpty()) {
+                if (checkbox?.tag as? Boolean == true) {
+                    checkedViews.add(child)
+                } else {
+                    uncheckedViews.add(child)
+                }
+            } else {
+                // 텍스트가 없으면 그대로 unchecked로 처리
+                uncheckedViews.add(child)
+            }
+        }
+        container.removeAllViews()
+        uncheckedViews.forEach { container.addView(it) }
+        checkedViews.forEach { container.addView(it) }
     }
 
     private fun reorderContainer(container: ViewGroup, isWeek: Boolean) {
