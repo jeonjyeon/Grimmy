@@ -1,6 +1,8 @@
 package com.example.grimmy
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,13 +13,26 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
+import com.example.grimmy.HomeWeeklyFragment.Companion.REQUEST_CODE_CUSTOM_GALLERY
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
+import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyTestBinding
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -64,6 +79,14 @@ class HomeWeeklyTestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // === [그림 및 코멘트 기능 추가] ===
+        // testTodayDrawingBoxCl: 이미지(및 코멘트 오버레이)를 보여줄 컨테이너 (레이아웃에 정의되어 있어야 함)
+        binding.testTodayDrawingBoxCl.setOnClickListener {
+            // CustomGalleryActivity를 호출하여 이미지를 선택 (선택된 이미지들은 onActivityResult에서 처리)
+            val intent = Intent(activity, CustomGalleryActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE_CUSTOM_GALLERY)
+        }
 
         // === SeekBar thumb 아래에 현재 progress 값을 텍스트로 표시 ===
 
@@ -147,6 +170,64 @@ class HomeWeeklyTestFragment : Fragment() {
             scorePicker.show(parentFragmentManager, "scorePicker")
         }
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveTestRecordForDate(currentSelectedDate)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_CUSTOM_GALLERY && resultCode == Activity.RESULT_OK) {
+            val selectedImages = data?.getParcelableArrayListExtra<Uri>("selectedImages")
+            if (!selectedImages.isNullOrEmpty()) {
+                // 선택된 이미지 중 첫 번째 이미지를 저장 (필요에 따라 여러 이미지를 처리할 수도 있음)
+                selectedImageUri = selectedImages.first()
+                setupDrawingViewPager(selectedImages)
+            }
+        }
+    }
+
+
+    private fun setupDrawingViewPager(selectedImages: List<Uri>) {
+        val viewPager = binding.testTodayDrawingBoxCl.findViewById<ViewPager2>(R.id.drawing_viewpager)
+        // 예시로 dailyId는 1 (실제 사용시 해당 테스트 record id 사용)
+        val dailyId = 1
+        val adapter = TestDrawingPagerAdapter(selectedImages, dailyId)
+        viewPager.adapter = adapter
+        viewPager.visibility = View.VISIBLE
+
+        // 서버에서 테스트용 코멘트 조회 (GET API)
+        loadTestComments(dailyId, adapter)
+    }
+
+    private fun loadTestComments(dailyId: Int, adapter: TestDrawingPagerAdapter) {
+        RetrofitClient.service.getTestComment(dailyId).enqueue(object : Callback<List<TestCommentGetResponse>> {
+            override fun onResponse(
+                call: Call<List<TestCommentGetResponse>>,
+                response: Response<List<TestCommentGetResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    val commentResponses = response.body() ?: emptyList()
+                    val commentList = commentResponses.map { resp ->
+                        TestDrawingPagerAdapter.Comment(
+                            x = resp.x,
+                            y = resp.y,
+                            title = resp.title,
+                            content = resp.content
+                        )
+                    }
+                    adapter.updateComments(commentList)
+                    Log.d("HomeWeeklyTestFragment", "코멘트 조회 성공: ${commentList.size}개")
+                } else {
+                    Log.d("HomeWeeklyTestFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<List<TestCommentGetResponse>>, t: Throwable) {
+                Log.d("HomeWeeklyTestFragment", "코멘트 조회 오류: ${t.message}")
+            }
+        })
     }
 
     /**
@@ -289,19 +370,18 @@ class HomeWeeklyTestFragment : Fragment() {
     }
 
     private fun saveTestRecordForDate(recordDate: String) {
-        val drawing = selectedImageUri?.toString() ?: ""
-        val todayMood = selectedMood
-
         val createdAt = savedCreatedAt ?: getCurrentDateTime().also { savedCreatedAt = it }
         val updatedAt = getCurrentDateTime()
+        val todayMood = selectedMood
 
-        val scoreText = binding.testScoreTv.text.toString()  // 예: "00점"
+        val scoreText = binding.testScoreTv.text.toString()  // 예: "50 점"
         val scoreInt = scoreText.substringBefore("점").trim().toIntOrNull() ?: 0
 
-        val request = TestRecordSaveRequest(
+        // TestRecordSaveRequest 객체 생성 (drawing 필드는 빈 문자열로 설정)
+        val testRecordRequest = TestRecordSaveRequest(
             userId = 1,
             testDayRecording = recordDate,
-            drawing = drawing,
+            drawing = "",  // 파일은 별도로 전송
             drawingTime = binding.testTimeTakenTimeTv.text.toString(),
             score = scoreInt,
             feedback = binding.testFeedbackEdittextEt.text.toString(),
@@ -316,19 +396,72 @@ class HomeWeeklyTestFragment : Fragment() {
             updateAt = updatedAt
         )
 
-        RetrofitClient.service.postTestRecordSave(request).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 자동 저장 성공")
-                    Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 실패: ${response.code()} , ${response.message()}")
-                }
+        // GsonBuilder로 날짜 형식을 지정하여 JSON 문자열로 변환
+        val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
+        val jsonString = gson.toJson(testRecordRequest)
+        val jsonRequestBody: RequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
+
+        if (selectedImageUri != null) {
+            val file: File? = getFileFromUri(selectedImageUri!!)
+            if (file != null) {
+                val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
+                // "drawing" 파라미터로 파일 전송
+                val drawingPart = MultipartBody.Part.createFormData("drawing", file.name, requestFile)
+                RetrofitClient.service.postTestRecordSave(drawing = drawingPart, request = jsonRequestBody)
+                    .enqueue(object : Callback<TestRecordSaveResponse> {
+                        override fun onResponse(call: Call<TestRecordSaveResponse>, response: Response<TestRecordSaveResponse>) {
+                            if (response.isSuccessful) {
+                                response.body()?.let { res ->
+                                    Log.d("HomeWeeklyTestFragment", "Record saved successfully. Uploaded image URL: ${res.drawing}")
+                                    Toast.makeText(requireContext(), "기록이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                                } ?: run {
+                                    Log.d("HomeWeeklyTestFragment", "Response body is null")
+                                }
+                            } else {
+                                Log.d("HomeWeeklyTestFragment", "Record save failed: ${response.code()} ${response.message()}")
+                            }
+                        }
+                        override fun onFailure(call: Call<TestRecordSaveResponse>, t: Throwable) {
+                            Log.d("HomeWeeklyTestFragment", "Record save error: ${t.message}")
+                        }
+                    })
+            } else {
+                Toast.makeText(requireContext(), "이미지 파일 변환 실패", Toast.LENGTH_SHORT).show()
             }
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 에러: ${t.message}")
-            }
-        })
+        } else {
+            // 이미지가 선택되지 않은 경우, 빈 MultipartBody.Part 생성
+            val emptyRequestBody = "".toRequestBody("text/plain".toMediaTypeOrNull())
+            val emptyDrawingPart = MultipartBody.Part.createFormData("drawing", "", emptyRequestBody)
+            RetrofitClient.service.postTestRecordSave(drawing = emptyDrawingPart, request = jsonRequestBody)
+                .enqueue(object : Callback<TestRecordSaveResponse> {
+                    override fun onResponse(call: Call<TestRecordSaveResponse>, response: Response<TestRecordSaveResponse>) {
+                        if (response.isSuccessful) {
+                            Log.d("HomeWeeklyTestFragment", "Record saved successfully (no image).")
+                            Toast.makeText(requireContext(), "기록이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.d("HomeWeeklyTestFragment", "Record save failed: ${response.code()} ${response.message()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<TestRecordSaveResponse>, t: Throwable) {
+                        Log.d("HomeWeeklyTestFragment", "Record save error: ${t.message}")
+                    }
+                })
+        }
+    }
+
+    private fun getFileFromUri(uri: Uri): File? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val file = File(requireContext().cacheDir, "temp_image.png")
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+            outputStream.close()
+            inputStream?.close()
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun loadRecordForDate(recordDate: String) {

@@ -1,19 +1,21 @@
-package com.example.grimmy.Retrofit.Request
+package com.example.grimmy.Retrofit.Response
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
-data class DailyRecordSaveRequest(
+data class TestRecordSaveResponse(
     @SerializedName("userId") val userId : Int,
-    @SerializedName("dailyDayRecording") val dailyDayRecording : Date,
+    @SerializedName("testDayRecording") val testDayRecording : String,
     @SerializedName("drawing") val drawing : String,
     @SerializedName("drawingTime") val drawingTime : String,
+    @SerializedName("score") val score : Int,
     @SerializedName("feedback") val feedback : String?,
     @SerializedName("difficultIssue") val difficultIssue : String?,
     @SerializedName("goodIssue") val goodIssue : String?,
+    @SerializedName("addTime") val addTime : String,
+    @SerializedName("satisfication") val satisfication : String,
     @SerializedName("todayMood") val todayMood : String?,
     @SerializedName("moodDetail") val moodDetail : String?,
     @SerializedName("question") val question : String?,
     @SerializedName("createdAt") val createdAt : String,
-    @SerializedName("updatedAt") val updatedAt : String
+    @SerializedName("updateAt") val updateAt : String
 )
