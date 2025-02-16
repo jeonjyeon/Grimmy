@@ -18,11 +18,21 @@ import com.example.grimmy.HomeWeeklyFragment.Companion.REQUEST_CODE_CUSTOM_GALLE
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
+import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentHomeWeeklyTestBinding
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -160,6 +170,11 @@ class HomeWeeklyTestFragment : Fragment() {
             scorePicker.show(parentFragmentManager, "scorePicker")
         }
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveTestRecordForDate(currentSelectedDate)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -355,19 +370,18 @@ class HomeWeeklyTestFragment : Fragment() {
     }
 
     private fun saveTestRecordForDate(recordDate: String) {
-        val drawing = selectedImageUri?.toString() ?: ""
-        val todayMood = selectedMood
-
         val createdAt = savedCreatedAt ?: getCurrentDateTime().also { savedCreatedAt = it }
         val updatedAt = getCurrentDateTime()
+        val todayMood = selectedMood
 
-        val scoreText = binding.testScoreTv.text.toString()  // 예: "00점"
+        val scoreText = binding.testScoreTv.text.toString()  // 예: "50 점"
         val scoreInt = scoreText.substringBefore("점").trim().toIntOrNull() ?: 0
 
-        val request = TestRecordSaveRequest(
+        // TestRecordSaveRequest 객체 생성 (drawing 필드는 빈 문자열로 설정)
+        val testRecordRequest = TestRecordSaveRequest(
             userId = 1,
             testDayRecording = recordDate,
-            drawing = drawing,
+            drawing = "",  // 파일은 별도로 전송
             drawingTime = binding.testTimeTakenTimeTv.text.toString(),
             score = scoreInt,
             feedback = binding.testFeedbackEdittextEt.text.toString(),
@@ -382,19 +396,72 @@ class HomeWeeklyTestFragment : Fragment() {
             updateAt = updatedAt
         )
 
-        RetrofitClient.service.postTestRecordSave(request).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 자동 저장 성공")
-                    Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 실패: ${response.code()} , ${response.message()}")
-                }
+        // GsonBuilder로 날짜 형식을 지정하여 JSON 문자열로 변환
+        val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
+        val jsonString = gson.toJson(testRecordRequest)
+        val jsonRequestBody: RequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
+
+        if (selectedImageUri != null) {
+            val file: File? = getFileFromUri(selectedImageUri!!)
+            if (file != null) {
+                val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
+                // "drawing" 파라미터로 파일 전송
+                val drawingPart = MultipartBody.Part.createFormData("drawing", file.name, requestFile)
+                RetrofitClient.service.postTestRecordSave(drawing = drawingPart, request = jsonRequestBody)
+                    .enqueue(object : Callback<TestRecordSaveResponse> {
+                        override fun onResponse(call: Call<TestRecordSaveResponse>, response: Response<TestRecordSaveResponse>) {
+                            if (response.isSuccessful) {
+                                response.body()?.let { res ->
+                                    Log.d("HomeWeeklyTestFragment", "Record saved successfully. Uploaded image URL: ${res.drawing}")
+                                    Toast.makeText(requireContext(), "기록이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                                } ?: run {
+                                    Log.d("HomeWeeklyTestFragment", "Response body is null")
+                                }
+                            } else {
+                                Log.d("HomeWeeklyTestFragment", "Record save failed: ${response.code()} ${response.message()}")
+                            }
+                        }
+                        override fun onFailure(call: Call<TestRecordSaveResponse>, t: Throwable) {
+                            Log.d("HomeWeeklyTestFragment", "Record save error: ${t.message}")
+                        }
+                    })
+            } else {
+                Toast.makeText(requireContext(), "이미지 파일 변환 실패", Toast.LENGTH_SHORT).show()
             }
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("HomeWeeklyTestFragment", "[$recordDate] 기록 저장 에러: ${t.message}")
-            }
-        })
+        } else {
+            // 이미지가 선택되지 않은 경우, 빈 MultipartBody.Part 생성
+            val emptyRequestBody = "".toRequestBody("text/plain".toMediaTypeOrNull())
+            val emptyDrawingPart = MultipartBody.Part.createFormData("drawing", "", emptyRequestBody)
+            RetrofitClient.service.postTestRecordSave(drawing = emptyDrawingPart, request = jsonRequestBody)
+                .enqueue(object : Callback<TestRecordSaveResponse> {
+                    override fun onResponse(call: Call<TestRecordSaveResponse>, response: Response<TestRecordSaveResponse>) {
+                        if (response.isSuccessful) {
+                            Log.d("HomeWeeklyTestFragment", "Record saved successfully (no image).")
+                            Toast.makeText(requireContext(), "기록이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.d("HomeWeeklyTestFragment", "Record save failed: ${response.code()} ${response.message()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<TestRecordSaveResponse>, t: Throwable) {
+                        Log.d("HomeWeeklyTestFragment", "Record save error: ${t.message}")
+                    }
+                })
+        }
+    }
+
+    private fun getFileFromUri(uri: Uri): File? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val file = File(requireContext().cacheDir, "temp_image.png")
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+            outputStream.close()
+            inputStream?.close()
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun loadRecordForDate(recordDate: String) {

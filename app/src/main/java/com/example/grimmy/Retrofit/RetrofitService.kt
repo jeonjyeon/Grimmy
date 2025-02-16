@@ -17,6 +17,7 @@ import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
+import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -50,6 +51,7 @@ interface RetrofitService {
         @Body request: CategoryRequest
     ):Call<Void>
 
+    // 데일리 기록 작성
     @Multipart
     @POST("/record/daily/save")
     fun postDailyRecordSave(
@@ -58,10 +60,12 @@ interface RetrofitService {
     ):Call<DailyRecordSaveResponse>
 
     // 테스트 기록 작성
+    @Multipart
     @POST("/record/test/save")
     fun postTestRecordSave(
-        @Body request : TestRecordSaveRequest
-    ):Call<Void>
+        @Part drawing : MultipartBody.Part,
+        @Part("request") request : RequestBody
+    ):Call<TestRecordSaveResponse>
 
     // 데일리 코멘트 작성
     @POST("/record/daily/comment/{dailyId}/save")
