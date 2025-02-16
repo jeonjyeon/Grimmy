@@ -1,9 +1,9 @@
-package com.example.grimmy.Retrofit.Request
+package com.example.grimmy.Retrofit.Response
 
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
-data class DailyRecordSaveRequest(
+data class DailyRecordSaveResponse(
     @SerializedName("userId") val userId : Int,
     @SerializedName("dailyDayRecording") val dailyDayRecording : Date,
     @SerializedName("drawing") val drawing : String,
