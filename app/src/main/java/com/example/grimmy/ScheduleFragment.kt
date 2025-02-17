@@ -104,6 +104,8 @@ class ScheduleFragment : Fragment() {
             "수" -> 2
             "목" -> 3
             "금" -> 4
+            "토" -> 5
+            "일" -> 6
             else -> 0
         }
     }
