@@ -234,10 +234,7 @@ class GoalFragment : Fragment() {
         container.addView(materialView)
     }
 
-    /**
-     * material 컨테이너 내 항목들을 재정렬하는 함수.
-     * EditText에 텍스트가 있는 항목 중 체크되지 않은 항목은 위로, 체크된 항목은 아래로 배치합니다.
-     */
+
     private fun reorderMaterialContainer(container: ViewGroup) {
         val uncheckedViews = mutableListOf<View>()
         val checkedViews = mutableListOf<View>()

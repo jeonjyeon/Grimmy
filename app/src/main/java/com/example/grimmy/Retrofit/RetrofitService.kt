@@ -13,6 +13,7 @@ import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
+import com.example.grimmy.Retrofit.Response.GoalGetResponse
 import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
@@ -114,4 +115,7 @@ interface RetrofitService {
     fun getTestComment(
         @Path("dailyId") dailyId: Int
     ): Call<List<TestCommentGetResponse>>
+
+    @GET("/goal")
+    fun getGoal(): Call<GoalGetResponse>
 }
