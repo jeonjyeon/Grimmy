@@ -11,14 +11,16 @@
         android:background="@drawable/bg_rectangle"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/goal_item_title_title_tv"
+        <EditText
+            android:id="@+id/goal_item_title_title_et"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="타이틀"
             android:textColor="@color/font3"
+            android:textColorHint="@color/font3"
+            android:hint="타이틀"
             android:textSize="16sp"
             android:fontFamily="@font/pretendard_regular"
+            android:background="@color/transparent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginStart="20dp"
@@ -39,7 +41,7 @@
             android:id="@+id/big_box_edittext_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/goal_item_title_title_tv"
+            app:layout_constraintTop_toBottomOf="@id/goal_item_title_title_et"
             android:layout_marginTop="23dp"
             android:layout_marginBottom="13dp"
             android:layout_marginHorizontal="10dp"
