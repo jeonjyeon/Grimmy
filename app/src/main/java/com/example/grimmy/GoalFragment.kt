@@ -11,6 +11,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import com.example.grimmy.Retrofit.Response.GoalGetResponse
+import com.example.grimmy.Retrofit.Response.MonthlyGoal
+import com.example.grimmy.Retrofit.Response.Stuff
+import com.example.grimmy.Retrofit.Response.WeeklyGoal
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentGoalBinding
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
@@ -20,6 +25,9 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.ColorTemplate.COLORFUL_COLORS
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class GoalFragment : Fragment() {
 
@@ -344,5 +352,128 @@ class GoalFragment : Fragment() {
         val percentage = if (total > 0) (checked * 100f / total) else 0f
         updatePieChart(binding.goalWeekGraphPc, percentage, ContextCompat.getColor(requireContext(), R.color.graph_color))
         binding.goalWeekPercentTv.text = "${percentage.toInt()}%"
+    }
+
+    private fun fetchGoals() {
+        RetrofitClient.service.getGoal().enqueue(object : Callback<GoalGetResponse> {
+            override fun onResponse(call: Call<GoalGetResponse>, response: Response<GoalGetResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { goalResponse ->
+                        // 월 목표 데이터로 UI 구성
+                        populateMonthlyGoals(goalResponse.monthly_goals)
+                        // 주 목표 데이터로 UI 구성
+                        populateWeeklyGoals(goalResponse.weekly_goals)
+                        // 재료 목표 데이터로 UI 구성
+                        populateMaterialGoals(goalResponse.stuff)
+                        // 도넛 차트 업데이트
+                        updateMonthDonutChart()
+                        updateWeekDonutChart()
+                    }
+                } else {
+                    // 에러 처리
+                }
+            }
+            override fun onFailure(call: Call<GoalGetResponse>, t: Throwable) {
+                // 네트워크 에러 처리
+            }
+        })
+    }
+
+    private fun populateMonthlyGoals(monthlyGoals: List<MonthlyGoal>) {
+        binding.goalMonthBigBoxContainer.removeAllViews()
+        for (goal in monthlyGoals) {
+            val bigBoxView = layoutInflater.inflate(R.layout.item_big_box, binding.goalMonthBigBoxContainer, false)
+            // (옵션) bigBoxView 내에 목표 제목을 표시하는 TextView가 있다면 설정
+            // ex: bigBoxView.findViewById<TextView>(R.id.goal_month_tv).text = goal.title
+            val container = bigBoxView.findViewById<ViewGroup>(R.id.big_box_edittext_container)
+            for (sub in goal.subgoals) {
+                addEditTextBoxWithData(container, sub.title, sub.is_completed)
+            }
+            binding.goalMonthBigBoxContainer.addView(bigBoxView)
+        }
+    }
+
+    private fun populateWeeklyGoals(weeklyGoals: List<WeeklyGoal>) {
+        binding.goalWeekBigBoxContainer.removeAllViews()
+        for (goal in weeklyGoals) {
+            val bigBoxView = layoutInflater.inflate(R.layout.item_big_box, binding.goalWeekBigBoxContainer, false)
+            // (옵션) bigBoxView 내에 목표 제목을 표시하는 TextView가 있다면 설정
+            val container = bigBoxView.findViewById<ViewGroup>(R.id.big_box_edittext_container)
+            for (sub in goal.subgoals) {
+                addWeekEditTextBoxWithData(container, sub.title, sub.is_completed)
+            }
+            binding.goalWeekBigBoxContainer.addView(bigBoxView)
+        }
+    }
+
+    private fun populateMaterialGoals(stuffs: List<Stuff>) {
+        val container = binding.root.findViewById<ViewGroup>(R.id.goal_material_edittext_container)
+        container.removeAllViews()
+        for (stuff in stuffs) {
+            // (옵션) 재료 제목을 별도로 표시할 수도 있음
+            for (sub in stuff.substuffs) {
+                addMaterialEditTextBoxWithData(container, sub.title, sub.is_completed)
+            }
+        }
+    }
+
+    // Helper 함수: 데이터로 edittext_box 생성 (월용)
+    private fun addEditTextBoxWithData(container: ViewGroup, text: String, isCompleted: Boolean) {
+        val view = layoutInflater.inflate(R.layout.item_goal_edittext, container, false)
+        val checkboxIv = view.findViewById<ImageView>(R.id.goal_month_checkbox_iv)
+        val editTextEt = view.findViewById<EditText>(R.id.goal_month_edittext_et)
+        editTextEt.setText(text)
+        if (isCompleted) {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_on)
+            editTextEt.paintFlags = editTextEt.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.bg_black2))
+            checkboxIv.tag = true
+        } else {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_off)
+            editTextEt.paintFlags = editTextEt.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.font4))
+            checkboxIv.tag = false
+        }
+        container.addView(view)
+    }
+
+    // Helper 함수: 데이터로 edittext_box 생성 (주용)
+    private fun addWeekEditTextBoxWithData(container: ViewGroup, text: String, isCompleted: Boolean) {
+        val view = layoutInflater.inflate(R.layout.item_goal_week_edittext, container, false)
+        val checkboxIv = view.findViewById<ImageView>(R.id.goal_week_checkbox_iv)
+        val editTextEt = view.findViewById<EditText>(R.id.goal_week_edittext_et)
+        editTextEt.setText(text)
+        if (isCompleted) {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_on)
+            editTextEt.paintFlags = editTextEt.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.bg_black2))
+            checkboxIv.tag = true
+        } else {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_off)
+            editTextEt.paintFlags = editTextEt.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.font4))
+            checkboxIv.tag = false
+        }
+        container.addView(view)
+    }
+
+    // Helper 함수: 데이터로 material edittext_box 생성
+    private fun addMaterialEditTextBoxWithData(container: ViewGroup, text: String, isCompleted: Boolean) {
+        val view = layoutInflater.inflate(R.layout.item_material_checkbox, container, false)
+        val checkboxIv = view.findViewById<ImageView>(R.id.goal_material_checkbox_iv)
+        val editTextEt = view.findViewById<EditText>(R.id.goal_material_edittext_et)
+        editTextEt.setText(text)
+        if (isCompleted) {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_on)
+            editTextEt.paintFlags = editTextEt.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.bg_black2))
+            checkboxIv.tag = true
+        } else {
+            checkboxIv.setImageResource(R.drawable.img_checkbox_off)
+            editTextEt.paintFlags = editTextEt.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            editTextEt.setTextColor(ContextCompat.getColor(requireContext(), R.color.font4))
+            checkboxIv.tag = false
+        }
+        container.addView(view)
     }
 }
