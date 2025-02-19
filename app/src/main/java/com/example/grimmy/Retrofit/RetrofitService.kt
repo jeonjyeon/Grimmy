@@ -5,6 +5,7 @@ import com.example.grimmy.Retrofit.Request.CategoryRequest
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
 import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
+import com.example.grimmy.Retrofit.Request.KakaoAccessTokenRequest
 import com.example.grimmy.Retrofit.Request.NicknameRequest
 import com.example.grimmy.Retrofit.Request.StatusRequest
 import com.example.grimmy.Retrofit.Request.TestCommentSaveRequest
@@ -13,13 +14,16 @@ import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
+import com.example.grimmy.Retrofit.Response.KakaoAccessTokenResponse
 import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
+import com.kakao.sdk.auth.model.AccessTokenResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,23 +35,32 @@ import retrofit2.http.PATCH
 import retrofit2.http.Part
 
 interface RetrofitService {
-    @PATCH("user/{userId}/nickname")
+    @POST("/auth/kakao")
+    fun sendAccessToken(
+        @Body request: KakaoAccessTokenRequest
+    ): Call<KakaoAccessTokenResponse>
+
+    @PATCH("/user/{userId}/nickname")
     fun updateNickname(
+        @Path("userId") userId: Int,
         @Body request: NicknameRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/birthYear")
     fun updateBirthYear(
+        @Path("userId") userId: Int,
         @Body request: BirthRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/status")
     fun updateStatus(
+        @Path("userId") userId: Int,
         @Body request: StatusRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/category")
     fun updateCategory(
+        @Path("userId") userId: Int,
         @Body request: CategoryRequest
     ):Call<Void>
 
