@@ -64,16 +64,26 @@ class ExamTypeFragment : Fragment() {
 
     // ✅ 선택된 시험 유형을 ENUM 변환 후 서버에 전송하는 함수
     private fun sendExamTypeToServer(selectedTypes: List<String>) {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("userId", -1) // ✅ 저장된 userId 불러오기
+
+        if (userId == -1) {
+            Log.e("ExamTypeFragment", "❌ 저장된 userId가 없습니다! 요청을 보낼 수 없습니다.")
+            return
+        }
+        Log.i("ExamTypeFragment", "✅ 저장된 userId 사용: $userId")
+
         val examTypeEnums = selectedTypes.mapNotNull { getExamTypeEnum(it) } // 선택된 한글 값을 ENUM으로 변환
 
         if (examTypeEnums.isNotEmpty()) {
-            RetrofitClient.service.updateCategory(CategoryRequest(examTypeEnums.map { it.name })) // ✅ ENUM.name 리스트 전송
+            RetrofitClient.service.updateCategory(userId, CategoryRequest(examTypeEnums.map { it.name })) // ✅ ENUM.name 리스트 전송
                 .enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         if (response.isSuccessful) {
                             Log.i("ExamTypeFragment", "✅ 시험 유형 업데이트 성공! $examTypeEnums")
                         } else {
                             Log.e("ExamTypeFragment", "❌ 시험 유형 업데이트 실패: ${response.code()}")
+                            Log.e("ExamTypeFragment", "❌ 응답 내용: ${response.errorBody()?.string()}")
                         }
                     }
 

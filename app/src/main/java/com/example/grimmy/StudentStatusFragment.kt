@@ -83,9 +83,18 @@ class StudentStatusFragment : Fragment() {
 
     // ✅ 서버에 신분(status) 저장 요청
     private fun sendStatusToServer(status: String) {
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("userId", -1) // ✅ 저장된 userId 불러오기
+
+        if (userId == -1) {
+            Log.e("StudentStatusFragment", "❌ 저장된 userId가 없습니다! 요청을 보낼 수 없습니다.")
+            return
+        }
+        Log.i("StudentStatusFragment", "✅ 저장된 userId 사용: $userId")
+
         val statusEnum = getStatusEnum(status)
         if (statusEnum != null) {
-            RetrofitClient.service.updateStatus(StatusRequest(statusEnum.name)) // ✅ ENUM.name 전송
+            RetrofitClient.service.updateStatus(userId, StatusRequest(statusEnum.name)) // ✅ ENUM.name 전송
                 .enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         if (response.isSuccessful) {

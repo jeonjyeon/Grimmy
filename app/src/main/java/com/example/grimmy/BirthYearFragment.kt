@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.example.grimmy.Retrofit.Request.BirthRequest
 import com.example.grimmy.Retrofit.RetrofitClient
@@ -47,6 +48,7 @@ class BirthYearFragment : Fragment() {
 
         // TextView 클릭 이벤트 처리
         binding.yearNextBtnTv.setOnClickListener {
+            hideKeyboard()
             val selectedYear = binding.yearPickerNp.value
 
             // ✅ 출생 연도를 서버에 저장 (SharedPreferences에는 저장 안 함)
@@ -63,7 +65,16 @@ class BirthYearFragment : Fragment() {
 
     // ✅ 출생 연도를 서버에 저장하는 함수
     private fun sendBirthYearToServer(birthYear: Int) {
-        RetrofitClient.service.updateBirthYear(BirthRequest(birthYear))
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("userId", -1) // ✅ 저장된 userId 불러오기
+
+        if (userId == -1) {
+            Log.e("BirthYearFragment", "❌ 저장된 userId가 없습니다! 요청을 보낼 수 없습니다.")
+            return
+        }
+        Log.i("BirthYearFragment", "✅ 저장된 userId 사용: $userId")
+
+        RetrofitClient.service.updateBirthYear(userId, BirthRequest(birthYear))
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
@@ -100,6 +111,12 @@ class BirthYearFragment : Fragment() {
         binding.yearNextBtnTv.postDelayed({
             (activity as OnboardingActivity).goToNextPage()
         }, 300)
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val view = activity?.currentFocus ?: View(context)
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }

@@ -4,6 +4,9 @@ import com.example.grimmy.Retrofit.Request.BigGoalRequest
 import com.example.grimmy.Retrofit.Request.BirthRequest
 import com.example.grimmy.Retrofit.Request.CategoryRequest
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
+import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
+import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
+import com.example.grimmy.Retrofit.Request.KakaoAccessTokenRequest
 import com.example.grimmy.Retrofit.Request.NicknameRequest
 import com.example.grimmy.Retrofit.Request.StatusRequest
 import com.example.grimmy.Retrofit.Request.StuffDetailRequest
@@ -15,6 +18,7 @@ import com.example.grimmy.Retrofit.Response.BigGoalResponse
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
+import com.example.grimmy.Retrofit.Response.KakaoAccessTokenResponse
 import com.example.grimmy.Retrofit.Response.GoalGetResponse
 import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.StuffDetailResponse
@@ -37,23 +41,32 @@ import retrofit2.http.PATCH
 import retrofit2.http.Part
 
 interface RetrofitService {
-    @PATCH("user/{userId}/nickname")
+    @POST("/auth/kakao")
+    fun sendAccessToken(
+        @Body request: KakaoAccessTokenRequest
+    ): Call<KakaoAccessTokenResponse>
+
+    @PATCH("/user/{userId}/nickname")
     fun updateNickname(
+        @Path("userId") userId: Int,
         @Body request: NicknameRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/birthYear")
     fun updateBirthYear(
+        @Path("userId") userId: Int,
         @Body request: BirthRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/status")
     fun updateStatus(
+        @Path("userId") userId: Int,
         @Body request: StatusRequest
     ):Call<Void>
 
     @PATCH("/user/{userId}/category")
     fun updateCategory(
+        @Path("userId") userId: Int,
         @Body request: CategoryRequest
     ):Call<Void>
 
