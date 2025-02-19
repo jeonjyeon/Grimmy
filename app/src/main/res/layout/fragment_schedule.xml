@@ -67,7 +67,7 @@
             android:id="@+id/schedule_timetable_year_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2024년"
+            android:text="2025년"
             android:textColor="@color/font3"
             android:fontFamily="@font/pretendard_semi_bold"
             android:textSize="22sp"
