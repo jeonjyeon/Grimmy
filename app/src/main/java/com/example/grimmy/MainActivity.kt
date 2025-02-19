@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity(), OnPageUpListener {
             binding.bottomNav.selectedItemId = com.example.grimmy.R.id.fragment_home
         }
 
-        val keyHash = getKeyHash(this, packageName)
-        Log.d("KeyHash", keyHash!!)
+//        val keyHash = getKeyHash(this, packageName)
+//        Log.d("KeyHash", keyHash!!)
     }
 
     override fun onPageUpClicked() {
@@ -38,24 +38,24 @@ class MainActivity : AppCompatActivity(), OnPageUpListener {
         homeFragment?.scrollToTop()
     }
 
-    fun getKeyHash(context: Context, packageName: String): String? {
-        val packageInfo = try {
-            context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-        } catch (e: PackageManager.NameNotFoundException) {
-            return null
-        }
-
-        for (signature in packageInfo.signatures) {
-            try {
-                val md = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                return Base64.encodeToString(md.digest(), Base64.NO_WRAP)
-            } catch (e: NoSuchAlgorithmException) {
-                Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
-            }
-        }
-        return null
-    }
+//    fun getKeyHash(context: Context, packageName: String): String? {
+//        val packageInfo = try {
+//            context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+//        } catch (e: PackageManager.NameNotFoundException) {
+//            return null
+//        }
+//
+//        for (signature in packageInfo.signatures) {
+//            try {
+//                val md = MessageDigest.getInstance("SHA")
+//                md.update(signature.toByteArray())
+//                return Base64.encodeToString(md.digest(), Base64.NO_WRAP)
+//            } catch (e: NoSuchAlgorithmException) {
+//                Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
+//            }
+//        }
+//        return null
+//    }
 
     private fun setBottomNavView() {
         binding.bottomNav.setOnItemSelectedListener { item ->

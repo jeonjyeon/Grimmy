@@ -44,30 +44,18 @@ class ScheduleFragment : Fragment() {
 
         // 📌 ViewModel의 수업 데이터를 관찰하여 동적으로 시간표 업데이트
         scheduleViewModel.classSchedules.observe(viewLifecycleOwner) { classSchedules ->
-            val scheduleItems = classSchedules?.map { cs ->
-                ScheduleItem(
-                    dayOfWeek = parseDayToIndex(cs.day),
-                    startTimeMin = parseTimeToMinutes(cs.startTime),
-                    endTimeMin = parseTimeToMinutes(cs.endTime),
-                    courseName = cs.className,
-                    colorResId = android.R.color.holo_red_dark // 필요시 색상 변경 가능
-                )
-            } ?: emptyList()
+            if (classSchedules != null) {
+                binding.dynamicScheduleView.updateSchedule(classSchedules)
 
-            scheduleViewModel.classSchedules.observe(viewLifecycleOwner) { classSchedules ->
-                if (classSchedules != null) {
-                    binding.dynamicScheduleView.updateSchedule(classSchedules) // ✅ `List<ClassSchedule>`을 전달해야 함
-                }
-            }
-
-            if (classSchedules?.isNotEmpty() == true) {
                 // 디버깅: 마지막 수업 정보 로깅
-                val lastClass = classSchedules.last()
-                Log.d("ClassSchedule", "Class Name: ${lastClass.className}")
-                Log.d("ClassSchedule", "Class Place: ${lastClass.classPlace}")
-                Log.d("ClassSchedule", "Day: ${lastClass.day}")
-                Log.d("ClassSchedule", "Start Time: ${lastClass.startTime}")
-                Log.d("ClassSchedule", "End Time: ${lastClass.endTime}")
+                if (classSchedules.isNotEmpty()) {
+                    val lastClass = classSchedules.last()
+                    Log.d("ClassSchedule", "Class Name: ${lastClass.className}")
+                    Log.d("ClassSchedule", "Class Place: ${lastClass.classPlace}")
+                    Log.d("ClassSchedule", "Day: ${lastClass.day}")
+                    Log.d("ClassSchedule", "Start Time: ${lastClass.startTime}")
+                    Log.d("ClassSchedule", "End Time: ${lastClass.endTime}")
+                }
             }
         }
 

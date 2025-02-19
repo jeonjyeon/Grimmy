@@ -25,41 +25,8 @@ data class ScheduleItem(
     val startTimeMin: Int,   // 시작 시간 (분 단위)
     val endTimeMin: Int,     // 종료 시간 (분 단위)
     val courseName: String,
-    val colorResId: Int      // 실제 색상 int를 저장
-//    val color: Int      // 실제 색상 int를 저장
+    val color: Int           // 실제 색상 int를 저장
 )
-
-/**
-// * 색상 리스트에서 순서대로 색상을 부여하고, 리스트보다 인덱스가 클 경우 약간의 밝기 조절로 변형된 색상을 반환합니다.
-// */
-//private fun getColorForIndex(index: Int): Int {
-//    // baseColors: 원하는 기본 색상을 미리 정의 (R.color.xxx 대신 실제 리소스 id를 사용)
-//    val baseColors = listOf(
-//        ContextCompat.getColor(context, R.color.lightening),
-//        ContextCompat.getColor(context, R.color.happy),
-//        ContextCompat.getColor(context, R.color.love),
-//        ContextCompat.getColor(context, R.color.xx),
-//        ContextCompat.getColor(context, R.color.sleepy),
-//        ContextCompat.getColor(context, R.color.sad),
-//        ContextCompat.getColor(context, R.color.tired),
-//        ContextCompat.getColor(context, R.color.stress),
-//        ContextCompat.getColor(context, R.color.angry)
-//    )
-//    // 우선 기본 색상 선택
-//    val baseColor = baseColors[index % baseColors.size]
-//    // 만약 인덱스가 baseColors.size보다 크다면, 조정 계수를 계산합니다.
-//    val multiplier = 1f + (index / baseColors.size) * 0.1f
-//    return adjustColorBrightness(baseColor, multiplier)
-//}
-//
-//// 색상의 밝기를 조절하는 함수. multiplier가 1.0이면 그대로, 1.1이면 약간 더 밝게.
-//private fun adjustColorBrightness(color: Int, multiplier: Float): Int {
-//    val a = Color.alpha(color)
-//    val r = (Color.red(color) * multiplier).toInt().coerceAtMost(255)
-//    val g = (Color.green(color) * multiplier).toInt().coerceAtMost(255)
-//    val b = (Color.blue(color) * multiplier).toInt().coerceAtMost(255)
-//    return Color.argb(a, r, g, b)
-//}
 
 class DynamicScheduleView @JvmOverloads constructor(
     context: Context,
@@ -82,17 +49,44 @@ class DynamicScheduleView @JvmOverloads constructor(
         columnCount = 6
     }
 
+    // --- 색상 관련 함수 ---
+    private fun getColorForIndex(index: Int): Int {
+        val baseColors = listOf(
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.happy),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.lightening),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.love),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.xx),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.sleepy),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.sad),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.tired),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.stress),
+            ContextCompat.getColor(this@DynamicScheduleView.context, R.color.angry)
+        )
+        val baseColor = baseColors[index % baseColors.size]
+        val multiplier = 1f + (index / baseColors.size) * 0.1f
+        return adjustColorBrightness(baseColor, multiplier)
+    }
+
+    private fun adjustColorBrightness(color: Int, multiplier: Float): Int {
+        val a = Color.alpha(color)
+        val r = (Color.red(color) * multiplier).toInt().coerceAtMost(255)
+        val g = (Color.green(color) * multiplier).toInt().coerceAtMost(255)
+        val b = (Color.blue(color) * multiplier).toInt().coerceAtMost(255)
+        return Color.argb(a, r, g, b)
+    }
+    // --- 끝 색상 관련 함수 ---
+
     /**
      * 외부에서 ClassSchedule 리스트를 받아 내부 ScheduleItem으로 변환한 뒤,
      * 최대 요일 인덱스를 확인하여 totalColumns를 결정하고, 그리드를 구성합니다.
      */
     fun updateSchedule(classSchedules: List<ClassSchedule>) {
-        // 여기서 종료 시간이 시작 시간보다 작으면 자정을 넘긴 것으로 처리
-        val scheduleItems = classSchedules.map { cs ->
+        // 종료 시간이 시작 시간보다 작으면 자정을 넘긴 것으로 처리
+        val scheduleItems = classSchedules.mapIndexed { index, cs ->
             val startTime = parseTimeToMinutes(cs.startTime)
             var endTime = parseTimeToMinutes(cs.endTime)
             if (endTime < startTime) {
-                endTime += 24 * 60  // 자정을 넘겼으므로 24시간(1440분) 추가
+                endTime += 24 * 60  // 자정 넘김 처리
             }
             // parseDayToIndex가 음수를 반환하면 0으로 보정
             val dayIndex = parseDayToIndex(cs.day).coerceAtLeast(0)
@@ -101,7 +95,7 @@ class DynamicScheduleView @JvmOverloads constructor(
                 startTimeMin = startTime,
                 endTimeMin = endTime,
                 courseName = cs.className,
-                colorResId = android.R.color.holo_blue_light
+                color = getColorForIndex(index)  // 색상 리스트 순서대로 부여
             )
         }
         // 기본 시간 범위 초기화
@@ -113,12 +107,10 @@ class DynamicScheduleView @JvmOverloads constructor(
                 if (item.startTimeMin < minTimeMin) minTimeMin = item.startTimeMin
                 if (item.endTimeMin > maxTimeMin) maxTimeMin = item.endTimeMin
             }
-            // 최대 시간을 60분 단위로 올림 처리
+            // 최대 시간을 60분 단위로 올림 처리 (정각이면 그대로)
             maxTimeMin = if (maxTimeMin % 60 == 0) maxTimeMin else ((maxTimeMin + 59) / 60) * 60
         }
-        // 기본은 월~금(인덱스 0~4); 토(5)나 일(6)가 있으면 열을 확장
         val maxDayIndex = scheduleItems.maxByOrNull { it.dayOfWeek }?.dayOfWeek ?: 4
-        // 0열은 시간, 나머지는 (if maxDayIndex < 5 then 5, else maxDayIndex+1)
         val totalColumns = if (maxDayIndex < 5) 6 else (maxDayIndex + 2)
         columnCount = totalColumns
 
@@ -126,20 +118,13 @@ class DynamicScheduleView @JvmOverloads constructor(
         addScheduleItems(scheduleItems, totalColumns)
     }
 
-    /**
-     * 기본 그리드를 구성합니다.
-     * totalColumns: 전체 열 수 (0열: 시간, 1~(totalColumns-1): 요일)
-     */
     private fun buildBaseGrid(totalColumns: Int) {
         removeAllViews()
         val startHour = minTimeMin / 60
         val endHour = maxTimeMin / 60
-        // 총 행 수: 헤더 1행 + 시간 행; 종료 시간을 포함하기 위해 +1
-        val totalRows = (endHour - startHour) + 1
+        val totalRows = (endHour - startHour) + 1  // 종료 시간을 포함
 
-        // 헤더 행: row=0, col=0은 빈 칸
         addView(createHeaderCell("", 0, 0, totalRows, totalColumns))
-        // 요일 헤더
         val dayLabels = when (totalColumns) {
             6 -> listOf("월", "화", "수", "목", "금")
             7 -> listOf("월", "화", "수", "목", "금", "토")
@@ -149,8 +134,7 @@ class DynamicScheduleView @JvmOverloads constructor(
         for (i in dayLabels.indices) {
             addView(createHeaderCell(dayLabels[i], 0, i + 1, totalRows, totalColumns))
         }
-        // 시간 행 (row 1부터) - 종료 시간을 포함하도록 endHour + 1까지 반복
-        for (hour in startHour until endHour) {
+        for (hour in startHour until (endHour + 1)) {
             val currentRow = (hour - startHour) + 1
             addView(createTimeCell("$hour", currentRow, 0, totalRows, totalColumns))
             for (day in 0 until (totalColumns - 1)) {
@@ -159,9 +143,6 @@ class DynamicScheduleView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 셀 배경 drawable 반환 (res/drawable에 미리 정의)
-     */
     private fun getCellBackground(row: Int, col: Int, totalRows: Int, totalColumns: Int): Int {
         return when {
             row == 0 && col == 0 -> R.drawable.bg_schedule_cell_top_left
@@ -231,29 +212,20 @@ class DynamicScheduleView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * addScheduleItems:
-     * - 단일 셀에 있는 경우: 기존처럼 상단 오프셋과 분 비율에 따른 높이 적용.
-     * - 여러 셀에 걸치는 경우: 병합된 컨테이너(FrameLayout)를 GridLayout에 추가하고,
-     *   내부에 실제 시간 비율대로 높이와 오프셋을 반영하는 카드(innerCard)를 배치.
-     */
     private fun addScheduleItems(scheduleItems: List<ScheduleItem>, totalColumns: Int) {
         scheduleItems.forEach { item ->
             val col = item.dayOfWeek + 1
             val duration = item.endTimeMin - item.startTimeMin
             val startRow = ((item.startTimeMin - minTimeMin) / 60) + 1
             var endRow = ((item.endTimeMin - minTimeMin) / 60) + 1
-
-            // 만약 수업 지속 시간이 정확 60분이면 단일 셀로 취급
+            // 수업 지속 시간이 정확 60분이면 단일 셀로 처리
             if (duration == 60) {
                 endRow = startRow
             }
-
             val startOffsetRatio = (item.startTimeMin % 60) / 60f
             val endOffsetRatio = (item.endTimeMin % 60) / 60f
 
             if (startRow == endRow) {
-                // 단일 셀인 경우
                 val topMargin = (startOffsetRatio * cellHeight).toInt()
                 val viewHeight = ((item.endTimeMin - item.startTimeMin) * cellHeight) / 60
                 val card = createScheduleCard(item, showText = true, position = CardPosition.SINGLE)
@@ -269,7 +241,6 @@ class DynamicScheduleView @JvmOverloads constructor(
                 card.layoutParams = param
                 addView(card)
             } else {
-                // 여러 셀에 걸치는 경우 - 병합 컨테이너 사용
                 val totalMergedRows = endRow - startRow + 1
                 val mergedHeight = totalMergedRows * cellHeight
 
@@ -284,14 +255,9 @@ class DynamicScheduleView @JvmOverloads constructor(
                 }
                 container.layoutParams = containerParam
 
-                // 실제 수업 지속 시간에 따른 높이 (분 비율 반영)
-                val actualDurationMin = item.endTimeMin - item.startTimeMin
-                val actualViewHeight = (actualDurationMin * cellHeight) / 60
-                // 내부 카드의 topMargin: 첫 셀에서 시작 오프셋 반영
+                val actualViewHeight = (duration * cellHeight) / 60
                 val innerTopMargin = (startOffsetRatio * cellHeight).toInt()
 
-                // customRadii: 병합된 경우, 내부 카드의 상단은 항상 둥글게, 하단은
-                // 종료 오프셋이 있는 경우에만 둥글게 처리.
                 val radiusValue = dpToPx(8).toFloat()
                 val topLeft = radiusValue
                 val topRight = radiusValue
@@ -314,13 +280,8 @@ class DynamicScheduleView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * 단일 셀용 카드 생성 (여러 셀에 걸치는 경우는 별도 병합 컨테이너 사용)
-     */
     private fun createScheduleCard(item: ScheduleItem, showText: Boolean, position: CardPosition): CardView {
-        val card = CardView(context).apply {
-            radius = 0f
-        }
+        val card = CardView(context).apply { radius = 0f }
         val radiusValue = dpToPx(8).toFloat()
         val radii = when (position) {
             CardPosition.SINGLE -> floatArrayOf(radiusValue, radiusValue, radiusValue, radiusValue, radiusValue, radiusValue, radiusValue, radiusValue)
@@ -329,7 +290,7 @@ class DynamicScheduleView @JvmOverloads constructor(
             CardPosition.LAST -> floatArrayOf(0f, 0f, 0f, 0f, radiusValue, radiusValue, radiusValue, radiusValue)
         }
         val drawable = GradientDrawable().apply {
-            setColor(ContextCompat.getColor(context, item.colorResId))
+            setColor(item.color) // item.color를 바로 사용
             cornerRadii = radii
         }
         card.background = drawable
@@ -359,15 +320,10 @@ class DynamicScheduleView @JvmOverloads constructor(
         return card
     }
 
-    /**
-     * 내부 카드 생성용: customRadii 배열을 받아 둥근 모서리를 적용합니다.
-     */
     private fun createScheduleCardWithCustomRadii(item: ScheduleItem, showText: Boolean, customRadii: FloatArray): CardView {
-        val card = CardView(context).apply {
-            radius = 0f
-        }
+        val card = CardView(context).apply { radius = 0f }
         val drawable = GradientDrawable().apply {
-            setColor(ContextCompat.getColor(context, item.colorResId))
+            setColor(item.color)
             cornerRadii = customRadii
         }
         card.background = drawable
