@@ -82,7 +82,16 @@ class NicknameFragment : Fragment() {
 
     // ✅ 서버에 닉네임 저장 요청
     private fun sendNicknameToServer(nickname: String) {
-        RetrofitClient.service.updateNickname(NicknameRequest(nickname))
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("userId", -1) // ✅ 저장된 userId 불러오기
+
+        if (userId == -1) {
+            Log.e("NicknameFragment", "❌ 저장된 userId가 없습니다! 요청을 보낼 수 없습니다.")
+            return
+        }
+        Log.i("NicknameFragment", "✅ 저장된 userId 사용: $userId")
+
+        RetrofitClient.service.updateNickname(userId, NicknameRequest(nickname))
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
