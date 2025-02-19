@@ -453,8 +453,14 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     }
 
     private fun loadRecordForDate(recordDate: String) {
+        if (!isAdded) { // 프래그먼트가 detach된 경우 요청을 보내지 않음
+            Log.d("HomeWeeklyFragment", "[$recordDate] Fragment가 attach되지 않음. 요청 생략")
+            return
+        }
+
         RetrofitClient.service.getDailyRecordGet(userId = 1, date = recordDate).enqueue(object : Callback<DailyRecordGetResponse> {
             override fun onResponse(call: Call<DailyRecordGetResponse>, response: Response<DailyRecordGetResponse>) {
+                if (!isAdded) return // ✅ 응답이 왔을 때 프래그먼트가 detach되었는지 다시 확인
                 if (response.isSuccessful) {
                     response.body()?.let { record ->
                         // EditText 등에 기록된 내용을 채웁니다.
@@ -467,17 +473,29 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                         // 만약 mood 정보가 있으면 selectedMood도 업데이트
                         selectedMood = record.todayMood ?: ""
                         binding.weeklyFeelEdittextEt.setText(record.moodDetail ?: "")
-                        Toast.makeText(requireContext(), "[$recordDate] 기록을 불러왔습니다.", Toast.LENGTH_SHORT).show()
+
+                        // ✅ Toast 메시지 - context가 null일 경우 실행 안 함
+                        val safeContext = context ?: return
+                        Toast.makeText(safeContext, "[$recordDate] 기록을 불러왔습니다.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Log.d("HomeWeeklyFragment", "[$recordDate] 기록 조회 실패: ${response.code()} ${response.message()}")
-                    Toast.makeText(requireContext(), "[$recordDate] 기록 조회 실패", Toast.LENGTH_SHORT).show()
+
+                    val safeContext = context ?: return
+                    Toast.makeText(safeContext, "[$recordDate] 기록 조회 실패", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<DailyRecordGetResponse>, t: Throwable) {
+                if (!isAdded) {
+                    Log.d("HomeWeeklyFragment", "[$recordDate] Fragment가 detach 상태임. UI 업데이트 생략")
+                    return
+                }
                 Log.d("HomeWeeklyFragment", "[$recordDate] 기록 조회 에러: ${t.message}")
-                Toast.makeText(requireContext(), "[$recordDate] 기록 조회 에러", Toast.LENGTH_SHORT).show()
+
+                // 프래그먼트가 attach된 경우에만 Toast 실행
+                val safeContext = context ?: return
+                Toast.makeText(safeContext, "[$recordDate] 기록 조회 에러", Toast.LENGTH_SHORT).show()
             }
         })
     }
