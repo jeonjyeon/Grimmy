@@ -35,10 +35,13 @@
     <color name="bg_black">#3B3B3B</color>
     <color name="bg_black2">#4B4B4B</color>
 
+    <color name="lightening">#FFD760</color>
     <color name="happy">#FF6E1D</color>
-    <color name="angry">#FF8383</color>
-    <color name="lightening">#FFB300</color>
-    <color name="love">#FF6F61</color>
+    <color name="love">#FFAFAF</color>
+    <color name="xx">#BC84E9</color>
+    <color name="sleepy">#ADDC71</color>
     <color name="sad">#71A8DC</color>
-    <color name="sleepy">#B3CDE0</color>
+    <color name="tired">#30CD91</color>
+    <color name="stress">#25D4D1</color>
+    <color name="angry">#FF8383</color>
 </resources>

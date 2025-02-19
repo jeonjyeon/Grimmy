@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.grimmy.databinding.DialogAlertCustomBinding
 import com.example.grimmy.databinding.FragmentScheduleAddClassBinding
+import com.example.grimmy.utils.parseDayToIndex
+import com.example.grimmy.utils.parseTimeToMinutes
 import com.example.grimmy.viewmodel.ScheduleViewModel
 
 class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTimeSetListener,
@@ -45,11 +47,15 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
             } else {
                 // 수업 등록 로직
                 val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
-                scheduleViewModel.addClass(newClass)
-
-                Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
-                Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
-                requireActivity().supportFragmentManager.popBackStack()
+                // 📌 기존 수업과 겹치는지 확인
+                if (isOverlapping(newClass)) {
+                    showAlert("시간표가 겹쳐 추가할 수 없습니다.")
+                } else {
+                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
+                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
+                    scheduleViewModel.addClass(newClass)
+                    requireActivity().supportFragmentManager.popBackStack()
+                }
             }
         }
 
@@ -108,9 +114,25 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         dialog.show()
     }
 
-    private fun saveData(className: String, classPlace: String) {
-        Log.d("ScheduleAddClassFragment", "Class Name: $className")
-        Log.d("ScheduleAddClassFragment", "Class Place: $classPlace")
+    // 📌 기존 수업과 1분이라도 겹치는지 확인하는 함수
+    private fun isOverlapping(newClass: ClassSchedule): Boolean {
+        val existingSchedules = scheduleViewModel.classSchedules.value ?: return false
+        val newStartTime = parseTimeToMinutes(newClass.startTime)
+        val newEndTime = parseTimeToMinutes(newClass.endTime)
+        val newDayIndex = parseDayToIndex(newClass.day)
+
+        for (existingClass in existingSchedules) {
+            if (parseDayToIndex(existingClass.day) == newDayIndex) { // 같은 요일인지 확인
+                val existingStart = parseTimeToMinutes(existingClass.startTime)
+                val existingEnd = parseTimeToMinutes(existingClass.endTime)
+
+                // 📌 1분이라도 겹치면 true 반환
+                if (!(newEndTime <= existingStart || newStartTime >= existingEnd)) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     override fun onResume() {
@@ -140,7 +162,7 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
                 val currentEndTimeInMinutes = endHour * 60 + endMinute
 
                 // 시작 시간이 종료 시간보다 크면 종료 시간을 시작 시간 + 1시간으로 설정 (24시간 형식 고려)
-                if (chosenTimeInMinutes > currentEndTimeInMinutes) {
+                if (chosenTimeInMinutes >= currentEndTimeInMinutes) {
                     val newEndHour = (hour + 1) % 24
                     binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", newEndHour, minute)
                 }
@@ -158,7 +180,7 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
                 val currentStartTimeInMinutes = startHour * 60 + startMinute
 
                 // 종료 시간이 시작 시간보다 작으면 시작 시간을 종료 시간 - 1시간으로 설정 (24시간 형식 고려)
-                if (chosenTimeInMinutes < currentStartTimeInMinutes) {
+                if (chosenTimeInMinutes <= currentStartTimeInMinutes) {
                     val newStartHour = (hour + 23) % 24  // (hour - 1) mod 24
                     binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", newStartHour, minute)
                 }

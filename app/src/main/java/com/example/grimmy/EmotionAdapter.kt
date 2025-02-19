@@ -9,12 +9,15 @@ import com.example.grimmy.databinding.ItemEmotionBinding
 class EmotionAdapter(private var emotions: List<Emotion>) :
     RecyclerView.Adapter<EmotionAdapter.EmotionViewHolder>() {
     val emotionColors = mapOf(
+        "각성" to R.color.lightening,
         "기쁨" to R.color.happy,
-        "분노" to R.color.angry,
+        "열정" to R.color.love,
+        "힘듦" to R.color.xx,
+        "지루함" to R.color.sleepy,
         "슬픔" to R.color.sad,
-        "집중" to R.color.lightening,
-        "사랑" to R.color.love,
-        "피곤" to R.color.sleepy
+        "힘듦" to R.color.tired,
+        "짜증" to R.color.stress,
+        "분노" to R.color.angry
     )
     inner class EmotionViewHolder(val binding: ItemEmotionBinding) :
         RecyclerView.ViewHolder(binding.root)
