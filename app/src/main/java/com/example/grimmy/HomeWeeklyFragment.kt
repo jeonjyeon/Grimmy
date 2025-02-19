@@ -12,8 +12,10 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -222,6 +224,13 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
 
     private fun updateCalendarWeek() {
         binding.weeklyCalendarGl.removeAllViews()
+        // 화면 전체 너비와 GridLayout의 좌우 padding을 고려하여 가용 너비 계산
+        val screenWidth = resources.displayMetrics.widthPixels
+        val leftPadding = binding.weeklyCalendarGl.paddingLeft
+        val rightPadding = binding.weeklyCalendarGl.paddingRight
+        val availableWidth = screenWidth - (leftPadding + rightPadding)
+        val cellWidth = availableWidth / 7
+
         // 오늘 날짜(비교용; 시간 0시로 맞춤)
         val todayCal = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
@@ -239,15 +248,12 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             val currentDayCal = calendar.clone() as Calendar
             val currentDayStr = sdf.format(currentDayCal.time)
 
-            // 오늘 날짜는 항상 item_calendar_today 디자인 유지
-            // 만약 현재 선택된 날짜가 오늘과 같다면 item_calendar_today가 선택 디자인과 동일하다고 볼 수 있음
-            // 오늘이 아니면서 사용자가 선택한 날짜면 별도의 선택 디자인(item_calendar_selected)
             val layoutRes = when {
                 currentDayStr == todayStr -> R.layout.item_calendar_today
                 currentDayStr == currentSelectedDate -> R.layout.item_calendar_today
                 else -> R.layout.item_calendar_day
             }
-            val dayView = layoutInflater.inflate(layoutRes, binding.weeklyCalendarGl, false)
+            val dayView = layoutInflater.inflate(layoutRes, binding.weeklyCalendarGl, false) as ConstraintLayout
             val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             textView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
 
@@ -256,19 +262,24 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                 dayView.alpha = 0.5f
             } else {
                 dayView.setOnClickListener {
-                    // 자동 저장: 기존 선택된 날짜 기록 저장
                     saveRecordForDate(parseDate(currentSelectedDate))
-                    // 업데이트: 새 선택 날짜 설정
                     currentSelectedDate = currentDayStr
-                    // 조회: 해당 날짜의 기록을 불러오기
                     loadRecordForDate(currentDayStr)
-                    // UI 갱신: 달력의 각 항목이 올바른 디자인으로 표시되도록 갱신
                     updateCalendarWeek()
                 }
             }
+
+            val params = GridLayout.LayoutParams().apply {
+                width = cellWidth
+                height = GridLayout.LayoutParams.WRAP_CONTENT
+                bottomMargin = (10 * resources.displayMetrics.density).toInt()
+            }
+            dayView.layoutParams = params
+
             binding.weeklyCalendarGl.addView(dayView)
             calendar.add(Calendar.DATE, 1)
         }
+
         // 달력 업데이트 후 calendar를 이번 주 시작 날짜로 재설정
         calendar.set(
             thisWeekStart.get(Calendar.YEAR),

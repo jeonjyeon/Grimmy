@@ -60,6 +60,7 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
     }
 
     private fun updateCalendar(year: Int, month: Int) {
+        binding.monthlyDatepickerBtnTv.text = "${year}년 ${month}월"
         val gridLayout = binding.monthlyCalendarGl
         gridLayout.removeAllViews()
 
@@ -73,16 +74,28 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val todayStr = sdf.format(todayCal.time)
 
-        // 달력 날짜 계산: 해당 달의 1일로 설정
+        // 해당 달의 1일로 달력 설정
         val calendar = Calendar.getInstance()
         calendar.set(year, month - 1, 1)
         val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1  // 0-based index
         val maxDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
+        // 전체 화면 너비에서 GridLayout의 양옆 패딩(20dp씩)을 제외한 가용 너비 계산
+        val screenWidth = resources.displayMetrics.widthPixels
+        val paddingPx = (20 * resources.displayMetrics.density * 2).toInt()  // 20dp 양쪽
+        val availableWidth = screenWidth - paddingPx
+        val cellWidth = availableWidth / 7
+
         // 빈 칸 채우기 (첫날 앞에 들어갈 자리)
         for (i in 0 until firstDayOfWeek) {
             val placeholder = LayoutInflater.from(context).inflate(R.layout.item_calendar_day, gridLayout, false)
             placeholder.visibility = View.INVISIBLE
+            val params = GridLayout.LayoutParams().apply {
+                width = cellWidth
+                height = GridLayout.LayoutParams.WRAP_CONTENT
+                bottomMargin = (22 * resources.displayMetrics.density).toInt()
+            }
+            placeholder.layoutParams = params
             gridLayout.addView(placeholder)
         }
 
@@ -90,37 +103,38 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
         for (day in 1..maxDayOfMonth) {
             calendar.set(Calendar.DAY_OF_MONTH, day)
             val currentDateStr = sdf.format(calendar.time)
-
-            // 기본적으로 오늘 날짜는 항상 item_calendar_today, 선택되지 않은 날은 item_calendar_day
-            // (원하는 경우 선택된 날짜에 대해 item_calendar_selected 디자인 적용 가능)
             val layoutRes = if (currentDateStr == todayStr) R.layout.item_calendar_today else R.layout.item_calendar_day
+            val dayView = LayoutInflater.from(context).inflate(layoutRes, gridLayout, false) as ConstraintLayout
 
-            val dayView = LayoutInflater.from(context).inflate(layoutRes, gridLayout, false)
             // 날짜 텍스트 설정
             val dayTextView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
             dayTextView.text = day.toString()
 
-            // 기본 이미지를 설정 (default image)
+            // 기본 이미지 설정 (default image)
             val recordImageView = dayView.findViewById<ImageView>(R.id.item_calendar_day_img_iv)
-            recordImageView.setImageResource(R.drawable.img_default_profile_dark)
+//            recordImageView.setImageResource(R.drawable.bg_circle_box_color)
 
             // 월별 기록 데이터가 있다면 해당 날짜의 displayImage 값을 사용하여 이미지 로드
             val displayImage = monthlyRecordsMap[currentDateStr]
             if (!displayImage.isNullOrEmpty()) {
                 Glide.with(requireContext())
-                    .load(displayImage) // displayImage가 URI 문자열이라고 가정
+                    .load(displayImage)
                     .into(recordImageView)
                 recordImageView.visibility = View.VISIBLE
             } else {
-                // 데이터가 없으면 기본 이미지가 유지되거나, 필요에 따라 visibility를 GONE으로 처리할 수 있음
                 recordImageView.visibility = View.VISIBLE
             }
 
+            // 각 날짜 셀의 LayoutParams에 동적으로 계산한 cellWidth 및 bottomMargin 적용
+            val params = GridLayout.LayoutParams().apply {
+                width = cellWidth
+                height = GridLayout.LayoutParams.WRAP_CONTENT
+                bottomMargin = (22 * resources.displayMetrics.density).toInt() // 22dp margin 하단 추가
+            }
+            dayView.layoutParams = params
+
             gridLayout.addView(dayView)
         }
-
-        // 달력 상단 날짜 텍스트 업데이트 (예: "2024년 2월")
-        binding.monthlyDatepickerBtnTv.text = "${year}년 ${month}월"
     }
 
     /**
@@ -156,10 +170,4 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
             })
     }
 
-    // Helper: 현재 날짜를 지정한 형식으로 반환 (한국 표준시 적용)
-    private fun getCurrentDate(format: String): String {
-        val sdf = SimpleDateFormat(format, Locale.getDefault())
-        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
-        return sdf.format(Date())
-    }
 }
