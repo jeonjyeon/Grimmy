@@ -134,7 +134,7 @@ class DynamicScheduleView @JvmOverloads constructor(
         for (i in dayLabels.indices) {
             addView(createHeaderCell(dayLabels[i], 0, i + 1, totalRows, totalColumns))
         }
-        for (hour in startHour until (endHour + 1)) {
+        for (hour in startHour until endHour) {
             val currentRow = (hour - startHour) + 1
             addView(createTimeCell("$hour", currentRow, 0, totalRows, totalColumns))
             for (day in 0 until (totalColumns - 1)) {
