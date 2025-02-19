@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.grimmy.Retrofit.Request.CategoryRequest
+import com.example.grimmy.Retrofit.Response.UserResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentExamTypeBinding
 import retrofit2.Call
@@ -77,17 +78,19 @@ class ExamTypeFragment : Fragment() {
 
         if (examTypeEnums.isNotEmpty()) {
             RetrofitClient.service.updateCategory(userId, CategoryRequest(examTypeEnums.map { it.name })) // ✅ ENUM.name 리스트 전송
-                .enqueue(object : Callback<Void> {
-                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                .enqueue(object : Callback<UserResponse> {
+                    override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                         if (response.isSuccessful) {
                             Log.i("ExamTypeFragment", "✅ 시험 유형 업데이트 성공! $examTypeEnums")
+                            Log.i("ExamTypeFragment", "✅ 시험 유형 업데이트 성공! ${response.body()}")
+
                         } else {
                             Log.e("ExamTypeFragment", "❌ 시험 유형 업데이트 실패: ${response.code()}")
                             Log.e("ExamTypeFragment", "❌ 응답 내용: ${response.errorBody()?.string()}")
                         }
                     }
 
-                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                    override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                         Log.e("ExamTypeFragment", "❌ 네트워크 오류: ${t.message}")
                     }
                 })

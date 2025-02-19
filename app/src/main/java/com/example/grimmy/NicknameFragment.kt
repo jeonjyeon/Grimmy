@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.example.grimmy.databinding.FragmentNicknameBinding
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.Retrofit.Request.NicknameRequest
+import com.example.grimmy.Retrofit.Response.UserResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -92,10 +93,11 @@ class NicknameFragment : Fragment() {
         Log.i("NicknameFragment", "✅ 저장된 userId 사용: $userId")
 
         RetrofitClient.service.updateNickname(userId, NicknameRequest(nickname))
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            .enqueue(object : Callback<UserResponse> {
+                override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                     if (response.isSuccessful) {
                         Log.i("NicknameFragment", "✅ 닉네임 업데이트 성공!")
+                        Log.i("NicknameFragment", "✅ 닉네임 업데이트 성공! ${response.body()}")
 
                         // ✅ 닉네임을 SharedPreferences에 저장
                         saveNickname(nickname)
@@ -108,7 +110,7 @@ class NicknameFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                     Log.e("NicknameFragment", "❌ 네트워크 오류: ${t.message}")
                     showGuideMessage("네트워크 오류가 발생했습니다.")
                 }

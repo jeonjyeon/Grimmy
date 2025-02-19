@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.example.grimmy.Retrofit.Request.StatusRequest
+import com.example.grimmy.Retrofit.Response.UserResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentStudentStatusBinding
 import retrofit2.Call
@@ -95,8 +96,8 @@ class StudentStatusFragment : Fragment() {
         val statusEnum = getStatusEnum(status)
         if (statusEnum != null) {
             RetrofitClient.service.updateStatus(userId, StatusRequest(statusEnum.name)) // ✅ ENUM.name 전송
-                .enqueue(object : Callback<Void> {
-                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                .enqueue(object : Callback<UserResponse> {
+                    override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                         if (response.isSuccessful) {
                             Log.i("StudentStatusFragment", "✅ 신분 업데이트 성공! (${statusEnum.name})")
                             moveToNextPage()
@@ -105,7 +106,7 @@ class StudentStatusFragment : Fragment() {
                         }
                     }
 
-                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                    override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                         Log.e("StudentStatusFragment", "❌ 네트워크 오류: ${t.message}")
                     }
                 })

@@ -1,5 +1,6 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.grimmy.databinding.DialogAlertCustomBinding
@@ -33,9 +35,6 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         scheduleViewModel = ViewModelProvider(requireActivity()).get(ScheduleViewModel::class.java)
 
         binding.scheduleClassAddOkTv.setOnClickListener {
-//            val className = binding.scheduleAddClassNameEt.text.toString().trim()
-//            val classPlace = binding.scheduleAddClassPlaceEt.text.toString().trim()
-//            saveData(className, classPlace)
             val className = binding.scheduleAddClassNameEt.text.toString().trim()
             val classPlace = binding.scheduleAddClassPlaceEt.text.toString().trim()
             val classDay = binding.scheduleAddClassDaypickerBtnTv.text.toString()
@@ -45,15 +44,15 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
             if (className.isEmpty() || classPlace.isEmpty()) {
                 showAlert("수업 명과 장소를 입력해 주세요.")
             } else {
+                hideKeyboard()
                 // 수업 등록 로직
                 val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
                 // 📌 기존 수업과 겹치는지 확인
                 if (isOverlapping(newClass)) {
                     showAlert("시간표가 겹쳐 추가할 수 없습니다.")
                 } else {
-                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
-                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
                     scheduleViewModel.addClass(newClass)
+                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
@@ -191,5 +190,10 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
 
     override fun onDaySet(day: String) {
         binding.scheduleAddClassDaypickerBtnTv.text = day
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 }

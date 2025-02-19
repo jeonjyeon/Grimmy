@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.example.grimmy.Retrofit.Request.BirthRequest
+import com.example.grimmy.Retrofit.Response.UserResponse
 import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentBrithYearBinding
 import retrofit2.Call
@@ -75,8 +76,8 @@ class BirthYearFragment : Fragment() {
         Log.i("BirthYearFragment", "✅ 저장된 userId 사용: $userId")
 
         RetrofitClient.service.updateBirthYear(userId, BirthRequest(birthYear))
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            .enqueue(object : Callback<UserResponse> {
+                override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                     if (response.isSuccessful) {
                         Log.i("BirthYearFragment", "✅ 출생 연도 업데이트 성공!")
 
@@ -88,7 +89,7 @@ class BirthYearFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                     Log.e("BirthYearFragment", "❌ 네트워크 오류: ${t.message}")
                 }
             })

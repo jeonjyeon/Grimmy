@@ -29,6 +29,7 @@ import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
+import com.example.grimmy.Retrofit.Response.UserResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -53,25 +54,25 @@ interface RetrofitService {
     fun updateNickname(
         @Path("userId") userId: Int,
         @Body request: NicknameRequest
-    ):Call<Void>
+    ):Call<UserResponse>
 
     @PATCH("/user/{userId}/birthYear")
     fun updateBirthYear(
         @Path("userId") userId: Int,
         @Body request: BirthRequest
-    ):Call<Void>
+    ):Call<UserResponse>
 
     @PATCH("/user/{userId}/status")
     fun updateStatus(
         @Path("userId") userId: Int,
         @Body request: StatusRequest
-    ):Call<Void>
+    ):Call<UserResponse>
 
     @PATCH("/user/{userId}/category")
     fun updateCategory(
         @Path("userId") userId: Int,
         @Body request: CategoryRequest
-    ):Call<Void>
+    ):Call<UserResponse>
 
     // 데일리 기록 작성
     @Multipart

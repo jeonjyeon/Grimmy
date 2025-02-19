@@ -1,11 +1,13 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
 import com.example.grimmy.databinding.DialogDayPickerBinding
 
@@ -48,10 +50,12 @@ class DayPickerDialogFragment : DialogFragment() {
 
         binding.dayPickerOkBtnTv.setOnClickListener {
             listener?.onDaySet(selectedDay) // 선택된 요일 전달
+            hideKeyboard()
             dismiss()
         }
 
         binding.dayPickerCancelBtnTv.setOnClickListener {
+            hideKeyboard()
             dismiss()
         }
     }
@@ -90,5 +94,10 @@ class DayPickerDialogFragment : DialogFragment() {
 
     fun setOnDaySetListener(listener: OnDaySetListener) {
         this.listener = listener
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 }

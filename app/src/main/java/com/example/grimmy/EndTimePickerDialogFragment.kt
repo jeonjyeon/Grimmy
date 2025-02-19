@@ -1,11 +1,13 @@
 package com.example.grimmy
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.NumberPicker
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
@@ -48,9 +50,11 @@ class EndTimePickerDialogFragment : DialogFragment() {
             val minute = binding.endTimePickerTp.minute
             val adjustedMinute = minute * 5
             listener?.onTimeSet(hour, adjustedMinute)
+            hideKeyboard()
             dismiss()
         }
         binding.endTimePickerCancelBtnTv.setOnClickListener {
+            hideKeyboard()
             dismiss()
         }
     }
@@ -71,5 +75,10 @@ class EndTimePickerDialogFragment : DialogFragment() {
 
     fun setOnTimeSetListener(listener: OnTimeSetListener) {
         this.listener = listener
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 }
