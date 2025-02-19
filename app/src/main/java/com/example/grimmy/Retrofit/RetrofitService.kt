@@ -3,9 +3,9 @@ package com.example.grimmy.Retrofit
 import com.example.grimmy.Retrofit.Request.BigGoalRequest
 import com.example.grimmy.Retrofit.Request.BirthRequest
 import com.example.grimmy.Retrofit.Request.CategoryRequest
+import com.example.grimmy.Retrofit.Request.ClassAddRequest
+import com.example.grimmy.Retrofit.Request.ClassUpdateRequest
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
-import com.example.grimmy.Retrofit.Request.DailyRecordGetRequest
-import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
 import com.example.grimmy.Retrofit.Request.KakaoAccessTokenRequest
 import com.example.grimmy.Retrofit.Request.NicknameRequest
 import com.example.grimmy.Retrofit.Request.StatusRequest
@@ -15,6 +15,7 @@ import com.example.grimmy.Retrofit.Request.SubGoalReqeust
 import com.example.grimmy.Retrofit.Request.TestCommentSaveRequest
 
 import com.example.grimmy.Retrofit.Response.BigGoalResponse
+import com.example.grimmy.Retrofit.Response.ClassAddResponse
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
@@ -32,12 +33,14 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.PATCH
+import retrofit2.http.PUT
 import retrofit2.http.Part
 
 interface RetrofitService {
@@ -163,4 +166,29 @@ interface RetrofitService {
     // 목표 조회
     @GET("/goal")
     fun getGoal(): Call<GoalGetResponse>
+
+    // 시간표 조회
+    @GET("/schedule/{scheduleId}")
+    fun getSchedule(
+        @Path("scheduleDetailId") scheduleId: Int
+    ): Call<Void>
+
+    // 시간표 수업 추가
+    @POST("/schedule-details")
+    fun addClass(
+        @Body request: ClassAddRequest
+    ): Call<ClassAddResponse>
+
+    // 시간표 수업 삭제
+    @DELETE("/scedule-details/{scheduleDetailId}")
+    fun deleteClass(
+        @Path("scheduleDetailId") scheduleDetailId: Int
+    ): Call<Void>
+
+    // 시간표 수업 수정
+    @PUT("/scedule-details/{scheduleDetailId}")
+    fun updateClass(
+        @Path("scheduleDetailId") scheduleDetailId: Int,
+        @Body request: ClassUpdateRequest
+    ): Call<ClassAddResponse>
 }

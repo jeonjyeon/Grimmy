@@ -6,10 +6,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.grimmy.Retrofit.Request.ClassAddRequest
+import com.example.grimmy.Retrofit.Response.ClassAddResponse
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.FragmentScheduleBinding
 import com.example.grimmy.viewmodel.ScheduleViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ScheduleFragment : Fragment() {
 
@@ -73,29 +80,6 @@ class ScheduleFragment : Fragment() {
             .replace(R.id.schedule_frame, fragment) // ✅ 항상 최상단에 추가됨
             .addToBackStack(null)
             .commit()
-    }
-
-    // "HH:mm" 형식을 분 단위(Int)로 변환하는 헬퍼 함수
-    private fun parseTimeToMinutes(timeStr: String): Int {
-        val parts = timeStr.split(":")
-        if (parts.size != 2) return 0
-        val hour = parts[0].toIntOrNull() ?: 0
-        val minute = parts[1].toIntOrNull() ?: 0
-        return hour * 60 + minute
-    }
-
-    // 요일 문자열("월", "화", "수", "목", "금")을 0~4 인덱스로 변환하는 헬퍼 함수
-    private fun parseDayToIndex(dayStr: String): Int {
-        return when(dayStr.trim()) {
-            "월" -> 0
-            "화" -> 1
-            "수" -> 2
-            "목" -> 3
-            "금" -> 4
-            "토" -> 5
-            "일" -> 6
-            else -> 0
-        }
     }
 
     private fun getNickname(): String? {
