@@ -1,5 +1,6 @@
 package com.example.grimmy.Retrofit
 
+import com.example.grimmy.Retrofit.Request.BigGoalRequest
 import com.example.grimmy.Retrofit.Request.BirthRequest
 import com.example.grimmy.Retrofit.Request.CategoryRequest
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
@@ -8,22 +9,27 @@ import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
 import com.example.grimmy.Retrofit.Request.KakaoAccessTokenRequest
 import com.example.grimmy.Retrofit.Request.NicknameRequest
 import com.example.grimmy.Retrofit.Request.StatusRequest
+import com.example.grimmy.Retrofit.Request.StuffDetailRequest
+import com.example.grimmy.Retrofit.Request.StuffRequest
+import com.example.grimmy.Retrofit.Request.SubGoalReqeust
 import com.example.grimmy.Retrofit.Request.TestCommentSaveRequest
 
-import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
+import com.example.grimmy.Retrofit.Response.BigGoalResponse
 import com.example.grimmy.Retrofit.Response.DailyCommentGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordGetResponse
 import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
 import com.example.grimmy.Retrofit.Response.KakaoAccessTokenResponse
+import com.example.grimmy.Retrofit.Response.GoalGetResponse
 import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
+import com.example.grimmy.Retrofit.Response.StuffDetailResponse
+import com.example.grimmy.Retrofit.Response.StuffResponse
+import com.example.grimmy.Retrofit.Response.SubGoalResponse
 import com.example.grimmy.Retrofit.Response.TestCommentGetResponse
 import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
-import com.kakao.sdk.auth.model.AccessTokenResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -94,6 +100,32 @@ interface RetrofitService {
         @Body request: TestCommentSaveRequest
     ): Call<TestCommentSaveResponse>
 
+    // 큰 목표 작성
+    @POST("/goal/bigGoal")
+    fun postBigGoalSave(
+        @Body request: BigGoalRequest
+    ): Call<BigGoalResponse>
+
+    // 세부 목표 작성
+    @POST("/goal/{goal_id}/subgoal")
+    fun postSubGoalSave(
+        @Path("goal_id") goal_id: Int,
+        @Body request: SubGoalReqeust
+    ): Call<SubGoalResponse>
+
+    // 재료 리마인더 큰 제목 작성
+    @POST("/stuff")
+    fun postStuffSave(
+        @Body request: StuffRequest
+    ): Call<StuffResponse>
+
+    // 재료 리마인더 세부 제목 작성
+    @POST("/stuff/{stuff_id}/detail")
+    fun postStuffDetailSave(
+        @Path("stuff_id") stuff_id: Int,
+        @Body request: StuffDetailRequest
+    ): Call<StuffDetailResponse>
+
     // 데일리 기록 조회
     @GET("/record/daily/get")
     fun getDailyRecordGet(
@@ -127,4 +159,8 @@ interface RetrofitService {
     fun getTestComment(
         @Path("dailyId") dailyId: Int
     ): Call<List<TestCommentGetResponse>>
+
+    // 목표 조회
+    @GET("/goal")
+    fun getGoal(): Call<GoalGetResponse>
 }
