@@ -120,6 +120,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         binding.weeklyPageUpBtnIv.setOnClickListener {
             pageUpListener?.onPageUpClicked()
             // 필요 시 임시 저장 버튼으로도 호출 가능
+            saveRecordForDate(parseDate(currentSelectedDate))
         }
 
         setupEmotionClickListeners()
@@ -149,7 +150,6 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     override fun onPause() {
         super.onPause()
         // 화면 전환 전에 현재 선택된 날짜에 대해 자동 저장
-        saveRecordForDate(parseDate(currentSelectedDate))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -187,33 +187,33 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         dotsIndicator.visibility = View.VISIBLE
         placeholder.visibility = View.GONE
 
-        loadDailyComments(dailyId, adapter)
+//        loadDailyComments(dailyId, adapter)
     }
 
-    private fun loadDailyComments(dailyId: Int, adapter: DrawingPagerAdapter) {
-        RetrofitClient.service.getDailyComment(dailyId).enqueue(object : Callback<List<DailyCommentGetResponse>> {
-            override fun onResponse(call: Call<List<DailyCommentGetResponse>>, response: Response<List<DailyCommentGetResponse>>) {
-                if (response.isSuccessful) {
-                    val commentResponses = response.body() ?: emptyList()
-                    val commentList = commentResponses.map { resp ->
-                        DrawingPagerAdapter.Comment(
-                            x = resp.x,
-                            y = resp.y,
-                            title = resp.title,
-                            content = resp.content
-                        )
-                    }
-                    adapter.updateComments(commentList)
-                    Log.d("HomeWeeklyFragment", "코멘트 조회 성공: ${commentList.size}개")
-                } else {
-                    Log.d("HomeWeeklyFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
-                }
-            }
-            override fun onFailure(call: Call<List<DailyCommentGetResponse>>, t: Throwable) {
-                Log.d("HomeWeeklyFragment", "코멘트 조회 오류: ${t.message}")
-            }
-        })
-    }
+//    private fun loadDailyComments(dailyId: Int, adapter: DrawingPagerAdapter) {
+//        RetrofitClient.service.getDailyComment(dailyId).enqueue(object : Callback<List<DailyCommentGetResponse>> {
+//            override fun onResponse(call: Call<List<DailyCommentGetResponse>>, response: Response<List<DailyCommentGetResponse>>) {
+//                if (response.isSuccessful) {
+//                    val commentResponses = response.body() ?: emptyList()
+//                    val commentList = commentResponses.map { resp ->
+//                        DrawingPagerAdapter.Comment(
+//                            x = resp.x,
+//                            y = resp.y,
+//                            title = resp.title,
+//                            content = resp.content
+//                        )
+//                    }
+//                    adapter.updateComments(commentList)
+//                    Log.d("HomeWeeklyFragment", "코멘트 조회 성공: ${commentList.size}개")
+//                } else {
+//                    Log.d("HomeWeeklyFragment", "코멘트 조회 실패: ${response.code()} ${response.message()}")
+//                }
+//            }
+//            override fun onFailure(call: Call<List<DailyCommentGetResponse>>, t: Throwable) {
+//                Log.d("HomeWeeklyFragment", "코멘트 조회 오류: ${t.message}")
+//            }
+//        })
+//    }
 
     // --- 달력 관련 메소드 ---
     private fun adjustToStartOfWeek() {

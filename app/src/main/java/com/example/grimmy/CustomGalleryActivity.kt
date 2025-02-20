@@ -110,17 +110,17 @@ class CustomGalleryActivity : AppCompatActivity() {
         val part = MultipartBody.Part.createFormData("file", "upload_${System.currentTimeMillis()}", requestBody)
 
         val call = RetrofitClient.service.postRecordImageFile(part)
-        call.enqueue(object : Callback<RecordImageFileResponse> {
-            override fun onResponse(call: Call<RecordImageFileResponse>, response: Response<RecordImageFileResponse>) {
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
-                    val imageUrl = response.body()?.imageUrl
+                    val imageUrl = response.body()
                     Log.d("Upload", "Image URL: $imageUrl")
                     // 필요한 추가 처리 수행
                 } else {
                     Log.e("Upload", "Error: ${response.errorBody()?.string()}")
                 }
             }
-            override fun onFailure(call: Call<RecordImageFileResponse>, t: Throwable) {
+            override fun onFailure(call: Call<String>, t: Throwable) {
                 Log.e("Upload", "Failure: ${t.message}")
             }
         })

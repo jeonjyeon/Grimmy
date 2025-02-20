@@ -80,7 +80,7 @@ interface RetrofitService {
     @POST("/record/daily/savefile")
     fun postRecordImageFile(
         @Part file: MultipartBody.Part
-    ): Call<RecordImageFileResponse>
+    ): Call<String>
 
     // 데일리 기록 작성
     @POST("/record/daily/save")
