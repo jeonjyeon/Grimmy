@@ -10,9 +10,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.example.grimmy.HomeWeeklyFragment.Companion.REQUEST_CODE_CUSTOM_GALLERY
 import com.example.grimmy.Retrofit.Request.TestRecordSaveRequest
@@ -263,7 +265,15 @@ class HomeWeeklyTestFragment : Fragment() {
      */
     private fun updateCalendarWeek() {
         binding.testCalendarGl.removeAllViews()
-        // 오늘 날짜(비교용; 시간 0시로 설정)
+
+        // 전체 화면 너비에서 GridLayout의 좌우 padding을 고려한 가용 너비 계산
+        val screenWidth = resources.displayMetrics.widthPixels
+        val leftPadding = binding.testCalendarGl.paddingLeft
+        val rightPadding = binding.testCalendarGl.paddingRight
+        val availableWidth = screenWidth - (leftPadding + rightPadding)
+        val cellWidth = availableWidth / 7
+
+        // 오늘 날짜(비교용; 시간 0시로 맞춤)
         val todayCal = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -280,37 +290,42 @@ class HomeWeeklyTestFragment : Fragment() {
             val currentDayCal = calendar.clone() as Calendar
             val currentDayStr = sdf.format(currentDayCal.time)
 
-            // 디자인 결정: 오늘은 항상 item_calendar_today,
-            // 그 외에 (오늘이 아닌) 선택된 날짜는 item_calendar_selected,
-            // 기본 날짜는 item_calendar_day
             val layoutRes = when {
                 currentDayStr == todayStr -> R.layout.item_calendar_today
                 currentDayStr == currentSelectedDate -> R.layout.item_calendar_today
                 else -> R.layout.item_calendar_day
             }
-            val dayView = layoutInflater.inflate(layoutRes, binding.testCalendarGl, false)
-            val textView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
-            textView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
+            val dayView = LayoutInflater.from(context).inflate(layoutRes, binding.testCalendarGl, false) as ConstraintLayout
+
+            // 날짜 텍스트 설정
+            val dayTextView = dayView.findViewById<TextView>(R.id.item_calendar_day_tv)
+            dayTextView.text = "${currentDayCal.get(Calendar.DAY_OF_MONTH)}"
 
             if (currentDayCal.after(todayCal)) {
                 dayView.isClickable = false
                 dayView.alpha = 0.5f
             } else {
                 dayView.setOnClickListener {
-                    // 자동 저장: 현재 선택된 날짜의 기록 저장
                     saveTestRecordForDate(currentSelectedDate)
-                    // 업데이트: 새로 선택한 날짜 저장
                     currentSelectedDate = currentDayStr
-                    // 조회: 해당 날짜의 기록 불러오기
                     loadRecordForDate(currentDayStr)
-                    // UI 갱신: 달력 UI 업데이트하여 선택된 날짜는 item_calendar_selected로 표시
                     updateCalendarWeek()
                 }
             }
+
+            // 동적으로 LayoutParams 적용: width를 cellWidth, height WRAP_CONTENT, 하단 margin 10dp 적용
+            val params = GridLayout.LayoutParams().apply {
+                width = cellWidth
+                height = GridLayout.LayoutParams.WRAP_CONTENT
+                bottomMargin = (10 * resources.displayMetrics.density).toInt()
+            }
+            dayView.layoutParams = params
+
             binding.testCalendarGl.addView(dayView)
             calendar.add(Calendar.DATE, 1)
         }
-        // 달력 업데이트 후 calendar를 이번 주 시작 날짜로 재설정
+
+        // 달력 업데이트 후 calendar를 이번 주 시작 날짜로 복원
         calendar.set(
             thisWeekStart.get(Calendar.YEAR),
             thisWeekStart.get(Calendar.MONTH),
