@@ -99,29 +99,6 @@ class AlarmFragment : Fragment(), TimePickerDialogFragment.OnTimeSetListener, Al
             }
         }
 
-        binding.alarmPaintingReminderTimeBtnCl.setOnClickListener {
-            val currentTime = binding.alarmPaintingReminderTimeNextTv.text.toString()
-            val (currentHour, currentMinute) = parseTime(currentTime)
-
-            activeTextViewId = binding.alarmPaintingReminderTimeNextTv.id
-            showTimePickerDialog(currentHour, currentMinute)
-        }
-
-        binding.alarmMaterialReminderDayNextTv.setOnClickListener {
-            val pickerFragment = AlarmDatePickerDialogFragment().apply {
-                listener = this@AlarmFragment
-            }
-            pickerFragment.show(parentFragmentManager, "alarmDatePicker")
-        }
-
-        binding.alarmMaterialReminderTimeBtnCl.setOnClickListener {
-            val currentTime = binding.alarmMaterialReminderTimeNextTv.text.toString()
-            val (currentHour, currentMinute) = parseTime(currentTime)
-
-            activeTextViewId = binding.alarmMaterialReminderTimeNextTv.id
-            showTimePickerDialog(currentHour, currentMinute)
-        }
-
         return binding.root
     }
     private fun saveReminderSettings() {
