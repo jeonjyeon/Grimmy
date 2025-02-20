@@ -74,12 +74,12 @@ interface RetrofitService {
     ):Call<Void>
 
     @Multipart
-    @POST("/savefile")
+    @POST("/record/daily/savefile")
     fun uploadFile(
         @Part file: MultipartBody.Part
     ): Call<String>  // S3 URL 반환
 
-    @POST("/save")
+    @POST("/record/daily/save")
     fun postDailyRecordSave(
         @Body request: RequestBody
     ): Call<DailyRecordSaveResponse>
