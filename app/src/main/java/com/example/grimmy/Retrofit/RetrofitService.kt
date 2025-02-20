@@ -32,6 +32,7 @@ import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
 import com.example.grimmy.Retrofit.Response.UserResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -171,8 +172,8 @@ interface RetrofitService {
     // 시간표 조회
     @GET("/schedule/{scheduleId}")
     fun getSchedule(
-        @Path("scheduleDetailId") scheduleId: Int
-    ): Call<Void>
+        @Path("scheduleId") scheduleId: Int=1
+    ): Call<ResponseBody>
 
     // 시간표 수업 추가
     @POST("/schedule-details")

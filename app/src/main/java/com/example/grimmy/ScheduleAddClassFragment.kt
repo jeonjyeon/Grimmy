@@ -12,16 +12,24 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
+import com.example.grimmy.Retrofit.Request.ClassAddRequest
+import com.example.grimmy.Retrofit.Response.ClassAddResponse
+import com.example.grimmy.Retrofit.RetrofitClient
 import com.example.grimmy.databinding.DialogAlertCustomBinding
 import com.example.grimmy.databinding.FragmentScheduleAddClassBinding
 import com.example.grimmy.utils.parseDayToIndex
 import com.example.grimmy.utils.parseTimeToMinutes
 import com.example.grimmy.viewmodel.ScheduleViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTimeSetListener,
     EndTimePickerDialogFragment.OnTimeSetListener, DayPickerDialogFragment.OnDaySetListener {
     private lateinit var binding: FragmentScheduleAddClassBinding
-    private lateinit var scheduleViewModel: ScheduleViewModel
 
     val startTimePickerDialog = StartTimePickerDialogFragment()
     val endTimePickerDialog = EndTimePickerDialogFragment()
@@ -32,7 +40,6 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentScheduleAddClassBinding.inflate(inflater, container, false)
-        scheduleViewModel = ViewModelProvider(requireActivity()).get(ScheduleViewModel::class.java)
 
         binding.scheduleClassAddOkTv.setOnClickListener {
             val className = binding.scheduleAddClassNameEt.text.toString().trim()
@@ -44,17 +51,92 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
             if (className.isEmpty() || classPlace.isEmpty()) {
                 showAlert("수업 명과 장소를 입력해 주세요.")
             } else {
-                hideKeyboard()
-                // 수업 등록 로직
+                // 새 수업 객체 생성 (로컬 데이터 클래스: ClassSchedule)
                 val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
-                // 📌 기존 수업과 겹치는지 확인
-                if (isOverlapping(newClass)) {
-                    showAlert("시간표가 겹쳐 추가할 수 없습니다.")
-                } else {
-                    scheduleViewModel.addClass(newClass)
-                    Log.d("ScheduleAddClassFragment", "Class: ${scheduleViewModel.classSchedules.value}")
-                    requireActivity().supportFragmentManager.popBackStack()
+
+                // SharedPreferences에서 userId 가져오기 (예: "user_prefs" 파일에 "userId" 키로 저장)
+                val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                val userId = sharedPref.getInt("userId", -1)
+                if(userId == -1) {
+                    showAlert("유효한 사용자 정보가 없습니다.")
+                    return@setOnClickListener
                 }
+
+                // 1. GET API 호출: 기존 시간표 내 수업 정보 가져오기 (scheduleId는 예시로 1)
+                RetrofitClient.service.getSchedule(1).enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(
+                        call: Call<ResponseBody>,
+                        response: Response<ResponseBody>
+                    ) {
+                        if (response.isSuccessful) {
+                            val responseString = response.body()?.string() ?: ""
+                            Log.d("ScheduleAPI", "기존 시간표 원시 응답: $responseString")
+
+                            try {
+                                // 기존 수업 목록이 JSON 배열 형식이라고 가정
+                                val gson = Gson()
+                                val type = object : TypeToken<List<ClassAddResponse>>() {}.type
+                                val existingClasses: List<ClassAddResponse> = gson.fromJson(responseString, type)
+                                Log.d("ScheduleAPI", "기존 시간표 파싱 결과: $existingClasses")
+
+                                // 2. 중복 수업 체크
+                                if (isOverlapping(newClass, existingClasses)) {
+                                    showAlert("시간표가 겹쳐 추가할 수 없습니다.")
+                                } else {
+                                    // 3. POST API 호출: 수업 추가 요청
+                                    val request = ClassAddRequest(1, userId, className, classPlace, classDay, startTime, endTime)
+                                    RetrofitClient.service.addClass(request).enqueue(object : Callback<ClassAddResponse> {
+                                        override fun onResponse(
+                                            call: Call<ClassAddResponse>,
+                                            response: Response<ClassAddResponse>
+                                        ) {
+                                            if (response.isSuccessful) {
+                                                val addedClass = response.body()
+                                                Log.d("ScheduleAPI", "추가된 수업: $addedClass")
+
+                                                // 추가 후 최신 시간표를 다시 조회하여 로그 출력
+                                                RetrofitClient.service.getSchedule(1).enqueue(object : Callback<ResponseBody> {
+                                                    override fun onResponse(
+                                                        call: Call<ResponseBody>,
+                                                        response: Response<ResponseBody>
+                                                    ) {
+                                                        if (response.isSuccessful) {
+                                                            val updatedResponse = response.body()?.string() ?: ""
+                                                            Log.d("ScheduleAPI", "업데이트된 시간표 응답: $updatedResponse")
+                                                        } else {
+                                                            Log.d("ScheduleAPI", "업데이트된 시간표 조회 실패: ${response.errorBody()?.string()}")
+                                                        }
+                                                    }
+                                                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                                                        Log.e("ScheduleAPI", "업데이트된 시간표 조회 에러", t)
+                                                    }
+                                                })
+                                                requireActivity().supportFragmentManager.popBackStack()
+                                            } else {
+                                                Log.d("ScheduleAPI", "수업 추가 실패: ${response.errorBody()?.string()}")
+                                                showAlert("수업 추가에 실패하였습니다.")
+                                            }
+                                        }
+                                        override fun onFailure(call: Call<ClassAddResponse>, t: Throwable) {
+                                            Log.e("ScheduleAPI", "수업 추가 에러", t)
+                                            showAlert("수업 추가에 실패하였습니다.")
+                                        }
+                                    })
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                showAlert("시간표 정보를 파싱하는데 실패하였습니다.")
+                            }
+                        } else {
+                            Log.d("ScheduleAPI", "시간표 조회 실패: ${response.errorBody()?.string()}")
+                            showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                        }
+                    }
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        Log.e("ScheduleAPI", "시간표 조회 에러", t)
+                        showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                    }
+                })
             }
         }
 
@@ -113,19 +195,17 @@ class ScheduleAddClassFragment : Fragment(), StartTimePickerDialogFragment.OnTim
         dialog.show()
     }
 
-    // 📌 기존 수업과 1분이라도 겹치는지 확인하는 함수
-    private fun isOverlapping(newClass: ClassSchedule): Boolean {
-        val existingSchedules = scheduleViewModel.classSchedules.value ?: return false
+    // 기존의 수업과 1분이라도 겹치는지 API로 받은 수업 리스트로 확인
+    private fun isOverlapping(newClass: ClassSchedule, existingClasses: List<ClassAddResponse>): Boolean {
         val newStartTime = parseTimeToMinutes(newClass.startTime)
         val newEndTime = parseTimeToMinutes(newClass.endTime)
         val newDayIndex = parseDayToIndex(newClass.day)
 
-        for (existingClass in existingSchedules) {
-            if (parseDayToIndex(existingClass.day) == newDayIndex) { // 같은 요일인지 확인
-                val existingStart = parseTimeToMinutes(existingClass.startTime)
-                val existingEnd = parseTimeToMinutes(existingClass.endTime)
-
-                // 📌 1분이라도 겹치면 true 반환
+        for (existing in existingClasses) {
+            if (parseDayToIndex(existing.day) == newDayIndex) { // 같은 요일이면
+                val existingStart = parseTimeToMinutes(existing.startTime)
+                val existingEnd = parseTimeToMinutes(existing.endTime)
+                // 1분이라도 겹치면 true 반환
                 if (!(newEndTime <= existingStart || newStartTime >= existingEnd)) {
                     return true
                 }
