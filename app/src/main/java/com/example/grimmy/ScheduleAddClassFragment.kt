@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import com.example.grimmy.Retrofit.Request.ClassAddRequest
+import com.example.grimmy.Retrofit.Request.ClassUpdateRequest
 import com.example.grimmy.Retrofit.Response.ClassAddResponse
 import com.example.grimmy.Retrofit.Response.GetScheduleResponse
 import com.example.grimmy.Retrofit.RetrofitClient
@@ -38,11 +39,45 @@ class ScheduleAddClassFragment : Fragment(),
     val endTimePickerDialog = EndTimePickerDialogFragment()
     val dayPickerDialog = DayPickerDialogFragment()
 
+    // 플래그: 수정 모드 여부 (기본 false: 추가)
+    private var editMode: Boolean = false
+    // 수정 시 대상 수업의 detailId
+    private var scheduleDetailId: Int = -1
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // arguments를 통해 수정 모드와 detailId를 전달받았다면 저장
+        arguments?.let {
+            editMode = it.getBoolean("editMode", false)
+            scheduleDetailId = it.getInt("scheduleDetailId", -1)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentScheduleAddClassBinding.inflate(inflater, container, false)
+
+        // 만약 수정 모드라면, 기존 수업 정보를 GET API로 불러와 필드에 채웁니다.
+        if (editMode && scheduleDetailId != -1) {
+            RetrofitClient.service.getScheduleDetail(scheduleDetailId).enqueue(object :
+                Callback<ClassAddResponse> {
+                override fun onResponse(call: Call<ClassAddResponse>, response: Response<ClassAddResponse>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val detail = response.body()!!
+                        binding.scheduleAddClassNameEt.setText(detail.title)
+                        binding.scheduleAddClassPlaceEt.setText(detail.location)
+                        binding.scheduleAddClassDaypickerBtnTv.text = detail.day
+                        binding.scheduleAddClassStartTimepickerBtnTv.text = detail.startTime
+                        binding.scheduleAddClassEndTimepickerBtnTv.text = detail.endTime
+                    }
+                }
+                override fun onFailure(call: Call<ClassAddResponse>, t: Throwable) {
+                    Toast.makeText(context, "수업 정보를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
 
         binding.scheduleClassAddOkTv.setOnClickListener {
             val className = binding.scheduleAddClassNameEt.text.toString().trim()
@@ -58,7 +93,6 @@ class ScheduleAddClassFragment : Fragment(),
                 // 로컬 중복 체크용 객체 생성
                 val newClass = ClassSchedule(className, classPlace, classDay, startTime, endTime)
 
-                // SharedPreferences에서 userId 가져오기 (파일명/키는 프로젝트에 맞게)
                 val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
                 val userId = sharedPref.getInt("userId", -1)
                 if (userId == -1) {
@@ -66,91 +100,102 @@ class ScheduleAddClassFragment : Fragment(),
                     return@setOnClickListener
                 }
 
-                // 예시로 2025년 사용 (필요시 동적으로 변경)
                 val year = 2025
 
-                // 1. GET API 호출: 기존 시간표 내 수업 정보 가져오기 (userId와 year 전달)
-                RetrofitClient.service.getSchedule(userId, year).enqueue(object : Callback<GetScheduleResponse> {
-                    override fun onResponse(
-                        call: Call<GetScheduleResponse>,
-                        response: Response<GetScheduleResponse>
-                    ) {
-                        val existingClasses = if (response.isSuccessful) {
-                            response.body()?.details ?: emptyList()
-                        } else if (response.code() == 404) {
-                            // 404인 경우, 빈 시간표로 간주 (수업 목록 없음)
-                            emptyList()
-                        } else {
-                            showAlert("시간표 정보를 불러오는데 실패하였습니다.")
-                            return
+                if (editMode && scheduleDetailId != -1) {
+                    // 수정 모드: 먼저 GET API로 기존 수업들을 받아와 겹치는지 검사합니다.
+                    RetrofitClient.service.getSchedule(userId, year).enqueue(object : Callback<GetScheduleResponse> {
+                        override fun onResponse(call: Call<GetScheduleResponse>, response: Response<GetScheduleResponse>) {
+                            if (response.isSuccessful && response.body() != null) {
+                                // 현재 수정 대상 수업은 제외하고 비교합니다.
+                                val existingClasses = response.body()?.details?.filter { it.scheduleDetailId != scheduleDetailId } ?: emptyList()
+                                if (isOverlapping(newClass, existingClasses)) {
+                                    showAlert("시간표가 겹쳐 수정할 수 없습니다.")
+                                    return
+                                }
+                                // 겹치지 않으면 updateClass API 호출
+                                val request = ClassUpdateRequest(
+                                    scheduleId = 1, // 필요에 따라 기존 스케줄 ID 채워넣기
+                                    userId = userId,
+                                    title = className,
+                                    location = classPlace,
+                                    day = classDay,
+                                    startTime = startTime,
+                                    endTime = endTime
+                                )
+                                RetrofitClient.service.updateClass(scheduleDetailId, request).enqueue(object : Callback<ClassAddResponse> {
+                                    override fun onResponse(call: Call<ClassAddResponse>, response: Response<ClassAddResponse>) {
+                                        if (response.isSuccessful) {
+                                            Toast.makeText(context, "수업 수정 성공", Toast.LENGTH_SHORT).show()
+                                            refreshSchedule(userId, year)
+                                        } else {
+                                            showAlert("수업 수정에 실패하였습니다.")
+                                        }
+                                    }
+                                    override fun onFailure(call: Call<ClassAddResponse>, t: Throwable) {
+                                        showAlert("수업 수정에 실패하였습니다.")
+                                    }
+                                })
+                            } else {
+                                showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                            }
                         }
-                        Log.d("ScheduleAPI", "기존 시간표: ${response.body()}")
+                        override fun onFailure(call: Call<GetScheduleResponse>, t: Throwable) {
+                            showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                        }
+                    })
+                } else {
+                    // 추가 모드: 기존 코드 실행 (GET 후 중복 체크, POST API 호출 등)
+                    RetrofitClient.service.getSchedule(userId, year).enqueue(object : Callback<GetScheduleResponse> {
+                        override fun onResponse(call: Call<GetScheduleResponse>, response: Response<GetScheduleResponse>) {
+                            val existingClasses = if (response.isSuccessful) {
+                                response.body()?.details ?: emptyList()
+                            } else if (response.code() == 404) {
+                                emptyList()
+                            } else {
+                                showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                                return
+                            }
+                            Log.d("ScheduleAPI", "기존 시간표: ${response.body()}")
 
-                        // 중복 체크
-                        if (isOverlapping(newClass, existingClasses)) {
-                            showAlert("시간표가 겹쳐 추가할 수 없습니다.")
-                        } else {
-                            // POST API 호출: 수업 추가 요청
-                            val scheduleId = response.body()?.scheduleId ?: 1
-                            val request = ClassAddRequest(
-                                scheduleId = scheduleId,
-                                userId = userId,
-                                title = className,
-                                location = classPlace,
-                                day = classDay,
-                                startTime = startTime,
-                                endTime = endTime
-                            )
-                            RetrofitClient.service.addClass(userId, request).enqueue(object : Callback<ClassAddResponse> {
-                                override fun onResponse(
-                                    call: Call<ClassAddResponse>,
-                                    response: Response<ClassAddResponse>
-                                ) {
-                                    if (response.isSuccessful) {
-                                        val addedClass = response.body()
-                                        Log.d("ScheduleAPI", "추가된 수업: $addedClass")
-                                        Toast.makeText(context, "수업 추가 성공", Toast.LENGTH_SHORT).show()
-                                        // 수업 추가 성공 후, 최신 시간표 데이터를 GET API를 통해 받아옵니다.
-                                        RetrofitClient.service.getSchedule(userId, year).enqueue(object : Callback<GetScheduleResponse> {
-                                            override fun onResponse(
-                                                call: Call<GetScheduleResponse>,
-                                                response: Response<GetScheduleResponse>
-                                            ) {
-                                                if (response.isSuccessful && response.body() != null) {
-                                                    val scheduleDetails = response.body()?.details ?: emptyList()
-                                                    scheduleViewModel.setClassSchedules(scheduleDetails)
-                                                } else {
-                                                    Log.e("ScheduleAPI", "추가 후 시간표 불러오기 실패: ${response.errorBody()?.string()}")
-                                                }
-                                                // 데이터 업데이트 후 ScheduleFragment로 돌아갑니다.
-                                                requireActivity().supportFragmentManager.popBackStack()
-                                            }
-                                            override fun onFailure(call: Call<GetScheduleResponse>, t: Throwable) {
-                                                Log.e("ScheduleAPI", "추가 후 시간표 조회 API 실패", t)
-                                                requireActivity().supportFragmentManager.popBackStack()
-                                            }
-                                        })
-
-                                    } else {
-                                        Log.d("ScheduleAPI", "수업 추가 실패: ${response.errorBody()?.string()}")
+                            if (isOverlapping(newClass, existingClasses)) {
+                                showAlert("시간표가 겹쳐 추가할 수 없습니다.")
+                            } else {
+                                val scheduleId = response.body()?.scheduleId ?: 1
+                                val request = ClassAddRequest(
+                                    scheduleId = scheduleId,
+                                    userId = userId,
+                                    title = className,
+                                    location = classPlace,
+                                    day = classDay,
+                                    startTime = startTime,
+                                    endTime = endTime
+                                )
+                                RetrofitClient.service.addClass(userId, request).enqueue(object : Callback<ClassAddResponse> {
+                                    override fun onResponse(call: Call<ClassAddResponse>, response: Response<ClassAddResponse>) {
+                                        if (response.isSuccessful) {
+                                            Log.d("ScheduleAPI", "추가된 수업: ${response.body()}")
+                                            Toast.makeText(context, "수업 추가 성공", Toast.LENGTH_SHORT).show()
+                                            refreshSchedule(userId, year)
+                                        } else {
+                                            showAlert("수업 추가에 실패하였습니다.")
+                                        }
+                                    }
+                                    override fun onFailure(call: Call<ClassAddResponse>, t: Throwable) {
                                         showAlert("수업 추가에 실패하였습니다.")
                                     }
-                                }
-                                override fun onFailure(call: Call<ClassAddResponse>, t: Throwable) {
-                                    Log.e("ScheduleAPI", "수업 추가 에러", t)
-                                    showAlert("수업 추가에 실패하였습니다.")
-                                }
-                            })
+                                })
+                            }
                         }
-                    }
-                    override fun onFailure(call: Call<GetScheduleResponse>, t: Throwable) {
-                        Log.e("ScheduleAPI", "시간표 조회 에러", t)
-                        showAlert("시간표 정보를 불러오는데 실패하였습니다.")
-                    }
-                })
+                        override fun onFailure(call: Call<GetScheduleResponse>, t: Throwable) {
+                            showAlert("시간표 정보를 불러오는데 실패하였습니다.")
+                        }
+                    })
+                }
             }
         }
 
+        // 타임피커 다이얼로그 호출 메소드 사용
         binding.scheduleAddClassDayLl.setOnClickListener {
             val currentDay = binding.scheduleAddClassDaypickerBtnTv.text.toString()
             dayPickerDialog.setInitialDay(currentDay)
@@ -159,36 +204,60 @@ class ScheduleAddClassFragment : Fragment(),
         }
 
         binding.scheduleAddClassStartTimeLl.setOnClickListener {
-            val currentTime = binding.scheduleAddClassStartTimepickerBtnTv.text.toString()
-            val parts = currentTime.split(":")
-            val currentHour = parts[0].toInt()
-            val currentMinute = parts[1].toInt()
-
-            val args = Bundle().apply {
-                putInt("initialHour", currentHour)
-                putInt("initialMinute", currentMinute)
-            }
-            startTimePickerDialog.arguments = args
-            startTimePickerDialog.setOnTimeSetListener(this)
-            startTimePickerDialog.show(parentFragmentManager, "startTimePicker")
+            showTimePicker(startTimePickerDialog, binding.scheduleAddClassStartTimepickerBtnTv.text.toString(), "startTimePicker")
         }
 
         binding.scheduleAddClassEndTimeLl.setOnClickListener {
-            val currentTime = binding.scheduleAddClassEndTimepickerBtnTv.text.toString()
-            val parts = currentTime.split(":")
-            val currentHour = parts[0].toInt()
-            val currentMinute = parts[1].toInt()
-
-            val args = Bundle().apply {
-                putInt("initialHour", currentHour)
-                putInt("initialMinute", currentMinute)
-            }
-            endTimePickerDialog.arguments = args
-            endTimePickerDialog.setOnTimeSetListener(this)
-            endTimePickerDialog.show(parentFragmentManager, "startTimePicker")
+            showTimePicker(endTimePickerDialog, binding.scheduleAddClassEndTimepickerBtnTv.text.toString(), "endTimePicker")
         }
 
         return binding.root
+    }
+
+    // 최신 시간표 갱신 메소드 (위에서 설명한 refreshSchedule)
+    private fun refreshSchedule(userId: Int, year: Int) {
+        RetrofitClient.service.getSchedule(userId, year).enqueue(object : Callback<GetScheduleResponse> {
+            override fun onResponse(call: Call<GetScheduleResponse>, response: Response<GetScheduleResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val scheduleDetails = response.body()?.details ?: emptyList()
+                    scheduleViewModel.setClassSchedules(scheduleDetails)
+                } else {
+                    Log.e("ScheduleAPI", "추가/수정 후 시간표 불러오기 실패: ${response.errorBody()?.string()}")
+                }
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+            override fun onFailure(call: Call<GetScheduleResponse>, t: Throwable) {
+                Log.e("ScheduleAPI", "추가/수정 후 시간표 조회 API 실패", t)
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        })
+    }
+
+    // 타임피커 다이얼로그 호출 메소드 (오버로딩)
+    private fun showTimePicker(dialog: StartTimePickerDialogFragment, timeString: String, tag: String) {
+        val parts = timeString.split(":")
+        val currentHour = parts[0].toInt()
+        val currentMinute = parts[1].toInt()
+        val args = Bundle().apply {
+            putInt("initialHour", currentHour)
+            putInt("initialMinute", currentMinute)
+        }
+        dialog.arguments = args
+        dialog.setOnTimeSetListener(this)
+        dialog.show(parentFragmentManager, tag)
+    }
+
+    private fun showTimePicker(dialog: EndTimePickerDialogFragment, timeString: String, tag: String) {
+        val parts = timeString.split(":")
+        val currentHour = parts[0].toInt()
+        val currentMinute = parts[1].toInt()
+        val args = Bundle().apply {
+            putInt("initialHour", currentHour)
+            putInt("initialMinute", currentMinute)
+        }
+        dialog.arguments = args
+        dialog.setOnTimeSetListener(this)
+        dialog.show(parentFragmentManager, tag)
     }
 
     private fun showAlert(message: String) {
@@ -202,12 +271,10 @@ class ScheduleAddClassFragment : Fragment(),
         dialog.show()
     }
 
-    // 기존 수업과 중복 체크: 기존 수업 리스트 (List<ClassAddResponse>)와 새 수업(ClassSchedule)을 비교
     private fun isOverlapping(newClass: ClassSchedule, existingClasses: List<ClassAddResponse>): Boolean {
         val newStartTime = parseTimeToMinutes(newClass.startTime)
         val newEndTime = parseTimeToMinutes(newClass.endTime)
         val newDayIndex = parseDayToIndex(newClass.day)
-
         for (existing in existingClasses) {
             if (parseDayToIndex(existing.day) == newDayIndex) {
                 val existingStart = parseTimeToMinutes(existing.startTime)
@@ -231,42 +298,30 @@ class ScheduleAddClassFragment : Fragment(),
     }
 
     override fun onTimeSet(hour: Int, minute: Int) {
-        // 선택한 시간(분 단위)
         val chosenTimeInMinutes = hour * 60 + minute
-
         if (startTimePickerDialog.isVisible) {
-            // 시작 시간 텍스트 업데이트
             binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
-
-            // 현재 설정된 종료 시간 파싱
             val currentEndTimeStr = binding.scheduleAddClassEndTimepickerBtnTv.text.toString()
             val parts = currentEndTimeStr.split(":")
             if (parts.size == 2) {
                 val endHour = parts[0].toIntOrNull() ?: hour
                 val endMinute = parts[1].toIntOrNull() ?: minute
                 val currentEndTimeInMinutes = endHour * 60 + endMinute
-
-                // 시작 시간이 종료 시간보다 크면 종료 시간을 시작 시간 + 1시간으로 설정 (24시간 형식 고려)
                 if (chosenTimeInMinutes >= currentEndTimeInMinutes) {
                     val newEndHour = (hour + 1) % 24
                     binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", newEndHour, minute)
                 }
             }
         } else if (endTimePickerDialog.isVisible) {
-            // 종료 시간 텍스트 업데이트
             binding.scheduleAddClassEndTimepickerBtnTv.text = String.format("%02d:%02d", hour, minute)
-
-            // 현재 설정된 시작 시간 파싱
             val currentStartTimeStr = binding.scheduleAddClassStartTimepickerBtnTv.text.toString()
             val parts = currentStartTimeStr.split(":")
             if (parts.size == 2) {
                 val startHour = parts[0].toIntOrNull() ?: hour
                 val startMinute = parts[1].toIntOrNull() ?: minute
                 val currentStartTimeInMinutes = startHour * 60 + startMinute
-
-                // 종료 시간이 시작 시간보다 작으면 시작 시간을 종료 시간 - 1시간으로 설정 (24시간 형식 고려)
                 if (chosenTimeInMinutes <= currentStartTimeInMinutes) {
-                    val newStartHour = (hour + 23) % 24  // (hour - 1) mod 24
+                    val newStartHour = (hour + 23) % 24
                     binding.scheduleAddClassStartTimepickerBtnTv.text = String.format("%02d:%02d", newStartHour, minute)
                 }
             }

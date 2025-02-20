@@ -3,6 +3,7 @@ package com.example.grimmy
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -21,6 +22,7 @@ import com.example.grimmy.utils.parseDayToIndex
 import com.example.grimmy.utils.parseTimeToMinutes
 
 data class ScheduleItem(
+    val scheduleDetailId: Int, // 추가: 수업의 고유 ID (ClassAddResponse.scheduleDetailId)
     val dayOfWeek: Int,      // 0 ~ 6 (월~일)
     val startTimeMin: Int,   // 시작 시간 (분 단위)
     val endTimeMin: Int,     // 종료 시간 (분 단위)
@@ -91,6 +93,7 @@ class DynamicScheduleView @JvmOverloads constructor(
             // parseDayToIndex가 음수를 반환하면 0으로 보정
             val dayIndex = parseDayToIndex(cs.day).coerceAtLeast(0)
             ScheduleItem(
+                scheduleDetailId = cs.scheduleDetailId, // 추가된 부분
                 dayOfWeek = dayIndex,
                 startTimeMin = startTime,
                 endTimeMin = endTime,
@@ -290,10 +293,21 @@ class DynamicScheduleView @JvmOverloads constructor(
             CardPosition.LAST -> floatArrayOf(0f, 0f, 0f, 0f, radiusValue, radiusValue, radiusValue, radiusValue)
         }
         val drawable = GradientDrawable().apply {
-            setColor(item.color) // item.color를 바로 사용
+            setColor(item.color)
             cornerRadii = radii
         }
         card.background = drawable
+
+        // 여기서 카드 클릭 시 바텀시트 다이얼로그를 호출하도록 onClickListener 추가
+        card.setOnClickListener {
+            // ClassDetailBottomSheetFragment 는 별도로 구현해야 합니다.
+            val bottomSheet = ClassBottomSheetFragment()
+            val bundle = Bundle().apply {
+                putInt("scheduleDetailId", item.scheduleDetailId)
+            }
+            bottomSheet.arguments = bundle
+            bottomSheet.show((context as androidx.appcompat.app.AppCompatActivity).supportFragmentManager, bottomSheet.tag)
+        }
 
         if (showText) {
             val durationMin = item.endTimeMin - item.startTimeMin

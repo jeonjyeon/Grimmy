@@ -2,9 +2,10 @@
     android:layout_width="match_parent"
     android:layout_height="460dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/darker"
-    android:paddingVertical="40dp"
-    >
+    tools:context=".ClassBottomSheetFragment"
+    android:paddingVertical="40dp">
 
     <TextView
         android:id="@+id/class_title_tv"
@@ -90,7 +91,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/class_schedule_ll"
         app:layout_constraintStart_toStartOf="parent"
-
+        android:layout_marginTop="20dp"
         >
         <ImageView
             android:id="@+id/class_edit_iv"
@@ -99,7 +100,6 @@
             android:src="@drawable/ic_edit"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="20dp"
             android:paddingStart="20dp"
             android:paddingEnd="0dp"
             android:paddingVertical="10dp"

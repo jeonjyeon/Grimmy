@@ -176,6 +176,12 @@ interface RetrofitService {
         @Path("year") year: Int
     ): Call<GetScheduleResponse>
 
+    // 일정 조회
+    @GET("/schedule-details/{detailId}")
+    fun getScheduleDetail(
+        @Path("detailId") userId: Int
+    ): Call<ClassAddResponse>
+
     // 시간표 수업 추가
     @POST("/schedule-details/{userId}")
     fun addClass(
@@ -184,15 +190,15 @@ interface RetrofitService {
     ): Call<ClassAddResponse>
 
     // 시간표 수업 삭제
-    @DELETE("/scedule-details/{scheduleDetailId}")
+    @DELETE("/scedule-details/{detailId}")
     fun deleteClass(
-        @Path("scheduleDetailId") scheduleDetailId: Int
+        @Path("detailId") scheduleDetailId: Int
     ): Call<Void>
 
     // 시간표 수업 수정
     @PUT("/scedule-details/{scheduleDetailId}")
     fun updateClass(
-        @Path("scheduleDetailId") scheduleDetailId: Int,
+        @Path("detailId") scheduleDetailId: Int,
         @Body request: ClassUpdateRequest
     ): Call<ClassAddResponse>
 }
