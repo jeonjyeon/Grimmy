@@ -40,12 +40,12 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 
-
 class CustomGalleryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCustomGalleryBinding
     private val imageMap = mutableMapOf<String, MutableList<Uri>>()
     private var imageAdapter: ImageAdapter? = null
+    private var imageUrl : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +81,7 @@ class CustomGalleryActivity : AppCompatActivity() {
             if (selectedImages.isNotEmpty()) {
                 val resultIntent = Intent().apply {
                     putParcelableArrayListExtra("selectedImages", ArrayList(selectedImages))
+                    putExtra("imageUrl", imageUrl)
                 }
                 setResult(RESULT_OK, resultIntent)
                 uploadSelectedImages(selectedImages)
@@ -113,9 +114,12 @@ class CustomGalleryActivity : AppCompatActivity() {
         call.enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
-                    val imageUrl = response.body()
-                    Log.d("Upload", "Image URL: $imageUrl")
+                    val image_url = response.body()
+                    Log.d("Upload", "Image URL: $image_url")
                     // 필요한 추가 처리 수행
+                    if (image_url != null) {
+                        imageUrl = image_url
+                    }
                 } else {
                     Log.e("Upload", "Error: ${response.errorBody()?.string()}")
                 }
@@ -125,8 +129,6 @@ class CustomGalleryActivity : AppCompatActivity() {
             }
         })
     }
-
-
 
     private fun checkPermissionsAndLoadImages() {
         val requiredPermissions = arrayOf(

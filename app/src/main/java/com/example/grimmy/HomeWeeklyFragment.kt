@@ -66,8 +66,18 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
     // 현재 선택된 날짜를 "yyyy-MM-dd" 형식으로 저장 (초기값은 오늘)
     private var currentSelectedDate: String = getCurrentDate("yyyy-MM-dd")
 
+    // SharedPreferences와 user_id를 늦은 초기화로 선언
+    private lateinit var sharedPref: android.content.SharedPreferences
+    private var user_id: Int = 0
+
+    private var drawingUrl: String? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        // Context가 attach된 이후에 초기화
+        sharedPref = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        user_id = sharedPref.getInt("userId", 0)
+
         if (context is OnPageUpListener) {
             pageUpListener = context
         } else {
@@ -156,6 +166,10 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CUSTOM_GALLERY && resultCode == Activity.RESULT_OK) {
             val selectedImages = data?.getParcelableArrayListExtra<Uri>("selectedImages")
+            val imageUrl = data?.getStringExtra("imageUrl")
+            if (!imageUrl.isNullOrEmpty()) {
+                drawingUrl = imageUrl
+            }
             if (!selectedImages.isNullOrEmpty()) {
                 // 하나의 이미지만 사용하도록 첫 번째 URI 저장
                 selectedImageUri = selectedImages.first()
@@ -373,11 +387,12 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val moodDetail = binding.weeklyFeelEdittextEt.text.toString()
         val question = binding.weeklyQuestionEdittextEt.text.toString()
 
-        // DailyRecordSaveRequest 객체 생성 (drawing 필드는 빈 문자열로 설정)
+        val drawingValue = drawingUrl ?: ""
+
         val recordRequest = DailyRecordSaveRequest(
-            userId = 1,
+            userId = user_id,
             dailyDayRecording = recordDate,
-            drawing = "",
+            drawing = drawingValue,
             drawingTime = drawingTime,
             feedback = feedback,
             difficultIssue = difficultIssue,
@@ -393,7 +408,6 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         // GsonBuilder로 날짜 형식을 지정하여 JSON 문자열로 변환
         val gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
         val jsonString = gson.toJson(recordRequest)
-        val jsonRequestBody: RequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
 
         // 이미지 파일이 선택된 경우 파일로 변환
         if (selectedImageUri != null) {
@@ -402,6 +416,8 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                 val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
                 // "drawing"은 서버에서 인식하는 파라미터 이름입니다.
                 val drawingPart = MultipartBody.Part.createFormData("drawing", file.name, requestFile)
+
+                Log.d("HomeWeeklyFragment",recordRequest.toString())
                 // API 호출
                 RetrofitClient.service.postDailyRecordSave(recordRequest)
                     .enqueue(object : Callback<DailyRecordSaveResponse> {
@@ -469,7 +485,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             return
         }
 
-        RetrofitClient.service.getDailyRecordGet(userId = 1, date = recordDate).enqueue(object : Callback<DailyRecordGetResponse> {
+        RetrofitClient.service.getDailyRecordGet(userId = user_id, date = recordDate).enqueue(object : Callback<DailyRecordGetResponse> {
             override fun onResponse(call: Call<DailyRecordGetResponse>, response: Response<DailyRecordGetResponse>) {
                 if (!isAdded) return // ✅ 응답이 왔을 때 프래그먼트가 detach되었는지 다시 확인
                 if (response.isSuccessful) {

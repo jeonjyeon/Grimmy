@@ -33,9 +33,15 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
 
     private var monthlyRecordsMap: Map<String, String> = emptyMap()
 
+    private lateinit var sharedPref: android.content.SharedPreferences
+    private var user_id: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentHomeMonthlyBinding.inflate(inflater, container, false)
+
+        sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        user_id = sharedPref.getInt("userId", 0)
 
         // 초기 날짜 설정
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
@@ -141,7 +147,8 @@ class HomeMonthlyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedL
      * 월별 기록 데이터를 API를 통해 로드하여 monthlyRecordsMap에 저장한 후, 달력 UI를 갱신합니다.
      */
     private fun loadMonthlyRecords(year: Int, month: Int) {
-        RetrofitClient.service.getMonthlyRecord(userId = 1, year = year, month = month)
+
+        RetrofitClient.service.getMonthlyRecord(userId = user_id, year = year, month = month)
             .enqueue(object : Callback<List<MonthlyRecordGetResponse>> {
                 override fun onResponse(
                     call: Call<List<MonthlyRecordGetResponse>>,
