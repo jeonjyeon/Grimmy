@@ -403,7 +403,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
                 // "drawing"은 서버에서 인식하는 파라미터 이름입니다.
                 val drawingPart = MultipartBody.Part.createFormData("drawing", file.name, requestFile)
                 // API 호출
-                RetrofitClient.service.postDailyRecordSave(drawing = drawingPart, request = jsonRequestBody)
+                RetrofitClient.service.postDailyRecordSave(recordRequest)
                     .enqueue(object : Callback<DailyRecordSaveResponse> {
                         override fun onResponse(
                             call: Call<DailyRecordSaveResponse>,
@@ -428,7 +428,7 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
             // 이미지가 선택되지 않은 경우, 빈 문자열로 전송 (빈 MultipartBody.Part 생성)
             val emptyRequestBody = "".toRequestBody("text/plain".toMediaTypeOrNull())
             val emptyDrawingPart = MultipartBody.Part.createFormData("drawing", "", emptyRequestBody)
-            RetrofitClient.service.postDailyRecordSave(drawing = emptyDrawingPart, request = jsonRequestBody)
+            RetrofitClient.service.postDailyRecordSave(recordRequest)
                 .enqueue(object : Callback<DailyRecordSaveResponse> {
                     override fun onResponse(
                         call: Call<DailyRecordSaveResponse>,

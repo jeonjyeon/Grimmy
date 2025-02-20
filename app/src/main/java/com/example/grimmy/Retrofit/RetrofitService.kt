@@ -6,6 +6,7 @@ import com.example.grimmy.Retrofit.Request.CategoryRequest
 import com.example.grimmy.Retrofit.Request.ClassAddRequest
 import com.example.grimmy.Retrofit.Request.ClassUpdateRequest
 import com.example.grimmy.Retrofit.Request.DailyCommentSaveRequest
+import com.example.grimmy.Retrofit.Request.DailyRecordSaveRequest
 import com.example.grimmy.Retrofit.Request.KakaoAccessTokenRequest
 import com.example.grimmy.Retrofit.Request.NicknameRequest
 import com.example.grimmy.Retrofit.Request.StatusRequest
@@ -22,6 +23,7 @@ import com.example.grimmy.Retrofit.Response.DailyRecordSaveResponse
 import com.example.grimmy.Retrofit.Response.KakaoAccessTokenResponse
 import com.example.grimmy.Retrofit.Response.GoalGetResponse
 import com.example.grimmy.Retrofit.Response.MonthlyRecordGetResponse
+import com.example.grimmy.Retrofit.Response.RecordImageFileResponse
 import com.example.grimmy.Retrofit.Response.StuffDetailResponse
 import com.example.grimmy.Retrofit.Response.StuffResponse
 import com.example.grimmy.Retrofit.Response.SubGoalResponse
@@ -73,12 +75,17 @@ interface RetrofitService {
         @Body request: CategoryRequest
     ):Call<Void>
 
-    // 데일리 기록 작성
+    // 데일리 기록 이미지 저장
     @Multipart
+    @POST("/record/daily/savefile")
+    fun postRecordImageFile(
+        @Part file: MultipartBody.Part
+    ): Call<RecordImageFileResponse>
+
+    // 데일리 기록 작성
     @POST("/record/daily/save")
     fun postDailyRecordSave(
-        @Part drawing : MultipartBody.Part,
-        @Part("request") request :RequestBody
+        @Body request :DailyRecordSaveRequest
     ):Call<DailyRecordSaveResponse>
 
     // 테스트 기록 작성
