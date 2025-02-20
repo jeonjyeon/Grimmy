@@ -203,9 +203,9 @@ interface RetrofitService {
     ): Call<Void>
 
     // 시간표 수업 수정
-    @PUT("/scedule-details/{scheduleDetailId}")
+    @PUT("/scedule-details/{detailId}")
     fun updateClass(
-        @Path("detailId") scheduleDetailId: Int,
+        @Path("detailId") detailId: Int,
         @Body request: ClassUpdateRequest
     ): Call<ClassAddResponse>
 }
