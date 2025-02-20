@@ -23,10 +23,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grimmy.databinding.ActivityCustomGalleryBinding
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import com.example.grimmy.Retrofit.ContentUriRequestBody
+import com.example.grimmy.Retrofit.Response.RecordImageFileResponse
+import com.example.grimmy.Retrofit.RetrofitClient
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 
 
 class CustomGalleryActivity : AppCompatActivity() {
@@ -71,12 +83,50 @@ class CustomGalleryActivity : AppCompatActivity() {
                     putParcelableArrayListExtra("selectedImages", ArrayList(selectedImages))
                 }
                 setResult(RESULT_OK, resultIntent)
+                uploadSelectedImages(selectedImages)
                 finish()
             } else {
                 Toast.makeText(this, "선택된 이미지가 없습니다.", Toast.LENGTH_SHORT).show()
             }
+
         }
     }
+
+    private fun uploadSelectedImages(selectedImages: List<Uri>) {
+        for (uri in selectedImages) {
+            uploadImage(uri)
+        }
+    }
+
+    private fun uploadImage(uri: Uri) {
+        // ContentResolver를 사용해 MIME 타입을 동적으로 결정합니다.
+        val requestBody = ContentUriRequestBody(contentResolver, uri)
+
+        // MIME 타입 로그 출력 (오류 발생 시 디버깅에 유용)
+        val mimeType = requestBody.contentType()?.toString() ?: "unknown"
+        Log.d("Upload", "Uploading file with MIME type: $mimeType")
+
+        // 서버에서 파일 필드 이름을 "file"로 받으므로 이를 사용합니다.
+        val part = MultipartBody.Part.createFormData("file", "upload_${System.currentTimeMillis()}", requestBody)
+
+        val call = RetrofitClient.service.postRecordImageFile(part)
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.isSuccessful) {
+                    val imageUrl = response.body()
+                    Log.d("Upload", "Image URL: $imageUrl")
+                    // 필요한 추가 처리 수행
+                } else {
+                    Log.e("Upload", "Error: ${response.errorBody()?.string()}")
+                }
+            }
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.e("Upload", "Failure: ${t.message}")
+            }
+        })
+    }
+
+
 
     private fun checkPermissionsAndLoadImages() {
         val requiredPermissions = arrayOf(

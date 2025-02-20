@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
 class RetrofitClient {
@@ -53,6 +54,7 @@ class RetrofitClient {
             Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(okHttpClient) // ✅ JWT 인터셉터가 포함된 클라이언트 사용
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
         }
