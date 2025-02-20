@@ -9,8 +9,9 @@
 
     <ImageView
         android:id="@+id/item_calendar_day_img_iv"
-        android:layout_width="47dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintDimensionRatio="1:1"
         android:background="@drawable/circle_background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
