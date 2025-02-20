@@ -354,7 +354,6 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val updatedAt = getCurrentDateTime()
         val todayMood = selectedMood
 
-        // UI에서 입력받은 나머지 값들
         val feedback = binding.weeklyFeedbackEdittextEt.text.toString()
         val difficultIssue = binding.weeklyHardEdittextEt.text.toString()
         val goodIssue = binding.weeklyGoodEdittextEt.text.toString()
@@ -362,80 +361,105 @@ class HomeWeeklyFragment : Fragment(), DatePickerDialogFragment.OnDateSelectedLi
         val moodDetail = binding.weeklyFeelEdittextEt.text.toString()
         val question = binding.weeklyQuestionEdittextEt.text.toString()
 
-        // DailyRecordSaveRequest 객체 생성 (drawing 필드는 빈 문자열로 설정)
-        val recordRequest = DailyRecordSaveRequest(
-            userId = 1,
-            dailyDayRecording = recordDate,
-            drawing = "",
-            drawingTime = drawingTime,
-            feedback = feedback,
-            difficultIssue = difficultIssue,
-            goodIssue = goodIssue,
-            todayMood = todayMood,
-            moodDetail = moodDetail,
-            question = question,
-            createdAt = createdAt,
-            updatedAt = updatedAt
-        )
-
-        // JSON 문자열로 변환 후 RequestBody 생성
-        // GsonBuilder로 날짜 형식을 지정하여 JSON 문자열로 변환
-        val gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
-        val jsonString = gson.toJson(recordRequest)
-        val jsonRequestBody: RequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
-
-        // 이미지 파일이 선택된 경우 파일로 변환
         if (selectedImageUri != null) {
             val file: File? = getFileFromUri(selectedImageUri!!)
             if (file != null) {
                 val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
-                // "drawing"은 서버에서 인식하는 파라미터 이름입니다.
-                val drawingPart = MultipartBody.Part.createFormData("drawing", file.name, requestFile)
-                // API 호출
-                RetrofitClient.service.postDailyRecordSave(drawing = drawingPart, request = jsonRequestBody)
-                    .enqueue(object : Callback<DailyRecordSaveResponse> {
-                        override fun onResponse(
-                            call: Call<DailyRecordSaveResponse>,
-                            response: Response<DailyRecordSaveResponse>
-                        ) {
-                            if (response.isSuccessful) {
-                                Log.d("HomeWeeklyFragment", "[$recordDate] 기록 자동 저장 성공")
-                                Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Log.e("HomeWeeklyFragment", "기록 저장 실패: ${response.code()} ${response.message()}")
-                                Log.d("HomeWeeklyFragment",response.body().toString())
-                            }
+                val filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+                // 1. 먼저 파일을 업로드하여 S3 URL 받기
+                RetrofitClient.service.uploadFile(filePart).enqueue(object : Callback<String> {
+                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                        if (response.isSuccessful) {
+                            val uploadedImageUrl = response.body() ?: ""
+
+                            // 2. 받은 URL을 포함하여 `DailyRecordSaveRequest` 객체 생성
+                            val recordRequest = DailyRecordSaveRequest(
+                                userId = 1,
+                                dailyDayRecording = recordDate,
+                                drawing = uploadedImageUrl,  // S3 URL 사용
+                                drawingTime = drawingTime,
+                                feedback = feedback,
+                                difficultIssue = difficultIssue,
+                                goodIssue = goodIssue,
+                                todayMood = todayMood,
+                                moodDetail = moodDetail,
+                                question = question,
+                                createdAt = createdAt,
+                                updatedAt = updatedAt
+                            )
+
+                            val gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
+                            val jsonString = gson.toJson(recordRequest)
+                            val jsonRequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
+
+                            // 3. 기록 저장 API 호출
+                            RetrofitClient.service.postDailyRecordSave(jsonRequestBody)
+                                .enqueue(object : Callback<DailyRecordSaveResponse> {
+                                    override fun onResponse(call: Call<DailyRecordSaveResponse>, response: Response<DailyRecordSaveResponse>) {
+                                        if (response.isSuccessful) {
+                                            Log.d("HomeWeeklyFragment", "[$recordDate] 기록 저장 성공")
+                                            Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Log.e("HomeWeeklyFragment", "기록 저장 실패: ${response.code()} ${response.message()}")
+                                        }
+                                    }
+
+                                    override fun onFailure(call: Call<DailyRecordSaveResponse>, t: Throwable) {
+                                        Log.e("HomeWeeklyFragment", "기록 저장 에러: ${t.message}")
+                                    }
+                                })
+                        } else {
+                            Log.e("HomeWeeklyFragment", "파일 업로드 실패: ${response.code()} ${response.message()}")
                         }
-                        override fun onFailure(call: Call<DailyRecordSaveResponse>, t: Throwable) {
-                            Log.e("HomeWeeklyFragment", "기록 저장 에러: ${t.message}")
-                        }
-                    })
+                    }
+
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        Log.e("HomeWeeklyFragment", "파일 업로드 에러: ${t.message}")
+                    }
+                })
             } else {
                 Toast.makeText(requireContext(), "이미지 파일 변환 실패", Toast.LENGTH_SHORT).show()
             }
         } else {
-            // 이미지가 선택되지 않은 경우, 빈 문자열로 전송 (빈 MultipartBody.Part 생성)
-            val emptyRequestBody = "".toRequestBody("text/plain".toMediaTypeOrNull())
-            val emptyDrawingPart = MultipartBody.Part.createFormData("drawing", "", emptyRequestBody)
-            RetrofitClient.service.postDailyRecordSave(drawing = emptyDrawingPart, request = jsonRequestBody)
+            // 이미지가 없는 경우 기존 로직 그대로 수행 (빈 문자열 전달)
+            val recordRequest = DailyRecordSaveRequest(
+                userId = 1,
+                dailyDayRecording = recordDate,
+                drawing = "",  // 이미지 없음
+                drawingTime = drawingTime,
+                feedback = feedback,
+                difficultIssue = difficultIssue,
+                goodIssue = goodIssue,
+                todayMood = todayMood,
+                moodDetail = moodDetail,
+                question = question,
+                createdAt = createdAt,
+                updatedAt = updatedAt
+            )
+
+            val gson = GsonBuilder().setDateFormat("yyyy-MM-dd").create()
+            val jsonString = gson.toJson(recordRequest)
+            val jsonRequestBody = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
+
+            RetrofitClient.service.postDailyRecordSave(jsonRequestBody)
                 .enqueue(object : Callback<DailyRecordSaveResponse> {
-                    override fun onResponse(
-                        call: Call<DailyRecordSaveResponse>,
-                        response: Response<DailyRecordSaveResponse>
-                    ) {
+                    override fun onResponse(call: Call<DailyRecordSaveResponse>, response: Response<DailyRecordSaveResponse>) {
                         if (response.isSuccessful) {
-                            Log.d("HomeWeeklyFragment", "[$recordDate] 기록 자동 저장 성공")
+                            Log.d("HomeWeeklyFragment", "[$recordDate] 기록 저장 성공")
                             Toast.makeText(requireContext(), "[$recordDate] 자동 저장되었습니다.", Toast.LENGTH_SHORT).show()
                         } else {
                             Log.e("HomeWeeklyFragment", "기록 저장 실패: ${response.code()} ${response.message()}")
                         }
                     }
+
                     override fun onFailure(call: Call<DailyRecordSaveResponse>, t: Throwable) {
                         Log.e("HomeWeeklyFragment", "기록 저장 에러: ${t.message}")
                     }
                 })
         }
     }
+
 
     private fun getFileFromUri(uri: Uri): File? {
         return try {
