@@ -16,9 +16,9 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.example.grimmy.Retrofit.Response.ClassAddResponse
 import com.example.grimmy.utils.parseDayToIndex
 import com.example.grimmy.utils.parseTimeToMinutes
-import kotlin.math.ceil
 
 data class ScheduleItem(
     val dayOfWeek: Int,      // 0 ~ 6 (월~일)
@@ -80,7 +80,7 @@ class DynamicScheduleView @JvmOverloads constructor(
      * 외부에서 ClassSchedule 리스트를 받아 내부 ScheduleItem으로 변환한 뒤,
      * 최대 요일 인덱스를 확인하여 totalColumns를 결정하고, 그리드를 구성합니다.
      */
-    fun updateSchedule(classSchedules: List<ClassSchedule>) {
+    fun updateSchedule(classSchedules: List<ClassAddResponse>) {
         // 종료 시간이 시작 시간보다 작으면 자정을 넘긴 것으로 처리
         val scheduleItems = classSchedules.mapIndexed { index, cs ->
             val startTime = parseTimeToMinutes(cs.startTime)
@@ -94,7 +94,7 @@ class DynamicScheduleView @JvmOverloads constructor(
                 dayOfWeek = dayIndex,
                 startTimeMin = startTime,
                 endTimeMin = endTime,
-                courseName = cs.className,
+                courseName = cs.title,
                 color = getColorForIndex(index)  // 색상 리스트 순서대로 부여
             )
         }

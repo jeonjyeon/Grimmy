@@ -30,9 +30,9 @@ import com.example.grimmy.Retrofit.Response.TestCommentSaveResponse
 import com.example.grimmy.Retrofit.Response.TestRecordGetResponse
 import com.example.grimmy.Retrofit.Response.TestRecordSaveResponse
 import com.example.grimmy.Retrofit.Response.UserResponse
+import com.example.grimmy.Retrofit.Response.GetScheduleResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -170,14 +170,16 @@ interface RetrofitService {
     fun getGoal(): Call<GoalGetResponse>
 
     // 시간표 조회
-    @GET("/schedule/{scheduleId}")
+    @GET("/schedule/{userId}/{year}")
     fun getSchedule(
-        @Path("scheduleId") scheduleId: Int=1
-    ): Call<ResponseBody>
+        @Path("userId") userId: Int,
+        @Path("year") year: Int
+    ): Call<GetScheduleResponse>
 
     // 시간표 수업 추가
-    @POST("/schedule-details")
+    @POST("/schedule-details/{userId}")
     fun addClass(
+        @Path("userId") userId: Int,
         @Body request: ClassAddRequest
     ): Call<ClassAddResponse>
 
